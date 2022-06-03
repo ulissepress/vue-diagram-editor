@@ -1,0 +1,15 @@
+html,
+body {
+    position: relative;
+    height: 100%;
+    margin: 0;
+    padding: 5px;
+    background-color: #f0f2f5;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+    background-color: #daeaf5;
+    border: 1px solid #8db6d1;
+    padding: 4px 8px;
+}
