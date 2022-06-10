@@ -24,27 +24,26 @@
                     <component v-if="item.component" :is="item.component" :item="item" />
                     <div v-else>{{ item.title }}</div>
 
-                    <div class="decorator decorator-delete" v-if="item.id == currentTarget" @click.stop="deleteItem" title="delete item">&times;</div>
-                    <div class="decorator decorator-size"   v-if="item.id == currentTarget">X: {{ item.x }} &nbsp; Y: {{ item.y}} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}}</div>
+                    <div class="decorator decorator-delete" v-if="item.id == currentTarget" :style="{ zoom: 1/zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
+                    <div class="decorator decorator-size"   v-if="item.id == currentTarget" :style="{ zoom: 1/zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y}} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}}</div>
             </div>
             <Moveable v-if="targetDefined"
                       ref     = "moveable"
-                      :target = "['.target']"
-                      
-                      :zoom   = "zoomFactor"
+                      :target = "['.target']"                      
+                      :zoom   = "1 / zoomFactor"
                       :origin = "false"  
                       
                       :throttleRotate = "1"
                       :throttleResize = "1"
                       
-                      :roundable="true"
-                      :draggable="true"
-                      :rotatable="true"
-                      :resizable="true"
+                      :roundable = "true"
+                      :draggable = "true"
+                      :rotatable = "true"
+                      :resizable = "true"
 
-                      @drag="onDrag"
-                      @resize="onResize"
-                      @rotate="onRotate" />
+                      @drag   = "onDrag"
+                      @resize = "onResize"
+                      @rotate = "onRotate" />
         </div>
     </vue-infinite-viewer>
 </template>
