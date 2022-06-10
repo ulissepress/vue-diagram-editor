@@ -8,7 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vueuse/core": "^8.6.0",
     "vue": "^3.2.25",
+    "vue-guides": "^0.17.1",
     "vue3-infinite-viewer": "^0.3.0",
     "vue3-moveable": "^0.4.8"
   },
