@@ -23,8 +23,8 @@
                         :origin = "false"  
                         
                         :throttleDrag   = "1"
-                        :throttleRotate = "1"
                         :throttleResize = "1"
+                        :throttleRotate = "shiftPressed ? 45 : 1"
                         :keepRatio      = "shiftPressed"
 
 
@@ -135,7 +135,7 @@ function createItem(title : string, component?: string, componentOptions?: any) 
         y: Math.floor(Math.random() * 200),
         z: 0,
         w: 100 + Math.floor(Math.random() * 400),
-        h: 50 + Math.floor(Math.random() * 200),
+        h: 50  + Math.floor(Math.random() * 200),
         r: 0,
         background: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
         component,
