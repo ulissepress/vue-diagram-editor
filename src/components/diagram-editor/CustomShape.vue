@@ -6,6 +6,8 @@
 </template>
 
 <script setup lang="ts">
+import { onUpdated } from 'vue';
 
+onUpdated(()=> console.log('CustomShape updated'))
 </script>
 

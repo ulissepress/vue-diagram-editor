@@ -1,5 +1,6 @@
 <template>
-   <div class="shape-ellipse" :style="{'backgroundColor': props.item.background }"></div>
+   <div class="shape-ellipse" :style="{'backgroundColor': props.item.background }">
+   {{ new Date() }}</div>
 </template>
 
 <style scoped>

@@ -13,11 +13,15 @@
 
 <script setup lang="ts">
 
+import { onUpdated } from 'vue';
 import Item from './DiagramEditor.vue';
 
 const props = defineProps({
   item: Item
 })
+
+onUpdated(()=> console.log('Image updated'))
+
 
 </script>
 
