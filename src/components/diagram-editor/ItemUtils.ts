@@ -10,16 +10,22 @@ export interface Item {
     h: number;
     r: number;
 
+    borderRadius: number;
+
     background: string;
 
     component?:        string;
     componentOptions?: any;
+
+    locked?: boolean;
 }
 
 let counter = 0;
 
 class _ItemUtils {
     createItem(title : string, component?: string, componentOptions?: any) : Item {
+        if(!component) component = "Shape";
+        
         return {
             id: "ID" + (++counter),
             title,
@@ -29,6 +35,7 @@ class _ItemUtils {
             w: 100 + Math.floor(Math.random() * 400),
             h: 50  + Math.floor(Math.random() * 200),
             r: 0,
+            borderRadius: 0,
             background: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
             component,
             componentOptions

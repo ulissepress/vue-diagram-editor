@@ -1,5 +1,5 @@
 <template>
-   <img class="image" :src="item.componentOptions.src" />
+   <img class="image" :src="item.componentOptions.src" :style="{ borderRadius: item.borderRadius + 'px' }"/>
 </template>
 
 <style scoped>
@@ -13,13 +13,13 @@
 
 <script setup lang="ts">
 
-import { onUpdated } from 'vue';
+import { onMounted } from 'vue';
 import { Item } from './ItemUtils';
 
 const { item } = defineProps<{item: Item}>();
 
 
-onUpdated(()=> console.log('Image updated'))
+onMounted(()=> console.log('Image onMounted'))
 
 
 </script>

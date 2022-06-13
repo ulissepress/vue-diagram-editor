@@ -1,5 +1,5 @@
 <template>
-   <div class="shape-ellipse" :style="{'backgroundColor': item.background }"></div>
+   <div class="shape-ellipse" :style="{'backgroundColor': item.background }">{{ item.title }}</div>
 </template>
 
 <style scoped>
@@ -8,6 +8,10 @@
     height: 100%;
     border-radius: 50%;
     border: 1px solid black;
+
+    display: flex;
+    justify-content: center;
+    align-items: center; 
 
 }
 </style>
