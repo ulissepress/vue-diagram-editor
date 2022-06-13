@@ -1,6 +1,5 @@
 <template>
-   <div class="shape-ellipse" :style="{'backgroundColor': props.item.background }">
-   {{ new Date() }}</div>
+   <div class="shape-ellipse" :style="{'backgroundColor': item.background }"></div>
 </template>
 
 <style scoped>
@@ -13,11 +12,9 @@
 }
 </style>
 
-<script setup lang="ts">
+<script setup lang="ts">import { Item } from './ItemUtils';
 
-const props = defineProps({
-  item: Object
-})
+const { item } = defineProps<{item: Item}>();
 
 </script>
 

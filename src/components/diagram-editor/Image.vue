@@ -1,5 +1,5 @@
 <template>
-   <img class="image" :src="props.item.componentOptions.src" />
+   <img class="image" :src="item.componentOptions.src" />
 </template>
 
 <style scoped>
@@ -14,11 +14,10 @@
 <script setup lang="ts">
 
 import { onUpdated } from 'vue';
-import Item from './DiagramEditor.vue';
+import { Item } from './ItemUtils';
 
-const props = defineProps({
-  item: Item
-})
+const { item } = defineProps<{item: Item}>();
+
 
 onUpdated(()=> console.log('Image updated'))
 

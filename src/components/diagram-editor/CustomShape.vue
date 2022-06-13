@@ -7,6 +7,9 @@
 
 <script setup lang="ts">
 import { onUpdated } from 'vue';
+import { Item } from './ItemUtils';
+
+const { item } = defineProps<{item: Item}>();
 
 onUpdated(()=> console.log('CustomShape updated'))
 </script>

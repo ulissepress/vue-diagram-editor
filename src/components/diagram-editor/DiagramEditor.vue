@@ -14,7 +14,7 @@
                         <div v-else>{{ item.title }}</div>
 
                         <div class="decorator decorator-delete" v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
-                        <div class="decorator decorator-size"   v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y}} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
+                        <div class="decorator decorator-size"   v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
                 </div>
                 <Moveable  v-if = "targetDefined"
                         ref     = "moveable"
@@ -40,9 +40,9 @@
                         :rotatable = "true"
                         :resizable = "true"
 
-                        @drag   = "onDrag"
-                        @resize = "onResize"
-                        @rotate = "onRotate" />
+                        @drag      = "onDrag"
+                        @resize    = "onResize"
+                        @rotate    = "onRotate" />
             </div> <!-- viewport -->
         </VueInfiniteViewer>
     </div> <!-- editor-container -->    
@@ -50,7 +50,7 @@
     <div class="toolbar">
         ZOOM: <button @click="zoomOut">-</button> {{ zoomFactor * 100 }}% <button @click="zoomIn">+</button>&nbsp;&nbsp;<button @click="zoomReset">Reset</button>
         <br/><br/>
-        <button @click="addNewItem">Add New</button>
+        <button @click="emit('add-item')">Add New</button>
         &nbsp;
         <button @click="deleteItem" :disabled="!targetDefined">Delete</button>
         &nbsp;
@@ -70,11 +70,12 @@
 <script setup lang="ts">
 
 import { useKeyModifier } from '@vueuse/core';
-import { computed, nextTick, onMounted, ref, StyleValue } from "vue";
+import { computed, nextTick, onMounted, onUpdated, ref, StyleValue } from "vue";
 import Guides from "vue-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
 import { Item, ItemUtils } from './ItemUtils';
+
 
 // The component props
 export interface DiagramEditorProps {
@@ -95,6 +96,8 @@ onMounted(() => {
     //@ts-ignore
     if(vGuides.value) vGuides.value!.resize();
 });
+
+onUpdated(()=> console.log('DiagramEditor updated'))
 
 
 const zooms            = [5, 10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 500];        // must contain the value 100
@@ -127,12 +130,6 @@ function getItemStyle(item: Item) : StyleValue {
     }
 }
 
-
-function findItem(el: HTMLElement) : Item | undefined {
-    const id = el.dataset.itemId;
-    return items.find(v => v.id == id);
-}
-
 function selectItem(item: Item)  : void {
     // Item already selected
     if(item === selectedItem.value) return;
@@ -148,34 +145,33 @@ function selectNone() : void {
 }
 
 function onDrag(e: any) : void {
-    const item = findItem(e.target);
-    if(!item) return;
+    if(!selectedItem.value) return;
 
     //console.log('ondrag', item, e);
-    item.x = Math.floor(e.beforeTranslate[0]);
-    item.y = Math.floor(e.beforeTranslate[1]);
+    selectedItem.value.x = Math.floor(e.beforeTranslate[0]);
+    selectedItem.value.y = Math.floor(e.beforeTranslate[1]);
 
     e.target.style.transform = e.transform;    
 }
 
+
 function onResize(e: any) : void {
-    const item = findItem(e.target);
-    if(!item) return;
+    if(!selectedItem.value) return;
 
     // console.log('onresize', item, e);
-    item.w = Math.floor(e.width);
-    item.h = Math.floor(e.height);
+    selectedItem.value.w = Math.floor(e.width);
+    selectedItem.value.h = Math.floor(e.height);
 
-    e.target.style.width  = `${item.w}px`;
-    e.target.style.height = `${item.h}px`;
+    e.target.style.width  = `${selectedItem.value.w}px`;
+    e.target.style.height = `${selectedItem.value.h}px`;
 }
 
+
 function onRotate(e: any) : void {
-    const item = findItem(e.target);
-    if(!item) return;
+    if(!selectedItem.value) return;
 
     // console.log('onrotate', item, e);
-    item.r = e.beforeRotate;
+    selectedItem.value.r = e.beforeRotate % 360;
     e.target.style.transform = e.drag.transform;
 }
 
@@ -202,10 +198,7 @@ function changeItemColor() : void {
     if(selectedItem.value) selectedItem.value.background = `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`
 }
 
-function addNewItem() {
-    emit("add-item");
-}
-
+// TODO: to emit delete-item event
 function deleteItem() {
     if(!selectedItem.value) return;
     
