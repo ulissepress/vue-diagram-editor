@@ -16,9 +16,14 @@
 }
 </style>
 
-<script setup lang="ts">import { Item } from './ItemUtils';
+<script setup lang="ts">
+import { onMounted, onUpdated } from 'vue';
+import { Item } from './ItemUtils';
 
 const { item } = defineProps<{item: Item}>();
+
+onMounted(()=> console.log('Ellipse mounted'))
+onUpdated(()=> console.log('Ellipse updated'))
 
 </script>
 

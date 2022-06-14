@@ -26,8 +26,9 @@ function addNewItem() {
     items.push(ItemUtils.createItem('New Item'));
 }
 
-function deleteItem(item: Item) {    
-    items.splice(items.indexOf(item), 1)
+function deleteItem(item: Item) {
+    let idx = items.findIndex(v => v.id === item.id);
+    if(idx !== -1) items.splice(idx, 1)
 }
 
 </script>

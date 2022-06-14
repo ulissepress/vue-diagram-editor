@@ -13,14 +13,14 @@
 
 <script setup lang="ts">
 
-import { onMounted } from 'vue';
+import { onMounted, onUpdated } from 'vue';
 import { Item } from './ItemUtils';
 
 const { item } = defineProps<{item: Item}>();
 
 
-onMounted(()=> console.log('Image onMounted'))
-
+onMounted(()=> console.log('Image mounted'))
+onUpdated(()=> console.log('Image updated'))
 
 </script>
 
