@@ -57,13 +57,13 @@
         <br/><br/>
         <button @click="emit('add-item')">Add New</button>
         &nbsp;
-        <button @click="deleteItem" :disabled="!targetDefined">Delete</button>
+        <button @click="deleteItem" :disabled="!targetDefined || selectedItem?.locked === true">Delete</button>
         &nbsp;
         <button @click="changeItemColor" :disabled="!targetDefined || selectedItem?.locked === true">Change Color</button>
         <br/><br/>
-        <button @click="sendToBack" :disabled="!targetDefined">Send to back</button>
+        <button @click="sendToBack" :disabled="!targetDefined || selectedItem?.locked === true">Send to back</button>
         &nbsp;
-        <button @click="bringToFront" :disabled="!targetDefined">Bring to front</button>
+        <button @click="bringToFront" :disabled="!targetDefined || selectedItem?.locked === true">Bring to front</button>
         <p>Press SHIFT key to keep aspect ratio while resizing</p>       
         <div v-if="targetDefined">
             <h3>Item Data</h3>
@@ -104,9 +104,6 @@ onMounted(() => {
     //@ts-ignore
     if(vGuides.value) vGuides.value!.resize();
 });
-
-
-
 const zooms            = [5, 10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 500];        // must contain the value 100
 const defaultZoomIndex = zooms.findIndex(v => v === 100);     
 const zoom             = ref(defaultZoomIndex); 
@@ -122,7 +119,6 @@ const selectedItem   = ref<Item | null>(null);
 const targetDefined  = computed(() => selectedItem.value !== null)
 
 const shiftPressed = useKeyModifier('Shift')
-
 
 function getItemStyle(item: Item) : StyleValue {
     let t = `translate(${item.x}px, ${item.y}px)`;
@@ -154,25 +150,30 @@ function selectNone() : void {
 function onDrag(e: any) : void {
     if(!selectedItem.value) return;
 
-    //console.log('ondrag', item, e);
+    // console.log('ondrag', e);
     selectedItem.value.x = Math.floor(e.beforeTranslate[0]);
     selectedItem.value.y = Math.floor(e.beforeTranslate[1]);
-
-    e.target.style.transform = e.transform;    
+    e.target.style.transform = e.transform;  
 }
 
+function onDragEnd(e: any) : void {
+    if(!selectedItem.value) return;
+
+    //console.log('ondragEnd', e);
+    selectedItem.value.x = Math.floor(e.lastEvent.beforeTranslate[0]);
+    selectedItem.value.y = Math.floor(e.lastEvent.beforeTranslate[1]);
+}
 
 function onResize(e: any) : void {
     if(!selectedItem.value) return;
 
-    // console.log('onresize', item, e);
+    // console.log('onresize', e);
     selectedItem.value.w = Math.floor(e.width);
     selectedItem.value.h = Math.floor(e.height);
 
-    e.target.style.width  = `${selectedItem.value.w}px`;
-    e.target.style.height = `${selectedItem.value.h}px`;
+    e.target.style.width  = `${Math.floor(e.width)}px`;
+    e.target.style.height = `${Math.floor(e.height)}px`;
 }
-
 
 function onRotate(e: any) : void {
     if(!selectedItem.value) return;
