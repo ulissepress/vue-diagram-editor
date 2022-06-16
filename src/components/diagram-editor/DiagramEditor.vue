@@ -6,6 +6,9 @@
 
         <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll">
             <div ref="viewport" class="viewport" @click="selectNone">
+                <svg ref="canvas" style="position:absolute; left:0px; top:0px; border: 2px solid red; z-index: -100000;" width="100%" height="100%" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <component v-for="(c, i) in connections" :key="c.id" is="Line" :from="getItemById(c.from)" :to="getItemById(c.to)" />                                                             
+                </svg>
                 <div v-for="(item, i) in items" :key           = "item.id" 
                                                 :data-item-id  = "item.id"
                                                 :class         = "{ 'item' : true, 'target': item.id === selectedItem?.id, 'locked': item.locked === true}" 
@@ -66,8 +69,8 @@
         <button @click="bringToFront" :disabled="!targetDefined || selectedItem?.locked === true">Bring to front</button>
         <p>Press SHIFT key to keep aspect ratio while resizing</p>       
         <div v-if="targetDefined">
-            <h3>Item Data</h3>
-            <pre>{{ selectedItem }}</pre>
+            <h3>Selected Item</h3>
+            <pre>{{ selectedItem }}</pre>            
         </div> 
     </div>
 </template>
@@ -79,15 +82,16 @@ import { computed, nextTick, onMounted, ref, StyleValue } from "vue";
 import Guides from "vue-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
-import { Item, ItemUtils } from './ItemUtils';
+import { Item, ItemConnection, ItemUtils } from './ItemUtils';
 
 
-// The component props
+// The component props and events
+// ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
-    items: Item[]
+    items: Item[],
+    connections: ItemConnection[]
 }
 
-// The component events
 export interface DiagramEditorEvents {
     (e: 'add-item'): void
     (e: 'delete-item', item: Item): void
@@ -95,15 +99,20 @@ export interface DiagramEditorEvents {
 
 const { items } = defineProps<DiagramEditorProps>();
 const emit      = defineEmits<DiagramEditorEvents>();
+// ------------------------------------------------------------------------------------------------------------------------
 
 onMounted(() => {
     console.log('DiagramEditor mounted')
 
     //@ts-ignore
-    if(hGuides.value) hGuides.value!.resize();
+    if(hGuides.value) hGuides.value.resize();
     //@ts-ignore
-    if(vGuides.value) vGuides.value!.resize();
+    if(vGuides.value) vGuides.value.resize();
 });
+
+
+// The component state
+// ------------------------------------------------------------------------------------------------------------------------
 const zooms            = [5, 10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 500];        // must contain the value 100
 const defaultZoomIndex = zooms.findIndex(v => v === 100);     
 const zoom             = ref(defaultZoomIndex); 
@@ -112,6 +121,7 @@ const guideUnits       = 50; // computed(() => zoomFactor.value < .5 ? 0 : 50);
 
 const viewer         = ref();
 const viewport       = ref()
+const canvas         = ref<SVGElement>()
 const moveable       = ref();
 const hGuides        = ref();
 const vGuides        = ref();
@@ -199,6 +209,13 @@ function onScroll(e: any) : void {
     if(hGuides.value) { hGuides.value.scroll(e.scrollLeft); hGuides.value.scrollGuides(e.scrollTop); }
     //@ts-ignore
     if(vGuides.value) { vGuides.value.scroll(e.scrollTop); vGuides.value.scrollGuides(e.scrollLeft); }
+
+
+    if(!canvas.value) return;
+    console.log('onscroll', e);
+    canvas.value.style.transform = `translate(${e.scrollLeft}px, ${e.scrollTop}px)`;
+    //canvas.value.scrollTo(e.scrollLeft, e.scrollTop);
+
 }
 
 
@@ -228,6 +245,29 @@ function elementGuidelines() {
     if(!viewport.value) return [];
 
     return Array.prototype.slice.call(viewport.value!.querySelectorAll(".item"), 0).filter(n => !n.classList.contains('target'))
+}
+
+function getItemById(id: string) : Item | undefined {
+    return items.find(n => n.id == id);
+}
+
+function findNodePosition(node: HTMLElement) {
+  let x = node.offsetLeft;
+  let y = node.offsetTop;
+
+//   let el: HTMLElement | null = node;
+  
+//   while(el != null) {
+//     el = el.offsetParent as HTMLElement;
+//     if(el) {
+//         x += el.offsetLeft;
+//         y +=  el.offsetTop;
+//     }
+//   }
+  return {
+      "x": x,
+      "y": y
+  };
 }
 </script>
 

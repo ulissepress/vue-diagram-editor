@@ -20,6 +20,12 @@ export interface Item {
     locked?: boolean;
 }
 
+export interface ItemConnection {
+    id: string,
+    from: string,
+    to: string
+}
+
 let counter = 0;
 
 class _ItemUtils {
