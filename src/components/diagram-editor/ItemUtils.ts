@@ -11,6 +11,7 @@ export interface Item {
     r: number;
 
     borderRadius: number;
+    
     supportsRoundable: boolean;
     supportsResizable: boolean;
 
@@ -31,12 +32,10 @@ export interface ItemConnection {
 let counter = 0;
 
 class _ItemUtils {
-    createItem(title : string, component?: string, componentOptions?: any) : Item {
-        if(!component) component = "Shape";
-
+    createItem(item?: Partial<Item>) : Item {
         return {
             id: "ID" + (++counter),
-            title,
+            title: "Item " + counter,
             
             x: Math.floor(Math.random() * 400),
             y: Math.floor(Math.random() * 200),
@@ -46,15 +45,14 @@ class _ItemUtils {
             r: 0,
 
             borderRadius: 0,
-            supportsRoundable: ['Shape', 'Image'].includes(component),
-
-            supportsResizable: !['CustomShape'].includes(component),
+            supportsRoundable: item?.component || ['Shape', 'Image'].includes(item?.component || ''),
+            supportsResizable: true,
 
             background: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
+            component: 'Shape',
 
-            component,
-            componentOptions
-        }
+            ...item
+        } as Item
     }
 
     deleteItem(items: Item[], item: Item) {
