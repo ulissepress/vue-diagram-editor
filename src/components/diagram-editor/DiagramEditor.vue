@@ -10,9 +10,7 @@
         <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll">
             <div ref="viewport" class="viewport" @click="selectNone">
                 <!-- Render Connections -->
-                <svg ref="canvas" style="position:absolute; left:0px; top:0px; border: 2px solid red; z-index: -100000;" width="100%" height="100%" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <component v-for="(c, i) in connections" :key="c.id" is="Line" :from="getItemById(c.from)" :to="getItemById(c.to)" />                                                             
-                </svg>
+                <component v-for="(c, i) in connections" :key="c.id" is="Connection" :from="getItemById(c.from)" :to="getItemById(c.to)" :type="c.type" />                                                             
 
                 <!-- Render Items -->
                 <div v-for="(item, i) in items" :key           = "item.id" 

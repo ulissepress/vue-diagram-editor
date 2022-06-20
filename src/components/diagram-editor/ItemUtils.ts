@@ -23,10 +23,16 @@ export interface Item {
     locked?: boolean;
 }
 
+export enum ConnectionType {
+    LINE  = "line",
+    CURVE = "curve"
+}
+
 export interface ItemConnection {
     id: string,
     from: string,
-    to: string
+    to: string,
+    type?: ConnectionType
 }
 
 let counter = 0;
