@@ -44,10 +44,10 @@
                         :isDisplayInnerSnapDigit = "true"
                         :elementGuidelines       = "elementGuidelines()"
                         
-                        :roundable = "selectedItemActive"
+                        :roundable = "selectedItemActive && selectedItem?.supportsRoundable === true"
                         :draggable = "selectedItemActive"
                         :rotatable = "selectedItemActive"
-                        :resizable = "selectedItemActive"
+                        :resizable = "selectedItemActive && selectedItem?.supportsResizable === true"
 
                         @drag      = "onDrag"
                         @resize    = "onResize"

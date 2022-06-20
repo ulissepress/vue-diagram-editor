@@ -12,6 +12,7 @@ export interface Item {
 
     borderRadius: number;
     supportsRoundable: boolean;
+    supportsResizable: boolean;
 
     background: string;
 
@@ -46,6 +47,8 @@ class _ItemUtils {
 
             borderRadius: 0,
             supportsRoundable: ['Shape', 'Image'].includes(component),
+
+            supportsResizable: !['CustomShape'].includes(component),
 
             background: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
 
