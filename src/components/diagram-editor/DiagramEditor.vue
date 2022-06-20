@@ -17,7 +17,7 @@
                                                 :class         = "{ 'item' : true, 'target': item.id === selectedItem?.id, 'locked': item.locked === true}" 
                                                 :style         = "getItemStyle(item)"
                                                 @click.stop    = "selectItem(item)" 
-                                                @dblclick.stop = "item.locked = item.locked ? false : true"> 
+                                                @dblclick.stop = "lockItem(item)"> 
 
                         <component v-if="item.component" :is="item.component" :item="item" />
 
@@ -49,10 +49,21 @@
                         :rotatable = "selectedItemActive"
                         :resizable = "selectedItemActive && selectedItem?.supportsResizable === true"
 
+                        @dragStart = "onDragStart"
                         @drag      = "onDrag"
-                        @resize    = "onResize"
-                        @rotate    = "onRotate"
-                        @round     = "onRound"
+                        @dragEnd   = "onDragEnd"
+
+                        @resizeStart = "onResizeStart"
+                        @resize      = "onResize"
+                        @resizeEnd   = "onResizeEnd"
+                        
+                        @rotateStart = "onRotateStart"
+                        @rotate      = "onRotate"
+                        @rotateEnd   = "onRotateEnd"
+
+                        @roundStart  = "onRoundStart"
+                        @round       = "onRound"
+                        @roundEnd    = "onRoundEnd"
                         />
             </div> <!-- viewport -->
         </VueInfiniteViewer>
@@ -66,9 +77,11 @@
         <button @click="deleteItem(selectedItem!)"  :disabled="!selectedItemActive">Delete</button>&nbsp;
         <button @click="changeItemColor"            :disabled="!selectedItemActive">Change Color</button><br/><br/>
         <button @click="sendToBack"                 :disabled="!selectedItemActive">Send to back</button>&nbsp;
-        <button @click="bringToFront"               :disabled="!selectedItemActive">Bring to front</button>
-        <p>Press SHIFT key to keep aspect ratio while resizing</p>       
+        <button @click="bringToFront"               :disabled="!selectedItemActive">Bring to front</button><br/><br/>
+        <button @click="undo"                       :disabled="!historyManager.canUndo()">Undo</button>&nbsp;
+        <button @click="redo"                       :disabled="!historyManager.canRedo()">Redo</button>
         <div v-if="targetDefined">
+            <p>Press SHIFT key to keep aspect ratio while resizing</p>
             <h3>Selected Item</h3>
             <pre>{{ selectedItem }}</pre>            
         </div> 
@@ -78,10 +91,16 @@
 <script setup lang="ts">
 
 import { useKeyModifier } from '@vueuse/core';
-import { computed, nextTick, onMounted, ref, StyleValue } from "vue";
+import { computed, nextTick, onMounted, onUpdated, ref, StyleValue } from "vue";
 import Guides from "vue-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
+import HistoryManager from './commands/HistoryManager';
+import { LockCommand, UnlockCommand } from './commands/LockCommand';
+import MoveCommand from './commands/MoveCommand';
+import ResizeCommand from './commands/ResizeCommand';
+import RotateCommand from './commands/RotateCommand';
+import RoundCommand from './commands/RoundCommand';
 import { Item, ItemConnection, ItemUtils } from './ItemUtils';
 
 
@@ -110,6 +129,10 @@ onMounted(() => {
     if(vGuides.value) vGuides.value.resize();
 });
 
+onUpdated(() => {
+    //console.log('DiagramEditor updated')
+})
+
 
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
@@ -129,13 +152,18 @@ const selectedItem       = ref<Item | null>(null);
 const targetDefined      = computed(() => selectedItem.value !== null)
 const selectedItemActive = computed(() => selectedItem.value != null && !selectedItem.value.locked === true)
 
+const shiftPressed   = useKeyModifier('Shift')
+const historyManager = ref(new HistoryManager());
 
+let originPos:   [number, number] = [0, 0];
+let originSize:  [number, number] = [0, 0];
+let originAngle: number = 0;
+let originRound: number = 0;
 
-const shiftPressed = useKeyModifier('Shift')
 
 function getItemStyle(item: Item) : StyleValue {
     let t = `translate(${item.x}px, ${item.y}px)`;
-    if(item.r != 0) t += ` rotate(${item.r})`
+    if(item.r !== 0) t += ` rotate(${item.r}deg)`
 
     const style: StyleValue = {
         "width":            item.w + 'px',
@@ -164,6 +192,14 @@ function selectNone() : void {
     selectedItem.value = null;
 }
 
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Drag item
+// ---------------------------------------------------------------------------------------------------------------------
+function onDragStart(e: any) : void {
+    if(selectedItem.value) originPos = [selectedItem.value.x, selectedItem.value.y];
+}
+
 function onDrag(e: any) : void {
     if(!selectedItem.value) return;
 
@@ -174,11 +210,15 @@ function onDrag(e: any) : void {
 }
 
 function onDragEnd(e: any) : void {
-    if(!selectedItem.value) return;
+    historyManager.value.execute(new MoveCommand(selectedItem.value!, originPos));
+}
 
-    //console.log('ondragEnd', e);
-    selectedItem.value.x = Math.floor(e.lastEvent.beforeTranslate[0]);
-    selectedItem.value.y = Math.floor(e.lastEvent.beforeTranslate[1]);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Resize item
+// ---------------------------------------------------------------------------------------------------------------------
+function onResizeStart(e: any) : void {
+    if(selectedItem.value) originSize = [selectedItem.value.w, selectedItem.value.h];
 }
 
 function onResize(e: any) : void {
@@ -192,12 +232,36 @@ function onResize(e: any) : void {
     e.target.style.height = `${Math.floor(e.height)}px`;
 }
 
+function onResizeEnd(e: any) : void {
+    historyManager.value.execute(new ResizeCommand(selectedItem.value!, originSize));
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Rotate item
+// ---------------------------------------------------------------------------------------------------------------------
+function onRotateStart(e: any) : void {
+    if(selectedItem.value) originAngle = selectedItem.value.r;
+}
+
 function onRotate(e: any) : void {
     if(!selectedItem.value) return;
 
     // console.log('onrotate', item, e);    
     selectedItem.value.r = e.beforeRotate % 360;
     e.target.style.transform = e.drag.transform;
+}
+
+function onRotateEnd(e: any) : void {
+    historyManager.value.execute(new RotateCommand(selectedItem.value!, originAngle));        
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Round item
+// ---------------------------------------------------------------------------------------------------------------------
+function onRoundStart(e: any) : void {
+    if(selectedItem.value) originRound = selectedItem.value.borderRadius;
 }
 
 function onRound(e: any) : void {
@@ -208,7 +272,16 @@ function onRound(e: any) : void {
     e.target.style.borderRadius = e.borderRadius;
 }
 
+function onRoundEnd(e: any) : void {
+    historyManager.value.execute(new RoundCommand(selectedItem.value!, originRound));        
+}
 
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Scrolling
+// ---------------------------------------------------------------------------------------------------------------------
 function onScroll(e: any) : void {
     if(e.ctrlKey) e.deltaY < 0 ? zoomIn() : zoomOut();
 
@@ -243,6 +316,10 @@ function deleteItem(item: Item) {
     selectNone();
 }
 
+function lockItem(item: Item) {
+    historyManager.value.execute(item.locked === true ? new UnlockCommand(item) : new LockCommand(item));
+}
+
 //@ts-ignore
 function zoomReset() { zoom.value = defaultZoomIndex; viewer.value!.scrollCenter(); }
 function zoomIn()    { if(zoom.value < zooms.length - 1) zoom.value++; }
@@ -258,24 +335,16 @@ function getItemById(id: string) : Item | undefined {
     return items.find(n => n.id == id);
 }
 
-function findNodePosition(node: HTMLElement) {
-  let x = node.offsetLeft;
-  let y = node.offsetTop;
-
-//   let el: HTMLElement | null = node;
-  
-//   while(el != null) {
-//     el = el.offsetParent as HTMLElement;
-//     if(el) {
-//         x += el.offsetLeft;
-//         y +=  el.offsetTop;
-//     }
-//   }
-  return {
-      "x": x,
-      "y": y
-  };
+function undo() {  
+    historyManager.value?.undo(); 
+    nextTick(() => moveable.value?.updateTarget());
 }
+
+function redo() {  
+    historyManager.value?.redo(); 
+    nextTick(() => moveable.value?.updateTarget());
+}
+
 </script>
 
 
@@ -338,8 +407,8 @@ function findNodePosition(node: HTMLElement) {
     font-weight: bold;
 }
 
-.item.locked {
-    
+.item.target.locked {
+    border: 3px dotted red;
 }
 
 

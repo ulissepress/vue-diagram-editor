@@ -21,7 +21,7 @@ let items   = reactive([
     a1, a2, a3,
     ItemUtils.createItem( { title: 'Item B',            component: "Shape" } ),
     ItemUtils.createItem( { title: 'Item (no resize)',  component: "Shape", supportsResizable: false } ),
-    ItemUtils.createItem( { title: 'Item D',    component: "CustomShape" } ),
+    ItemUtils.createItem( { title: 'Item D',    component: "CustomShape", supportsRoundable: false } ),
     ItemUtils.createItem( { title: 'Ellipse 1', component: "Ellipse", w: 400, h: 200  } ),
     ItemUtils.createItem( { title: 'Circle',    component: "Ellipse", w: 200, h: 200 } ),
     ItemUtils.createItem( { title: 'My Image',  component: "Image", componentOptions: { src : "https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80" }} ),

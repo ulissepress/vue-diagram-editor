@@ -45,7 +45,7 @@ class _ItemUtils {
             r: 0,
 
             borderRadius: 0,
-            supportsRoundable: item?.component || ['Shape', 'Image'].includes(item?.component || ''),
+            supportsRoundable: true,
             supportsResizable: true,
 
             background: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
