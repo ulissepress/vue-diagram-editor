@@ -1,6 +1,5 @@
 <template>
-    <div style="width: 100%; height: 90%;">
-        <h1 style="text-align: center;">Vue3 Diagram Editor</h1>
+    <div style="width: 100%; height: 95%;">
         <DiagramEditor  :items       = "items" 
                         :connections = "connections"
                         @add-item    = "addNewItem" 
@@ -11,7 +10,8 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 import DiagramEditor from './components/diagram-editor/DiagramEditor.vue';
-import { ConnectionStyle, ConnectionType, Item, ItemConnection, ItemUtils } from './components/diagram-editor/ItemUtils';
+import ItemUtils from './components/diagram-editor/ItemUtils';
+import { ConnectionStyle, ConnectionType, Item, ItemConnection } from './components/diagram-editor/types';
 
 const a1 = ItemUtils.createItem( { id: 'a1' });
 const a2 = ItemUtils.createItem( { id: 'a2' });
@@ -32,7 +32,7 @@ let items = reactive([
 let connections: ItemConnection[] = [
     ItemUtils.createConnection('a1', 'a2'),
     ItemUtils.createConnection('a1', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DOTTED }),
-    ItemUtils.createConnection('a2', 'a3', { type: ConnectionType.CURVE, color: "red", thick: 3, style: ConnectionStyle.DASHED }),
+    ItemUtils.createConnection('a2', 'a3', { type: ConnectionType.CURVE, color: "red", thick: 4, style: ConnectionStyle.DASHED }),
 ];
 
 

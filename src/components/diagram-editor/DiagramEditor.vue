@@ -117,8 +117,8 @@ import MoveCommand from './commands/MoveCommand';
 import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
-import EditorTools from './EditorTools';
-import { Item, ItemConnection, ItemUtils } from './ItemUtils';
+import ItemUtils from './ItemUtils';
+import { EditorTools, Item, ItemConnection } from './types';
 
 
 // The component props and events

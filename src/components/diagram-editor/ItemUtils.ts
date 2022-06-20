@@ -1,53 +1,8 @@
-
-export interface Item {
-    id:    string;
-    title: string;
-    
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    h: number;
-    r: number;
-
-    borderRadius: number;
-    
-    supportsRoundable: boolean;
-    supportsResizable: boolean;
-
-    background: string;
-
-    component?:        string;
-    componentOptions?: any;
-
-    locked?: boolean;
-}
-
-export enum ConnectionType {
-    LINE  = "line",
-    CURVE = "curve"
-}
-
-
-export enum ConnectionStyle {
-    SOLID  = "solid",
-    DASHED = "dashed",
-    DOTTED = "dotted"
-}
-
-export interface ItemConnection {
-    id: string;
-    from: string;
-    to: string;
-    type: ConnectionType;
-    style: ConnectionStyle;
-    thick: number;
-    color: string;
-}
+import { ConnectionStyle, ConnectionType, Item, ItemConnection } from "./types";
 
 let counter = 0;
 
-class _ItemUtils {
+export default new class ItemUtils {
     createItem(item?: Partial<Item>) : Item {
         return {
             id: "ID" + (++counter),
@@ -76,9 +31,9 @@ class _ItemUtils {
             id: "ID" + (++counter),
             from,
             to,
-            type: ConnectionType.LINE,
+            type:  ConnectionType.LINE,
             style: ConnectionStyle.SOLID,
-            thick: 1,
+            thick: 2,
             color: "#333",
             
             ...options
@@ -101,6 +56,3 @@ class _ItemUtils {
         return max;
     }
 }
-
-
-export const ItemUtils = new _ItemUtils();

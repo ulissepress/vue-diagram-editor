@@ -1,5 +1,5 @@
 import Command from './Command';
-import { Item } from '../ItemUtils';
+import { Item } from '../types';
 
 export default class RotateCommand implements Command {
 
