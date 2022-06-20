@@ -6,9 +6,12 @@
 
         <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll">
             <div ref="viewport" class="viewport" @click="selectNone">
+                <!-- Render Connections -->
                 <svg ref="canvas" style="position:absolute; left:0px; top:0px; border: 2px solid red; z-index: -100000;" width="100%" height="100%" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <component v-for="(c, i) in connections" :key="c.id" is="Line" :from="getItemById(c.from)" :to="getItemById(c.to)" />                                                             
                 </svg>
+
+                <!-- Render Items -->
                 <div v-for="(item, i) in items" :key           = "item.id" 
                                                 :data-item-id  = "item.id"
                                                 :class         = "{ 'item' : true, 'target': item.id === selectedItem?.id, 'locked': item.locked === true}" 
@@ -41,10 +44,10 @@
                         :isDisplayInnerSnapDigit = "true"
                         :elementGuidelines       = "elementGuidelines()"
                         
-                        :roundable = "selectedItem != null && !selectedItem.locked === true"                        
-                        :draggable = "selectedItem != null && !selectedItem.locked === true"
-                        :rotatable = "selectedItem != null && !selectedItem.locked === true"
-                        :resizable = "selectedItem != null && !selectedItem.locked === true"
+                        :roundable = "selectedItemActive"
+                        :draggable = "selectedItemActive"
+                        :rotatable = "selectedItemActive"
+                        :resizable = "selectedItemActive"
 
                         @drag      = "onDrag"
                         @resize    = "onResize"
@@ -60,13 +63,10 @@
         <br/><br/>
         <button @click="emit('add-item')">Add New</button>
         &nbsp;
-        <button @click="deleteItem" :disabled="!targetDefined || selectedItem?.locked === true">Delete</button>
-        &nbsp;
-        <button @click="changeItemColor" :disabled="!targetDefined || selectedItem?.locked === true">Change Color</button>
-        <br/><br/>
-        <button @click="sendToBack" :disabled="!targetDefined || selectedItem?.locked === true">Send to back</button>
-        &nbsp;
-        <button @click="bringToFront" :disabled="!targetDefined || selectedItem?.locked === true">Bring to front</button>
+        <button @click="deleteItem(selectedItem!)"  :disabled="!selectedItemActive">Delete</button>&nbsp;
+        <button @click="changeItemColor"            :disabled="!selectedItemActive">Change Color</button><br/><br/>
+        <button @click="sendToBack"                 :disabled="!selectedItemActive">Send to back</button>&nbsp;
+        <button @click="bringToFront"               :disabled="!selectedItemActive">Bring to front</button>
         <p>Press SHIFT key to keep aspect ratio while resizing</p>       
         <div v-if="targetDefined">
             <h3>Selected Item</h3>
@@ -119,14 +119,17 @@ const zoom             = ref(defaultZoomIndex);
 const zoomFactor       = computed(() => zooms[zoom.value] / 100);
 const guideUnits       = 50; // computed(() => zoomFactor.value < .5 ? 0 : 50);
 
-const viewer         = ref();
-const viewport       = ref()
-const canvas         = ref<SVGElement>()
-const moveable       = ref();
-const hGuides        = ref();
-const vGuides        = ref();
-const selectedItem   = ref<Item | null>(null);
-const targetDefined  = computed(() => selectedItem.value !== null)
+const viewer             = ref();
+const viewport           = ref()
+const canvas             = ref<SVGElement>()
+const moveable           = ref();
+const hGuides            = ref();
+const vGuides            = ref();
+const selectedItem       = ref<Item | null>(null);
+const targetDefined      = computed(() => selectedItem.value !== null)
+const selectedItemActive = computed(() => selectedItem.value != null && !selectedItem.value.locked === true)
+
+
 
 const shiftPressed = useKeyModifier('Shift')
 
@@ -134,13 +137,17 @@ function getItemStyle(item: Item) : StyleValue {
     let t = `translate(${item.x}px, ${item.y}px)`;
     if(item.r != 0) t += ` rotate(${item.r})`
 
-    return {
+    const style: StyleValue = {
         "width":            item.w + 'px',
         "height":           item.h + 'px',
         "zIndex":           item.z,
         "backgroundColor":  item.component ? "transparent" : item.background,
         "transform":        t        
     }
+
+    if(item.supportsRoundable === true) style.borderRadius = Math.max(1, item.borderRadius) + 'px';
+
+    return style;
 }
 
 function selectItem(item: Item)  : void {
@@ -323,7 +330,7 @@ function findNodePosition(node: HTMLElement) {
     display: flex;
     justify-content: center;
     align-items: center; 
-    border-radius: 1px;
+    border-radius: 0px;
     user-select: none;
 }
 

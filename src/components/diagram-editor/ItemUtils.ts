@@ -11,6 +11,7 @@ export interface Item {
     r: number;
 
     borderRadius: number;
+    supportsRoundable: boolean;
 
     background: string;
 
@@ -31,18 +32,23 @@ let counter = 0;
 class _ItemUtils {
     createItem(title : string, component?: string, componentOptions?: any) : Item {
         if(!component) component = "Shape";
-        
+
         return {
             id: "ID" + (++counter),
             title,
+            
             x: Math.floor(Math.random() * 400),
             y: Math.floor(Math.random() * 200),
-            z: 0,
             w: 100 + Math.floor(Math.random() * 400),
             h: 50  + Math.floor(Math.random() * 200),
+            z: 0,
             r: 0,
+
             borderRadius: 0,
+            supportsRoundable: ['Shape', 'Image'].includes(component),
+
             background: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
+
             component,
             componentOptions
         }
