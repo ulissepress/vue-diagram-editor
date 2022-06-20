@@ -10,7 +10,7 @@
         <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll">
             <div ref="viewport" class="viewport" @click="selectNone">
                 <!-- Render Connections -->
-                <component v-for="(c, i) in connections" :key="c.id" is="Connection" :from="getItemById(c.from)" :to="getItemById(c.to)" :type="c.type" />                                                             
+                <component v-for="(c, i) in connections" :key="c.id" is="Connection" :from="getItemById(c.from)" :to="getItemById(c.to)" :options="c" />                                                             
 
                 <!-- Render Items -->
                 <div v-for="(item, i) in items" :key           = "item.id" 
@@ -107,6 +107,7 @@ import MoveCommand from './commands/MoveCommand';
 import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
+import EditorTools from './EditorTools';
 import { Item, ItemConnection, ItemUtils } from './ItemUtils';
 
 
@@ -142,11 +143,11 @@ onUpdated(() => {
 
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
-const zooms            = [5, 10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 500];        // must contain the value 100
-const defaultZoomIndex = zooms.findIndex(v => v === 100);     
-const zoom             = ref(defaultZoomIndex); 
-const zoomFactor       = computed(() => zooms[zoom.value] / 100);
-const guideUnits       = 50; // computed(() => zoomFactor.value < .5 ? 0 : 50);
+const zooms              = [5, 10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 500];        // must contain the value 100
+const defaultZoomIndex   = zooms.findIndex(v => v === 100);     
+const zoom               = ref(defaultZoomIndex); 
+const zoomFactor         = computed(() => zooms[zoom.value] / 100);
+const guideUnits         = 50; // computed(() => zoomFactor.value < .5 ? 0 : 50);
 
 const viewer             = ref();
 const viewport           = ref()
@@ -158,9 +159,13 @@ const selectedItem       = ref<Item | null>(null);
 const targetDefined      = computed(() => selectedItem.value !== null)
 const selectedItemActive = computed(() => selectedItem.value != null && !selectedItem.value.locked === true)
 
-const shiftPressed   = useKeyModifier('Shift')
-const historyManager = ref(new HistoryManager());
+const shiftPressed       = useKeyModifier('Shift')
+const historyManager     = ref(new HistoryManager());
+const currentTool        = ref(EditorTools.SELECTION);
 
+
+// Temporary variables
+// ------------------------------------------------------------------------------------------------------------------------
 let originPos:   [number, number] = [0, 0];
 let originSize:  [number, number] = [0, 0];
 let originAngle: number = 0;

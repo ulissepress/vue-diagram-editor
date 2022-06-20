@@ -28,11 +28,21 @@ export enum ConnectionType {
     CURVE = "curve"
 }
 
+
+export enum ConnectionStyle {
+    SOLID  = "solid",
+    DASHED = "dashed",
+    DOTTED = "dotted"
+}
+
 export interface ItemConnection {
-    id: string,
-    from: string,
-    to: string,
-    type?: ConnectionType
+    id: string;
+    from: string;
+    to: string;
+    type: ConnectionType;
+    style: ConnectionStyle;
+    thick: number;
+    color: string;
 }
 
 let counter = 0;
@@ -59,6 +69,20 @@ class _ItemUtils {
 
             ...item
         } as Item
+    }
+
+    createConnection(from: string, to: string, options?: Partial<ItemConnection>) : ItemConnection {
+        return {
+            id: "ID" + (++counter),
+            from,
+            to,
+            type: ConnectionType.LINE,
+            style: ConnectionStyle.SOLID,
+            thick: 1,
+            color: "#333",
+            
+            ...options
+        } as ItemConnection
     }
 
     deleteItem(items: Item[], item: Item) {

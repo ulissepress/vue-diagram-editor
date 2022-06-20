@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUpdated } from 'vue';
-import { Item } from './ItemUtils';
+import { Item } from '../ItemUtils';
 
 const { item } = defineProps<{item: Item}>();
 

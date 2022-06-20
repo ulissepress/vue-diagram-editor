@@ -1,14 +1,19 @@
 <template>
-    <svg class="connection" :style="style" :viewBox="viewBox" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="connection" fill="none" stroke-linecap="round" stroke-linejoin="round"
+            :style="style" 
+            :viewBox="viewBox" 
+            :stroke-dasharray="dashArray"
+            :stroke="options.color" 
+            :stroke-width="options.thick" >
         <path :d="linePath" />    
     </svg>
 </template>
 
 <script setup lang="ts">
 import { computed, CSSProperties } from 'vue';
-import { ConnectionType, Item } from './ItemUtils';
+import { ConnectionStyle, ConnectionType, Item, ItemConnection } from '../ItemUtils';
 
-const { from, to, type } = defineProps<{from: Item, to: Item, type: ConnectionType}>();
+const { from, to, options } = defineProps<{from: Item, to: Item, options: ItemConnection}>();
 
 const style = computed<CSSProperties>(() => {
     let b = boundingBox.value;
@@ -20,6 +25,14 @@ const style = computed<CSSProperties>(() => {
         "height": b.h + 'px',
     }
 });
+
+const dashArray = computed(() => {
+    if(options.style == ConnectionStyle.DASHED) return '8,10';
+    if(options.style == ConnectionStyle.DOTTED) return '2,4';
+
+    return null;  // ConnectionStyle.SOLID
+});
+
 
 
 const boundingBox = computed(() => {
@@ -59,9 +72,12 @@ const linePath = computed( () => {
     if(m1x < m2x && m2y > m1y) { x1 = 0; y1 = 0; x2 = b.w; y2 = b.h; }
 
     let tension = 0;
-    if(type === ConnectionType.CURVE) tension = 0.8;
+    if(options.type === ConnectionType.CURVE) tension = -0.8;
 
-    if (tension < 0) {
+    if (tension === 0) {
+        return "M " + x1 + " " + y1 + " L " + x2 + " " + y2;
+    }
+    else if (tension < 0) {
         let delta = (y2 - y1) * tension;
         let hx1 = x1;
         let hy1 = y1 - delta;

@@ -1,11 +1,11 @@
 import './assets/app.css';
 
 import App from './App.vue';
-import Connection from "./components/diagram-editor/Connection.vue";
-import CustomShape from "./components/diagram-editor/CustomShape.vue";
-import Ellipse from "./components/diagram-editor/Ellipse.vue";
-import Image from "./components/diagram-editor/Image.vue";
-import Shape from "./components/diagram-editor/Shape.vue";
+import Connection from "./components/diagram-editor/blocks/Connection.vue";
+import CustomShape from "./components/diagram-editor/blocks/CustomShape.vue";
+import Ellipse from "./components/diagram-editor/blocks/Ellipse.vue";
+import Image from "./components/diagram-editor/blocks/Image.vue";
+import Shape from "./components/diagram-editor/blocks/Shape.vue";
 import { createApp } from 'vue';
 
 const app = createApp(App);
