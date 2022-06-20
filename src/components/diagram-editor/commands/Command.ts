@@ -1,5 +1,5 @@
 
-export default interface ICommand {
+export default interface Command {
     do() : void;
     undo(): void;
 }

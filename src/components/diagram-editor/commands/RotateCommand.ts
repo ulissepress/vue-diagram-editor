@@ -1,7 +1,7 @@
-import ICommand from './ICommand';
+import Command from './Command';
 import { Item } from '../ItemUtils';
 
-export default class RotateCommand implements ICommand {
+export default class RotateCommand implements Command {
 
     private newAngle: number = 0;
 

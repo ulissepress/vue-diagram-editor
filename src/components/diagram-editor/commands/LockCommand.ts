@@ -1,7 +1,7 @@
-import ICommand from './ICommand';
+import Command from './Command';
 import { Item } from '../ItemUtils';
 
-export class LockCommand implements ICommand {
+export class LockCommand implements Command {
 
     constructor(private item: Item) {}
 
@@ -9,7 +9,7 @@ export class LockCommand implements ICommand {
     undo(): void { this.item.locked = false; }
 }
 
-export class UnlockCommand implements ICommand {
+export class UnlockCommand implements Command {
 
     constructor(private item: Item) {}
 

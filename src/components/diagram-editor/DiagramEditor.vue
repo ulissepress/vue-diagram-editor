@@ -1,9 +1,12 @@
 <template>
     <div class="editor-container">
+
+        <!-- Rulers -->
         <Guides type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)', height: '30px' }" :style = "{ position: 'absolute', top: '0px'}" />
         <Guides type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width: '30px' }" :style = "{ position: 'absolute', top: '0px'}" />
         <div style="position: absolute; top: 0px; left: 0px; width: 30px; height: 30px; background-color: #333;"></div>
 
+        <!-- Editor Canvas -->
         <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll">
             <div ref="viewport" class="viewport" @click="selectNone">
                 <!-- Render Connections -->
@@ -21,8 +24,8 @@
 
                         <component v-if="item.component" :is="item.component" :item="item" />
 
-                        <div class="decorator decorator-delete" v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem(item)" title="delete item">&times;</div>
-                        <div class="decorator decorator-locked" v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true">&#x1F512;</div>
+                        <div class="decorator decorator-delete" v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
+                        <div class="decorator decorator-locked" v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
                         <div class="decorator decorator-size"   v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
                 </div> <!-- item -->
                 
@@ -67,25 +70,30 @@
                         />
             </div> <!-- viewport -->
         </VueInfiniteViewer>
-    </div> <!-- editor-container -->    
     
-    <div class="toolbar">
-        ZOOM: <button @click="zoomOut">-</button> {{ zoomFactor * 100 }}% <button @click="zoomIn">+</button>&nbsp;&nbsp;<button @click="zoomReset">Reset</button>
-        <br/><br/>
-        <button @click="emit('add-item')">Add New</button>
-        &nbsp;
-        <button @click="deleteItem(selectedItem!)"  :disabled="!selectedItemActive">Delete</button>&nbsp;
-        <button @click="changeItemColor"            :disabled="!selectedItemActive">Change Color</button><br/><br/>
-        <button @click="sendToBack"                 :disabled="!selectedItemActive">Send to back</button>&nbsp;
-        <button @click="bringToFront"               :disabled="!selectedItemActive">Bring to front</button><br/><br/>
-        <button @click="undo"                       :disabled="!historyManager.canUndo()">Undo</button>&nbsp;
-        <button @click="redo"                       :disabled="!historyManager.canRedo()">Redo</button>
-        <div v-if="targetDefined">
-            <p>Press SHIFT key to keep aspect ratio while resizing</p>
-            <h3>Selected Item</h3>
-            <pre>{{ selectedItem }}</pre>            
-        </div> 
-    </div>
+        <!-- Editor Toolbar -->
+        <div class="toolbar">
+            ZOOM: <button @click="zoomOut">-</button> {{ zoomFactor * 100 }}% 
+                <button @click="zoomIn">+</button>&nbsp;&nbsp;
+                <button @click="zoomReset">Reset</button>
+            <br/><br/>
+            <button @click="emit('add-item')">Add New</button>
+            &nbsp;
+            <button @click="deleteItem"      :disabled="!selectedItemActive">Delete</button>&nbsp;
+            <button @click="changeItemColor" :disabled="!selectedItemActive">Change Color</button><br/><br/>
+            <button @click="sendToBack"      :disabled="!selectedItemActive">Send to back</button>&nbsp;
+            <button @click="bringToFront"    :disabled="!selectedItemActive">Bring to front</button><br/><br/>
+            <button @click="undo"            :disabled="!historyManager.canUndo()">Undo</button>&nbsp;
+            <button @click="redo"            :disabled="!historyManager.canRedo()">Redo</button>
+            
+            <div v-if="targetDefined">
+                <p>Press SHIFT key to keep aspect ratio while resizing</p>
+                <h3>Selected Item</h3>
+                <pre>{{ selectedItem }}</pre>            
+            </div> 
+        </div> <!-- toolbar -->
+        
+    </div> <!-- editor-container -->    
 </template>
 
 <script setup lang="ts">
@@ -311,9 +319,11 @@ function changeItemColor() : void {
     if(selectedItem.value) selectedItem.value.background = `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`
 }
 
-function deleteItem(item: Item) {
-    emit('delete-item', item);
-    selectNone();
+function deleteItem() {
+    if(selectedItem.value) {
+        emit('delete-item', selectedItem.value);
+        selectNone();
+    }
 }
 
 function lockItem(item: Item) {
@@ -361,7 +371,7 @@ function redo() {
 .toolbar {
     position: absolute;
     right: 20px;
-    top: 110px;
+    top: 60px;
     width: 260px;
     height: auto;
     border: 1px solid;

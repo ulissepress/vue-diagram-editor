@@ -1,7 +1,7 @@
-import ICommand from './ICommand';
+import Command from './Command';
 import { Item } from '../ItemUtils';
 
-export default class ResizeCommand implements ICommand {
+export default class ResizeCommand implements Command {
 
     private newSize: [number, number] = [0, 0];
 

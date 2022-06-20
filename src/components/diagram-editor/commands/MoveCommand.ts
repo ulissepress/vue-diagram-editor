@@ -1,7 +1,7 @@
-import ICommand from './ICommand';
+import Command from './Command';
 import { Item } from '../ItemUtils';
 
-export default class MoveCommand implements ICommand {
+export default class MoveCommand implements Command {
 
     private newPos: [number, number] = [0, 0];
 

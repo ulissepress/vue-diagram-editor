@@ -1,7 +1,7 @@
-import ICommand from './ICommand';
+import Command from './Command';
 import { Item } from '../ItemUtils';
 
-export default class RoundCommand implements ICommand {
+export default class RoundCommand implements Command {
 
     private newRound: number = 0;
 

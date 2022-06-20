@@ -1,13 +1,13 @@
-import ICommand from "./ICommand";
+import Command from "./Command";
 
 export default class HistoryManager {
-    private undoStack: ICommand[] = [];
-    private redoStack: ICommand[] = [];
+    private undoStack: Command[] = [];
+    private redoStack: Command[] = [];
 
     public canUndo() : boolean { return this.undoStack.length > 0 }
     public canRedo() : boolean { return this.redoStack.length > 0 }
 
-    public execute(c: ICommand) {        
+    public execute(c: Command) {        
         c.do();
         this.undoStack.push(c);        
         this.redoStack = [];
