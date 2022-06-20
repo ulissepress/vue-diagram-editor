@@ -3,9 +3,10 @@
             :style="style" 
             :viewBox="viewBox" 
             :stroke-dasharray="dashArray"
-            :stroke="options.color" 
-            :stroke-width="options.thick" >
-        <path :d="linePath" />    
+            :stroke="selected ? '#4af' : options.color" 
+            :stroke-width="selected ? '3' : options.thick">
+        <path :d="linePath" style="pointer-events: none;" />
+        <path :d="linePath" stroke-width="10" stroke="red" stroke-opacity='0' @click.stop="emit('selected')" style="cursor: pointer; pointer-events: all;" />
     </svg>
 </template>
 
@@ -13,7 +14,12 @@
 import { computed, CSSProperties } from 'vue';
 import { ConnectionStyle, ConnectionType, Item, ItemConnection } from '../ItemUtils';
 
-const { from, to, options } = defineProps<{from: Item, to: Item, options: ItemConnection}>();
+export interface ConnectionEvents {
+    (e: 'selected' ): void    
+}
+
+const { from, to, options, selected } = defineProps<{from: Item, to: Item, options: ItemConnection, selected: boolean }>();
+const emit = defineEmits<ConnectionEvents>();
 
 const style = computed<CSSProperties>(() => {
     let b = boundingBox.value;
@@ -30,9 +36,8 @@ const dashArray = computed(() => {
     if(options.style == ConnectionStyle.DASHED) return '8,10';
     if(options.style == ConnectionStyle.DOTTED) return '2,4';
 
-    return null;  // ConnectionStyle.SOLID
+    return '';  // ConnectionStyle.SOLID
 });
-
 
 
 const boundingBox = computed(() => {
@@ -100,6 +105,6 @@ const linePath = computed( () => {
 .connection {
      position: absolute;
      z-index:  -100000;
-     border:   1px dashed red,   
+     /* border:   1px dashed red; */
 }
 </style>

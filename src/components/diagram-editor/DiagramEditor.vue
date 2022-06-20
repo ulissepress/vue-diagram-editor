@@ -10,7 +10,13 @@
         <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll">
             <div ref="viewport" class="viewport" @click="selectNone">
                 <!-- Render Connections -->
-                <component v-for="(c, i) in connections" :key="c.id" is="Connection" :from="getItemById(c.from)" :to="getItemById(c.to)" :options="c" />                                                             
+                <component v-for="(c, i) in connections" :key="c.id" is="Connection" 
+                                                :from="getItemById(c.from)" 
+                                                :to="getItemById(c.to)" 
+                                                :options="c" 
+                                                :selected="c.id === selectedConnection?.id"
+                                                @selected="selectedConnection = c; selectedItem = null;"
+                                                />
 
                 <!-- Render Items -->
                 <div v-for="(item, i) in items" :key           = "item.id" 
@@ -89,6 +95,10 @@
                 <h3>Selected Item</h3>
                 <pre>{{ selectedItem }}</pre>            
             </div> 
+            <div v-if="selectedConnection">
+                <h3>Selected Connection</h3>
+                <pre>{{ selectedConnection }}</pre>            
+            </div> 
         </div> <!-- toolbar -->
         
     </div> <!-- editor-container -->    
@@ -156,6 +166,7 @@ const moveable           = ref();
 const hGuides            = ref();
 const vGuides            = ref();
 const selectedItem       = ref<Item | null>(null);
+const selectedConnection = ref<ItemConnection | null>(null);
 const targetDefined      = computed(() => selectedItem.value !== null)
 const selectedItemActive = computed(() => selectedItem.value != null && !selectedItem.value.locked === true)
 
@@ -200,7 +211,10 @@ function selectItem(item: Item)  : void {
 }
 
 function selectNone() : void {
+    console.log('calling selectNone');
+    
     selectedItem.value = null;
+    selectedConnection.value = null;
 }
 
 
@@ -414,6 +428,7 @@ function redo() {
     align-items: center; 
     border-radius: 0px;
     user-select: none;
+    cursor: pointer;
 }
 
 .item.target {
