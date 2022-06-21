@@ -1,7 +1,6 @@
 <template>
     <div style="width: 100%; height: 95%;">
-        <DiagramEditor  :items       = "items" 
-                        :connections = "connections"
+        <DiagramEditor  :elements    = "elements"
                         @add-item    = "addNewItem" 
                         @delete-item = "deleteItem" />
     </div>
@@ -11,13 +10,13 @@
 import { reactive } from 'vue';
 import DiagramEditor from './components/diagram-editor/DiagramEditor.vue';
 import ItemUtils from './components/diagram-editor/ItemUtils';
-import { ConnectionStyle, ConnectionType, Item, ItemConnection } from './components/diagram-editor/types';
+import { ConnectionStyle, ConnectionType, DiagramElement, Item } from './components/diagram-editor/types';
 
-const a1 = ItemUtils.createItem( { id: 'a1' });
-const a2 = ItemUtils.createItem( { id: 'a2' });
-const a3 = ItemUtils.createItem( { id: 'a3' });
+const a1 = ItemUtils.createItem({ id: 'a1' });
+const a2 = ItemUtils.createItem({ id: 'a2' });
+const a3 = ItemUtils.createItem({ id: 'a3' });
 
-let items = reactive([
+let elements: DiagramElement[] = reactive([
     a1, a2, a3,
     // ItemUtils.createItem( { title: 'Item B',            component: "Shape" } ),
     // ItemUtils.createItem( { title: 'Item (no resize)',  component: "Shape", supportsResizable: false } ),
@@ -27,14 +26,12 @@ let items = reactive([
     // ItemUtils.createItem( { title: 'Circle',            component: "Ellipse",     w: 200, h: 200, supportsRoundable: false } ),
     
     // ItemUtils.createItem( { title: 'My Image',          component: "Image",       w: 250, h: 250, componentOptions: { src : "https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80" }} ),
-]);
 
-let connections: ItemConnection[] = [
     ItemUtils.createConnection('a1', 'a2'),
     ItemUtils.createConnection('a1', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DOTTED }),
     ItemUtils.createConnection('a2', 'a3', { type: ConnectionType.CURVE, color: "red", thick: 4, style: ConnectionStyle.DASHED }),
-];
 
+]);
 
 function addNewItem() {
     items.push(ItemUtils.createItem());

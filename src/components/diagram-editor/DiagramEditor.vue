@@ -118,14 +118,13 @@ import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
 import ItemUtils from './ItemUtils';
-import { EditorTools, Item, ItemConnection } from './types';
+import { DiagramElement, EditorTools, Item } from './types';
 
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
-    items: Item[],
-    connections: ItemConnection[]
+    elements: DiagramElement[]
 }
 
 export interface DiagramEditorEvents {
@@ -133,8 +132,8 @@ export interface DiagramEditorEvents {
     (e: 'delete-item', item: Item): void
 }
 
-const { items } = defineProps<DiagramEditorProps>();
-const emit      = defineEmits<DiagramEditorEvents>();
+const { elements } = defineProps<DiagramEditorProps>();
+const emit         = defineEmits<DiagramEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 onMounted(() => {
@@ -165,8 +164,7 @@ const canvas             = ref<SVGElement>()
 const moveable           = ref();
 const hGuides            = ref();
 const vGuides            = ref();
-const selectedItem       = ref<Item | null>(null);
-const selectedConnection = ref<ItemConnection | null>(null);
+const selectedItem       = ref<DiagramElement | null>(null);
 const targetDefined      = computed(() => selectedItem.value !== null)
 const selectedItemActive = computed(() => selectedItem.value != null && !selectedItem.value.locked === true)
 

@@ -1,4 +1,4 @@
-
+export type DiagramElement = Item | ItemConnection;
 export interface Item {
     id:    string;
     title: string;
@@ -55,3 +55,12 @@ export enum EditorTools {
     
     CONNECTION = 'connection'
 }
+
+
+export function isItem(e: DiagramElement) : e is Item {
+    return "x" in e;
+} 
+
+export function isConnection(e: DiagramElement) : e is ItemConnection {
+    return "from" in e;
+} 
