@@ -1,5 +1,5 @@
 <template>
-    <div class="shape" :style="{ backgroundColor: item.background, borderRadius: item.borderRadius + 'px' }">{{ item.title }}</div>
+    <div class="shape" :style="{ backgroundColor: item.backgroundColor, borderRadius: item.borderRadius + 'px' }">{{ item.title }}</div>
 </template>
 
 <script setup lang="ts">

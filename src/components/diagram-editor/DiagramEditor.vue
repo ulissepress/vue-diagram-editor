@@ -11,13 +11,14 @@
             <div ref="viewport" class="viewport" @click="selectNone">
                 <!-- Render Connections -->
                 <component v-for="(c, i) in connections" 
-                        is        = "Connection" 
+                        :is       = "c.component" 
                         :key      = "c.id" 
                         :from     = "getItemById(c.from)" 
-                        :to       = "getItemById(c.to)" 
+                        :to       = "getItemById(c.to)"
+                        :style    = "{ zIndex: c.z }"
                         :options  = "c" 
-                        :selected = "c.id === selectedConnection?.id"
-                        @selected = "selectedConnection = c; selectedItem = null;"/>
+                        :selected = "c.id === selectedItem?.id"
+                        @selected = "selectedItem = c"/>
                         
                 <!-- Render Items -->
                 <div v-for="(item, i) in items" 
@@ -37,7 +38,7 @@
                 </div> <!-- item -->
                 
                 <!-- Manage drag / resize / rotate / rounding of selected item -->
-                <Moveable v-if = "targetDefined"
+                <Moveable v-if = "targetDefined && isItem(selectedItem)"
                         ref     = "moveable"
                         :target = "['.target']"                      
                         :zoom   = "1 / zoomFactor"
@@ -87,7 +88,7 @@
             <button @click="emit('add-item')">Add New</button>
             &nbsp;
             <button @click="deleteItem"      :disabled="!selectedItemActive">Delete</button>&nbsp;
-            <button @click="changeItemColor" :disabled="!selectedItemActive">Change Color</button><br/><br/>
+            <button @click="changeBackColor" :disabled="!selectedItemActive">Change Color</button><br/><br/>
             <button @click="sendToBack"      :disabled="!selectedItemActive">Send to back</button>&nbsp;
             <button @click="bringToFront"    :disabled="!selectedItemActive">Bring to front</button><br/><br/>
             <button @click="undo"            :disabled="!historyManager.canUndo()">Undo</button>&nbsp;
@@ -97,10 +98,6 @@
                 <p>Press SHIFT key to keep aspect ratio while resizing</p>
                 <h3>Selected Item</h3>
                 <pre>{{ selectedItem }}</pre>            
-            </div> 
-            <div v-if="selectedConnection">
-                <h3>Selected Connection</h3>
-                <pre>{{ selectedConnection }}</pre>            
             </div> 
         </div> <!-- toolbar -->
         
@@ -114,6 +111,8 @@ import { computed, nextTick, onMounted, onUpdated, ref, StyleValue } from "vue";
 import Guides from "vue-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
+import ChangeBackgroundColorCommand from './commands/ChangeBackgroundColorCommand';
+import ChangeZOrderCommand from './commands/ChangeZOrderCommand';
 import HistoryManager from './commands/HistoryManager';
 import { LockCommand, UnlockCommand } from './commands/LockCommand';
 import MoveCommand from './commands/MoveCommand';
@@ -132,7 +131,10 @@ export interface DiagramEditorProps {
 
 export interface DiagramEditorEvents {
     (e: 'add-item'): void
-    (e: 'delete-item', item: Item): void
+    (e: 'delete-item', item: Item, historyManager: HistoryManager): void
+    
+    (e: 'add-connection',    connection: ItemConnection): void
+    (e: 'delete-connection', connection: ItemConnection): void
 }
 
 const { elements } = defineProps<DiagramEditorProps>();
@@ -167,10 +169,15 @@ const canvas             = ref<SVGElement>()
 const moveable           = ref();
 const hGuides            = ref();
 const vGuides            = ref();
-const selectedItem       = ref<Item | null>(null);
-const selectedConnection = ref<ItemConnection | null>(null);
+const selectedItem       = ref<DiagramElement | null>(null);
 const targetDefined      = computed(() => selectedItem.value !== null)
-const selectedItemActive = computed(() => selectedItem.value != null && !selectedItem.value.locked === true)
+
+const selectedItemActive = computed(() => {
+    if(!selectedItem.value) return false;
+
+    // An item is 'active' if not locked, a connection is always 'active'
+    return isItem(selectedItem.value) ? (!selectedItem.value.locked === true) : true;
+})
 
 const shiftPressed       = useKeyModifier('Shift')
 const historyManager     = ref(new HistoryManager());
@@ -196,7 +203,7 @@ function getItemStyle(item: Item) : StyleValue {
         "width":            item.w + 'px',
         "height":           item.h + 'px',
         "zIndex":           item.z,
-        "backgroundColor":  item.component ? "transparent" : item.background,
+        "backgroundColor":  item.component ? "transparent" : item.backgroundColor,
         "transform":        t        
     }
 
@@ -216,10 +223,8 @@ function selectItem(item: Item)  : void {
 }
 
 function selectNone() : void {
-    console.log('calling selectNone');
-    
+    console.log('selectNone()');
     selectedItem.value = null;
-    selectedConnection.value = null;
 }
 
 
@@ -227,11 +232,11 @@ function selectNone() : void {
 // Drag item
 // ---------------------------------------------------------------------------------------------------------------------
 function onDragStart(e: any) : void {
-    if(selectedItem.value) originPos = [selectedItem.value.x, selectedItem.value.y];
+    if(isItem(selectedItem.value)) originPos = [selectedItem.value.x, selectedItem.value.y];
 }
 
 function onDrag(e: any) : void {
-    if(!selectedItem.value) return;
+    if(!isItem(selectedItem.value)) return;
 
     // console.log('ondrag', e);
     selectedItem.value.x = Math.floor(e.beforeTranslate[0]);
@@ -240,7 +245,7 @@ function onDrag(e: any) : void {
 }
 
 function onDragEnd(e: any) : void {
-    historyManager.value.execute(new MoveCommand(selectedItem.value!, originPos));
+    if(isItem(selectedItem.value)) historyManager.value.execute(new MoveCommand(selectedItem.value, originPos, [selectedItem.value.x, selectedItem.value.y]));
 }
 
 
@@ -248,11 +253,11 @@ function onDragEnd(e: any) : void {
 // Resize item
 // ---------------------------------------------------------------------------------------------------------------------
 function onResizeStart(e: any) : void {
-    if(selectedItem.value) originSize = [selectedItem.value.w, selectedItem.value.h];
+    if(isItem(selectedItem.value)) originSize = [selectedItem.value.w, selectedItem.value.h];
 }
 
 function onResize(e: any) : void {
-    if(!selectedItem.value) return;
+    if(!isItem(selectedItem.value)) return;
 
     // console.log('onresize', e);
     selectedItem.value.w = Math.floor(e.width);
@@ -263,7 +268,7 @@ function onResize(e: any) : void {
 }
 
 function onResizeEnd(e: any) : void {
-    historyManager.value.execute(new ResizeCommand(selectedItem.value!, originSize));
+    if(isItem(selectedItem.value)) historyManager.value.execute(new ResizeCommand(selectedItem.value, originSize, [selectedItem.value.w, selectedItem.value.h]));
 }
 
 
@@ -271,11 +276,11 @@ function onResizeEnd(e: any) : void {
 // Rotate item
 // ---------------------------------------------------------------------------------------------------------------------
 function onRotateStart(e: any) : void {
-    if(selectedItem.value) originAngle = selectedItem.value.r;
+    if(isItem(selectedItem.value)) originAngle = selectedItem.value.r;
 }
 
 function onRotate(e: any) : void {
-    if(!selectedItem.value) return;
+    if(!isItem(selectedItem.value)) return;
 
     // console.log('onrotate', item, e);    
     selectedItem.value.r = e.beforeRotate % 360;
@@ -283,7 +288,7 @@ function onRotate(e: any) : void {
 }
 
 function onRotateEnd(e: any) : void {
-    historyManager.value.execute(new RotateCommand(selectedItem.value!, originAngle));        
+    if(isItem(selectedItem.value)) historyManager.value.execute(new RotateCommand(selectedItem.value, originAngle, selectedItem.value.r));
 }
 
 
@@ -291,11 +296,11 @@ function onRotateEnd(e: any) : void {
 // Round item
 // ---------------------------------------------------------------------------------------------------------------------
 function onRoundStart(e: any) : void {
-    if(selectedItem.value) originRound = selectedItem.value.borderRadius;
+    if(isItem(selectedItem.value)) originRound = selectedItem.value.borderRadius;
 }
 
 function onRound(e: any) : void {
-    if(!selectedItem.value) return;
+    if(!isItem(selectedItem.value)) return;
 
     //console.log('onRound', e);
     selectedItem.value.borderRadius = parseInt(e.borderRadius) || 0;
@@ -303,7 +308,7 @@ function onRound(e: any) : void {
 }
 
 function onRoundEnd(e: any) : void {
-    historyManager.value.execute(new RoundCommand(selectedItem.value!, originRound));        
+    if(isItem(selectedItem.value)) historyManager.value.execute(new RoundCommand(selectedItem.value, originRound, selectedItem.value.borderRadius));        
 }
 
 
@@ -330,20 +335,34 @@ function onScroll(e: any) : void {
 
 
 function sendToBack() : void {
-    if(selectedItem.value) selectedItem.value.z = ItemUtils.findMinZ(items.value as Item[]) - 1;
+    if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, ItemUtils.findMinZ(items.value as Item[]) - 1));    
 }
 
 function bringToFront() : void {
-    if(selectedItem.value) selectedItem.value.z = ItemUtils.findMaxZ(items.value as Item[]) + 1;    
+    if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, ItemUtils.findMaxZ(items.value as Item[]) + 1));    
 }
 
-function changeItemColor() : void {
-    if(selectedItem.value) selectedItem.value.background = `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`
+function changeBackColor() : void {
+    if(isItem(selectedItem.value)) {
+        const oldColor = selectedItem.value.backgroundColor;
+        const newColor = `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`;
+        historyManager.value.execute(new ChangeBackgroundColorCommand(selectedItem.value, oldColor, newColor));
+    }
+    else if(isConnection(selectedItem.value)) {
+        const oldColor = selectedItem.value.color;
+        const newColor = `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`;
+        historyManager.value.execute(new ChangeBackgroundColorCommand(selectedItem.value, oldColor, newColor));
+    }
 }
 
 function deleteItem() {
-    if(selectedItem.value) {
-        emit('delete-item', selectedItem.value);
+    if(isItem(selectedItem.value)) {
+        emit('delete-item', selectedItem.value, historyManager.value);
+        selectNone();
+    }
+
+    if(isConnection(selectedItem.value)) {
+        emit('delete-connection', selectedItem.value);
         selectNone();
     }
 }

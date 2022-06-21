@@ -1,8 +1,13 @@
 // export type DiagramElement = Item | ItemConnection;
 export interface DiagramElement {
-    id:     string;     // The unique element ID
-    title:  string;     // The element title / label
-    z:      number;     // The element z-index
+    id:     string;             // The unique element ID
+    title:  string;             // The element title / label
+    z:      number;             // The element z-index
+    
+    backgroundColor:  string;   // The element background color (item background, connection stroke color)
+    
+    component: string;          // The Vue component used to render this element
+    componentOptions?: any;     // The Vue component options / config
 }
 
 export interface Item extends DiagramElement {
@@ -17,10 +22,7 @@ export interface Item extends DiagramElement {
     supportsRoundable: boolean;     // The item can be rounded (user can change border radius)
     supportsResizable: boolean;     // The item can be resized
 
-    background: string;             // The item background color
-
-    component: string;              // The Vue component used to render tihs item
-    componentOptions?: any;         // The Vue component options / config
+    textColor:        string;       // The item background color
 
     locked: boolean;                // The item is locked (cannot be moved / resized / rotated / ...)
 }
@@ -58,10 +60,10 @@ export enum EditorTools {
 }
 
 
-export function isItem(e: DiagramElement) : e is Item {
-    return "x" in e;
+export function isItem(e: DiagramElement | undefined | null) : e is Item {
+    return e !== null && e != undefined && "x" in e;
 } 
 
-export function isConnection(e: DiagramElement) : e is ItemConnection {
-    return "from" in e;
+export function isConnection(e: DiagramElement | undefined | null) : e is ItemConnection {
+    return e !== null && e != undefined && "from" in e;
 } 

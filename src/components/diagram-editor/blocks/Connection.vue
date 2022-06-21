@@ -25,6 +25,10 @@ export interface ConnectionEvents {
 const { from, to, options, selected } = defineProps<{from: Item, to: Item, options: ItemConnection, selected: boolean }>();
 const emit = defineEmits<ConnectionEvents>();
 
+
+//onMounted(()=> console.log('Connection mounted'))
+//onUpdated(()=> console.log('Connection updated'))
+
 const style = computed<CSSProperties>(() => {
     let b = boundingBox.value;
 
@@ -91,6 +95,8 @@ const linePath = computed( () => {
      stroke-linecap: round;
      stroke-linejoin: round;
      /* border:   1px dashed red; */
+    pointer-events: none;
+
 }
 
 .realpath {

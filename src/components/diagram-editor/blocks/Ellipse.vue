@@ -1,5 +1,5 @@
 <template>
-   <div class="shape-ellipse" :style="{'backgroundColor': item.background }">{{ item.title }}</div>
+   <div class="shape-ellipse" :style="{'backgroundColor': item.backgroundColor }">{{ item.title }}</div>
 </template>
 
 <style scoped>

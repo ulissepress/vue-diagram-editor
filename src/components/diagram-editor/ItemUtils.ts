@@ -19,7 +19,7 @@ export default new class ItemUtils {
             supportsRoundable: true,
             supportsResizable: true,
 
-            background: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
+            backgroundColor: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
             component: 'Shape',
             
             locked: false,
@@ -30,6 +30,8 @@ export default new class ItemUtils {
 
     createConnection(from: string, to: string, options?: Partial<ItemConnection>) : ItemConnection {
         return {
+            component: 'Connection',
+
             id: "ID" + (++counter),
             from,
             to,
