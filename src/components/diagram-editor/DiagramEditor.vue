@@ -118,7 +118,7 @@ import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
 import ItemUtils from './ItemUtils';
-import { DiagramElement, EditorTools, Item } from './types';
+import { DiagramElement, EditorTools, isConnection, isItem, Item, ItemConnection } from './types';
 
 
 // The component props and events
@@ -164,7 +164,8 @@ const canvas             = ref<SVGElement>()
 const moveable           = ref();
 const hGuides            = ref();
 const vGuides            = ref();
-const selectedItem       = ref<DiagramElement | null>(null);
+const selectedItem       = ref<Item | null>(null);
+const selectedConnection = ref<ItemConnection | null>(null);
 const targetDefined      = computed(() => selectedItem.value !== null)
 const selectedItemActive = computed(() => selectedItem.value != null && !selectedItem.value.locked === true)
 
@@ -172,6 +173,9 @@ const shiftPressed       = useKeyModifier('Shift')
 const historyManager     = ref(new HistoryManager());
 const currentTool        = ref(EditorTools.SELECTION);
 
+
+const items       = computed(() => elements.filter(e => isItem(e)));
+const connections = computed(() => elements.filter(e => isConnection(e)));
 
 // Temporary variables
 // ------------------------------------------------------------------------------------------------------------------------
@@ -323,11 +327,11 @@ function onScroll(e: any) : void {
 
 
 function sendToBack() : void {
-    if(selectedItem.value) selectedItem.value.z = ItemUtils.findMinZ(items) - 1;
+    if(selectedItem.value) selectedItem.value.z = ItemUtils.findMinZ(items.value as Item[]) - 1;
 }
 
 function bringToFront() : void {
-    if(selectedItem.value) selectedItem.value.z = ItemUtils.findMaxZ(items) + 1;    
+    if(selectedItem.value) selectedItem.value.z = ItemUtils.findMaxZ(items.value as Item[]) + 1;    
 }
 
 function changeItemColor() : void {
@@ -357,7 +361,7 @@ function elementGuidelines() {
 }
 
 function getItemById(id: string) : Item | undefined {
-    return items.find(n => n.id == id);
+    return (items.value as Item[]).find(n => n.id == id);
 }
 
 function undo() {  
