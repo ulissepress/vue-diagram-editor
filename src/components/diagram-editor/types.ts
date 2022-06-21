@@ -1,16 +1,16 @@
 // export type DiagramElement = Item | ItemConnection;
 export interface DiagramElement {
-    id:     string;
-    title:  string;
-    z:      number;
+    id:     string;     // The unique element ID
+    title:  string;     // The element title / label
+    z:      number;     // The element z-index
 }
 
 export interface Item extends DiagramElement {
     x: number;      // X coordinate (in px)
     y: number;      // Y coordinate (in px)
-    w: number;      // width (in px)
-    h: number;      // height (in px)
-    r: number;      // rotation angle (in degrees)
+    w: number;      // Width (in px)
+    h: number;      // Height (in px)
+    r: number;      // Rotation angle (in degrees)
 
     borderRadius: number;           // border radius (in px)
     
@@ -46,8 +46,6 @@ export enum ConnectionStyle {
     DASHED = "dashed",
     DOTTED = "dotted"
 }
-
-
 
 export enum EditorTools {
     SELECTION = 'selection',

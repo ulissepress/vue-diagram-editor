@@ -9,7 +9,7 @@
         <!-- Real connection -->
         <path :d="linePath" class="realpath" />
 
-        <!-- Ticker (invisible) connection for cathing user clicks -->
+        <!-- Ticker (invisible) connection for catching user clicks -->
         <path :d="linePath" class="ghostpath" :stroke-opacity='selected ? 0.2 : 0' @click.stop="emit('selected')" />
     </svg>
 </template>

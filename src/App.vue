@@ -1,5 +1,5 @@
 <template>
-    <div style="width: 100%; height: 95%;">
+    <div style="width: 100%; height: 95%; padding-top: 16px;">
         <DiagramEditor  :elements    = "elements"
                         @add-item    = "addNewItem" 
                         @delete-item = "deleteItem" />

@@ -4,37 +4,40 @@
         <!-- Rulers -->
         <Guides type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)', height: '30px' }" :style = "{ position: 'absolute', top: '0px'}" />
         <Guides type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width: '30px' }" :style = "{ position: 'absolute', top: '0px'}" />
-        <div style="position: absolute; top: 0px; left: 0px; width: 30px; height: 30px; background-color: #333;"></div>
+        <div class="rulers-left-top-box" />
 
         <!-- Editor Canvas -->
         <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll">
             <div ref="viewport" class="viewport" @click="selectNone">
                 <!-- Render Connections -->
-                <component v-for="(c, i) in (connections as ItemConnection[])" 
-                                                is        = "Connection" 
-                                                :key      = "c.id" 
-                                                :from     = "getItemById(c.from)" 
-                                                :to       = "getItemById(c.to)" 
-                                                :options  = "c" 
-                                                :selected = "c.id === selectedConnection?.id"
-                                                @selected = "selectedConnection = c; selectedItem = null;"/>
+                <component v-for="(c, i) in connections" 
+                        is        = "Connection" 
+                        :key      = "c.id" 
+                        :from     = "getItemById(c.from)" 
+                        :to       = "getItemById(c.to)" 
+                        :options  = "c" 
+                        :selected = "c.id === selectedConnection?.id"
+                        @selected = "selectedConnection = c; selectedItem = null;"/>
+                        
                 <!-- Render Items -->
-                <div v-for="(item, i) in (items as Item[])" 
-                                                :key           = "item.id" 
-                                                :data-item-id  = "item.id"
-                                                :class         = "{ 'item' : true, 'target': item.id === selectedItem?.id, 'locked': item.locked === true}" 
-                                                :style         = "getItemStyle(item)"
-                                                @click.stop    = "selectItem(item)" 
-                                                @dblclick.stop = "lockItem(item)"> 
+                <div v-for="(item, i) in items" 
+                        class          = "item"
+                        :key           = "item.id" 
+                        :data-item-id  = "item.id"
+                        :class         = "{ 'target': item.id === selectedItem?.id, 'locked': item.locked === true }" 
+                        :style         = "getItemStyle(item)"
+                        @click.stop    = "selectItem(item)" 
+                        @dblclick.stop = "lockItem(item)"> 
 
-                        <component v-if="item.component" :is="item.component" :item="item" />
+                        <component :is="item.component" :item="item" />
 
-                        <div class="decorator decorator-delete" v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
-                        <div class="decorator decorator-locked" v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
-                        <div class="decorator decorator-size"   v-if="item === selectedItem" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
+                        <div class="decorator decorator-delete" v-if="item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
+                        <div class="decorator decorator-locked" v-if="item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
+                        <div class="decorator decorator-size"   v-if="item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
                 </div> <!-- item -->
                 
-                <Moveable  v-if = "targetDefined"
+                <!-- Manage drag / resize / rotate / rounding of selected item -->
+                <Moveable v-if = "targetDefined"
                         ref     = "moveable"
                         :target = "['.target']"                      
                         :zoom   = "1 / zoomFactor"
@@ -57,9 +60,9 @@
                         :rotatable = "selectedItemActive"
                         :resizable = "selectedItemActive && selectedItem?.supportsResizable === true"
 
-                        @dragStart = "onDragStart"
-                        @drag      = "onDrag"
-                        @dragEnd   = "onDragEnd"
+                        @dragStart   = "onDragStart"
+                        @drag        = "onDrag"
+                        @dragEnd     = "onDragEnd"
 
                         @resizeStart = "onResizeStart"
                         @resize      = "onResize"
@@ -71,8 +74,7 @@
 
                         @roundStart  = "onRoundStart"
                         @round       = "onRound"
-                        @roundEnd    = "onRoundEnd"
-                        />
+                        @roundEnd    = "onRoundEnd" />
             </div> <!-- viewport -->
         </VueInfiniteViewer>
     
@@ -175,8 +177,8 @@ const historyManager     = ref(new HistoryManager());
 const currentTool        = ref(EditorTools.SELECTION);
 
 
-const items       = computed(() => elements.filter(e => isItem(e)));
-const connections = computed(() => elements.filter(e => isConnection(e)));
+const items       = computed(() => elements.filter(e => isItem(e)) as Item[]);
+const connections = computed(() => elements.filter(e => isConnection(e)) as ItemConnection[]);
 
 // Temporary variables
 // ------------------------------------------------------------------------------------------------------------------------
@@ -417,6 +419,14 @@ function redo() {
     height: 100%;
 }
 
+.rulers-left-top-box {
+    position: absolute; 
+    top: 0px; 
+    left: 0px; 
+    width: 30px; 
+    height: 30px; 
+    background-color: #333;
+}
 
 .item {
     box-sizing: border-box;
