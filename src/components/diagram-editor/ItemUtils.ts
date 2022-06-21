@@ -21,6 +21,8 @@ export default new class ItemUtils {
 
             background: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
             component: 'Shape',
+            
+            locked: false,
 
             ...item
         } as Item

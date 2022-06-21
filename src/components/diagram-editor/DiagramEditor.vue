@@ -10,16 +10,17 @@
         <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll">
             <div ref="viewport" class="viewport" @click="selectNone">
                 <!-- Render Connections -->
-                <component v-for="(c, i) in connections" :key="c.id" is="Connection" 
-                                                :from="getItemById(c.from)" 
-                                                :to="getItemById(c.to)" 
-                                                :options="c" 
-                                                :selected="c.id === selectedConnection?.id"
-                                                @selected="selectedConnection = c; selectedItem = null;"
-                                                />
-
+                <component v-for="(c, i) in (connections as ItemConnection[])" 
+                                                is        = "Connection" 
+                                                :key      = "c.id" 
+                                                :from     = "getItemById(c.from)" 
+                                                :to       = "getItemById(c.to)" 
+                                                :options  = "c" 
+                                                :selected = "c.id === selectedConnection?.id"
+                                                @selected = "selectedConnection = c; selectedItem = null;"/>
                 <!-- Render Items -->
-                <div v-for="(item, i) in items" :key           = "item.id" 
+                <div v-for="(item, i) in (items as Item[])" 
+                                                :key           = "item.id" 
                                                 :data-item-id  = "item.id"
                                                 :class         = "{ 'item' : true, 'target': item.id === selectedItem?.id, 'locked': item.locked === true}" 
                                                 :style         = "getItemStyle(item)"
@@ -434,7 +435,7 @@ function redo() {
 }
 
 .item.target {
-    font-weight: bold;
+    cursor: pointer;
 }
 
 .item.target.locked {
