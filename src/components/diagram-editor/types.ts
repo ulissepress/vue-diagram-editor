@@ -28,14 +28,26 @@ export interface Item extends DiagramElement {
 }
 
 export interface ItemConnection extends DiagramElement {
-    from:   string;
-    to:     string;
-    type:   ConnectionType;
-    style:  ConnectionStyle;
-    thick:  number;
-    color:  string;
+    from:      string;
+    to:        string;
+    
+    fromPoint: ConnectionPoint;
+    toPoint:   ConnectionPoint;
+
+    type:      ConnectionType;
+    style:     ConnectionStyle;
+
+    thick:     number;
+    color:     string;
 }
 
+export enum ConnectionPoint {
+    TOP    = "top",
+    BOTTOM = "bottom",
+    LEFT   = "left",
+    RIGHT  = "right",
+    //CENTER = "center"
+}
 
 export enum ConnectionType {
     LINE  = "line",

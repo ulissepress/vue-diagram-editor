@@ -90,13 +90,12 @@ const linePath = computed( () => {
 
 <style scoped>
 .connection {
-     position: absolute;
-     fill: none;
-     stroke-linecap: round;
-     stroke-linejoin: round;
-     /* border:   1px dashed red; */
+    position: absolute;
+    fill: none;
+    /* stroke-linecap: round; */
+    /* stroke-linejoin: round; */
     pointer-events: none;
-
+    border:   1px dashed red; 
 }
 
 .realpath {
