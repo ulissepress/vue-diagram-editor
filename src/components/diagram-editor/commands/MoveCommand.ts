@@ -1,13 +1,11 @@
 import Command from './Command';
 import { Item } from '../types';
 
+type Pos = [number, number];
+
 export default class MoveCommand implements Command {
 
-    private newPos: [number, number] = [0, 0];
-
-    constructor(private item: Item, private oldPos: [number, number]) {
-        this.newPos = [item.x, item.y];
-    }
+    constructor(private item: Item, private oldPos: Pos, private newPos: Pos) {}
 
     do() : void {
         this.item.x = this.newPos[0];

@@ -3,17 +3,8 @@ import { Item } from '../types';
 
 export default class RoundCommand implements Command {
 
-    private newRound: number = 0;
-
-    constructor(private item: Item, private oldRound: number) {
-        this.newRound = item.borderRadius;
-    }
-
-    do() : void {
-        this.item.borderRadius = this.newRound;
-    }
-
-    undo(): void {
-        this.item.borderRadius = this.oldRound;
-    }
+    constructor(private item: Item, private oldBorderRadius: number, private newBorderRadius: number) {}
+    
+    do() : void  { this.item.borderRadius = this.newBorderRadius; }
+    undo(): void { this.item.borderRadius = this.oldBorderRadius; }
 }

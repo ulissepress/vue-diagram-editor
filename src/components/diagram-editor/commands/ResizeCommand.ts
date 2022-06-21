@@ -1,13 +1,11 @@
 import Command from './Command';
 import { Item } from '../types';
 
+type Size = [number, number];
+
 export default class ResizeCommand implements Command {
 
-    private newSize: [number, number] = [0, 0];
-
-    constructor(private item: Item, private oldSize: [number, number]) {
-        this.newSize = [item.w, item.h];
-    }
+    constructor(private item: Item, private oldSize: Size, private newSize: Size) {}
 
     do() : void {
         this.item.w = this.newSize[0];

@@ -5,15 +5,8 @@ export default class RotateCommand implements Command {
 
     private newAngle: number = 0;
 
-    constructor(private item: Item, private oldAngle: number) {
-        this.newAngle = item.r;
-    }
+    constructor(private item: Item, private oldAngle: number, private newAngle: number) {}
 
-    do() : void {
-        this.item.r = this.newAngle;
-    }
-
-    undo(): void {
-        this.item.r = this.oldAngle;
-    }
+    do()  : void { this.item.r = this.newAngle; }
+    undo(): void { this.item.r = this.oldAngle; }
 }
