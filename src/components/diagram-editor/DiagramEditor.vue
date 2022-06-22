@@ -119,7 +119,8 @@ import MoveCommand from './commands/MoveCommand';
 import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
-import ItemUtils from './ItemUtils';
+import { findMaxZ, findMinZ } from './helpers';
+
 import { DiagramElement, EditorTools, isConnection, isItem, Item, ItemConnection } from './types';
 
 
@@ -335,11 +336,11 @@ function onScroll(e: any) : void {
 
 
 function sendToBack() : void {
-    if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, ItemUtils.findMinZ(items.value as Item[]) - 1));    
+    if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, findMinZ(items.value as Item[]) - 1));    
 }
 
 function bringToFront() : void {
-    if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, ItemUtils.findMaxZ(items.value as Item[]) + 1));    
+    if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, findMaxZ(items.value as Item[]) + 1));    
 }
 
 function changeBackColor() : void {
@@ -357,7 +358,7 @@ function changeBackColor() : void {
 
 function deleteItem() {
     if(isItem(selectedItem.value)) {
-        emit('delete-item', selectedItem.value, historyManager.value);
+        emit('delete-item', selectedItem.value, historyManager.value as HistoryManager);
         selectNone();
     }
 
