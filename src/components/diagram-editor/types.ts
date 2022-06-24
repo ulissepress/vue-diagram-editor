@@ -62,11 +62,11 @@ export enum ConnectionStyle {
 }
 
 export enum EditorTools {
-    SELECTION = 'selection',
-    TEXT      = 'text',
-    SHAPE     = 'shape',
-    IMAGE     = 'image',
-    WIDGET    = 'widget',
+    SELECT = 'select',
+    TEXT   = 'text',
+    SHAPE  = 'shape',
+    IMAGE  = 'image',
+    WIDGET = 'widget',
     
     CONNECTION = 'connection'
 }

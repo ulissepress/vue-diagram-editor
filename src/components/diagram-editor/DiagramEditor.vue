@@ -7,8 +7,8 @@
         <div class="rulers-left-top-box" />
 
         <!-- Editor Canvas -->
-        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll">
-            <div ref="viewport" class="viewport" @click="selectNone">
+        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll" @mousemove="logMouseMove" @click="onViewportClick" :style="{ cursor: currentTool == EditorTools.SELECT ? 'auto' : 'crosshair'}">
+            <div ref="viewport" class="viewport" >
                 <!-- Render Connections -->
                 <component v-for="(c, i) in connections" 
                         :is       = "c.component" 
@@ -27,8 +27,8 @@
                         :data-item-id  = "item.id"
                         :class         = "{ 'target': item.id === selectedItem?.id, 'locked': item.locked === true }" 
                         :style         = "getItemStyle(item)"
-                        @click.stop    = "selectItem(item)" 
-                        @dblclick.stop = "lockItem(item)"> 
+                        @click.stop    = "currentTool == EditorTools.SELECT && selectItem(item)" 
+                        @dblclick.stop = "currentTool == EditorTools.SELECT && lockItem(item)"> 
 
                         <component :is="item.component" :item="item" />
 
@@ -38,7 +38,7 @@
                 </div> <!-- item -->
                 
                 <!-- Manage drag / resize / rotate / rounding of selected item -->
-                <Moveable v-if = "targetDefined && isItem(selectedItem)"
+                <Moveable v-if = "currentTool == EditorTools.SELECT && targetDefined && isItem(selectedItem)"
                         ref     = "moveable"
                         :target = "['.target']"                      
                         :zoom   = "1 / zoomFactor"
@@ -78,15 +78,18 @@
                         @roundEnd    = "onRoundEnd" />
             </div> <!-- viewport -->
         </VueInfiniteViewer>
-    
+
         <!-- Editor Toolbar -->
-        <div class="toolbar">
+        <Toolbar :selectedTool="currentTool" @toolSelected="selectCurrentTool"/>
+
+        <!-- Editor Info Panel -->
+        <div class="info-panel">
             ZOOM: <button @click="zoomOut">-</button> {{ zoomFactor * 100 }}% 
                 <button @click="zoomIn">+</button>&nbsp;&nbsp;
                 <button @click="zoomReset">Reset</button>
             <br/><br/>
-            <button @click="emit('add-item')">Add New</button>
-            &nbsp;
+            <!-- <button @click="emit('add-item')">Add New</button> 
+            &nbsp;-->
             <button @click="deleteItem"      :disabled="!selectedItemActive">Delete</button>&nbsp;
             <button @click="changeBackColor" :disabled="!selectedItemActive">Change Color</button><br/><br/>
             <button @click="sendToBack"      :disabled="!selectedItemActive">Send to back</button>&nbsp;
@@ -94,12 +97,14 @@
             <button @click="undo"            :disabled="!historyManager.canUndo()">Undo</button>&nbsp;
             <button @click="redo"            :disabled="!historyManager.canRedo()">Redo</button>
             
+            <pre>TOOL: {{ currentTool }}, Mouse: {{ mouseCoords }}</pre>         
+            
             <div v-if="targetDefined">
                 <p>Press SHIFT key to keep aspect ratio while resizing</p>
                 <h3>Selected Item</h3>
                 <pre>{{ selectedItem }}</pre>            
             </div> 
-        </div> <!-- toolbar -->
+        </div> <!-- info-panel -->
         
     </div> <!-- editor-container -->    
 </template>
@@ -119,8 +124,9 @@ import MoveCommand from './commands/MoveCommand';
 import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
-import { findMaxZ, findMinZ } from './helpers';
+import { createItem, findMaxZ, findMinZ } from './helpers';
 
+import Toolbar from './Toolbar.vue';
 import { DiagramElement, EditorTools, isConnection, isItem, Item, ItemConnection } from './types';
 
 
@@ -131,7 +137,7 @@ export interface DiagramEditorProps {
 }
 
 export interface DiagramEditorEvents {
-    (e: 'add-item'): void
+    (e: 'add-item', item: Item): void
     (e: 'delete-item', item: Item, historyManager: HistoryManager): void
     
     (e: 'add-connection',    connection: ItemConnection): void
@@ -182,7 +188,7 @@ const selectedItemActive = computed(() => {
 
 const shiftPressed       = useKeyModifier('Shift')
 const historyManager     = ref(new HistoryManager());
-const currentTool        = ref(EditorTools.SELECTION);
+const currentTool        = ref(EditorTools.SELECT);
 
 
 const items       = computed(() => elements.filter(e => isItem(e)) as Item[]);
@@ -194,6 +200,8 @@ let originPos:   [number, number] = [0, 0];
 let originSize:  [number, number] = [0, 0];
 let originAngle: number = 0;
 let originRound: number = 0;
+
+const mouseCoords = ref<[number, number]>([0, 0]);
 
 
 function getItemStyle(item: Item) : StyleValue {
@@ -397,6 +405,53 @@ function redo() {
     nextTick(() => moveable.value?.updateTarget());
 }
 
+
+function selectCurrentTool(tool: EditorTools) : void {
+    console.log('selectCurrentTool', tool);
+    
+    currentTool.value = tool;
+    selectNone();
+}
+
+function onViewportClick(e: any): void {
+    console.log('onViewportClick', e);
+    
+    if(currentTool.value == EditorTools.SELECT) {
+        selectNone();
+        return;
+    }
+
+    // Clicking the viewport in NON-selection mode ==> Add a new element
+    if(currentTool.value == EditorTools.SHAPE) {
+        const x = viewer.value!.getScrollLeft();
+        const y = viewer.value!.getScrollTop();
+
+
+        console.log('onViewportClick', x, y, viewer.value);
+        
+        
+        const item = createItem({
+            x,
+            y,
+            w: 200,
+            h: 100,
+            component: "Shape",
+            backgroundColor: "yellow",
+        });
+        console.log('creating item', item);
+
+        emit('add-item', item);        
+    }
+}
+
+function logMouseMove(e: any) {
+   const x = e.pageX - e.currentTarget.offsetLeft; 
+   const y = e.pageY - e.currentTarget.offsetTop; 
+
+   mouseCoords.value = [x, y];
+
+   
+}
 </script>
 
 
@@ -410,7 +465,7 @@ function redo() {
     height: 100%;    
 }
 
-.toolbar {
+.info-panel {
     position: absolute;
     right: 20px;
     top: 60px;

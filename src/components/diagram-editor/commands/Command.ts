@@ -1,5 +1,5 @@
 
 export default interface Command {
-    do() : void;
+    do()  : void;
     undo(): void;
 }
