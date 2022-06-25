@@ -1,6 +1,7 @@
 <template>
     <div style="width: 100%; height: 95%; padding-top: 16px; margin: 0 auto;">
-        <DiagramEditor  :elements    = "elements"
+        <DiagramEditor  :editable    = "true"
+                        :elements    = "elements"
                         @add-item    = "addNewItem" 
                         @delete-item = "deleteItem" />
     </div>
@@ -32,7 +33,7 @@ let elements: DiagramElement[] = reactive([
     createItem( { title: 'Circle',            component: "Ellipse",     w: 200, h: 200, supportsRoundable: false } ),
     
     createItem( { title: 'My Image',          component: "Image",       w: 250, h: 250, componentOptions: { src : "https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80" }} ),
-    createItem( { title: 'My Image',          component: "Image",       w: 800, h: 400, componentOptions: { src : "https://stmicroelectronics-my.sharepoint.com/:i:/r/personal/giuseppe-angelo_randazzo_st_com/Documents/_public/8d-action-list.png?csf=1&web=1&e=vqfufX" }} ),
+    //createItem( { title: 'My Image',          component: "Image",       w: 800, h: 400, componentOptions: { src : "https://stmicroelectronics-my.sharepoint.com/:i:/r/personal/giuseppe-angelo_randazzo_st_com/Documents/_public/8d-action-list.png?csf=1&web=1&e=vqfufX" }} ),
 
 
 

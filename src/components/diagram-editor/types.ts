@@ -1,4 +1,3 @@
-// export type DiagramElement = Item | ItemConnection;
 export interface DiagramElement {
     id:     string;             // The unique element ID
     title:  string;             // The element title / label
@@ -79,3 +78,13 @@ export function isItem(e: DiagramElement | undefined | null) : e is Item {
 export function isConnection(e: DiagramElement | undefined | null) : e is ItemConnection {
     return e !== null && e != undefined && "from" in e;
 } 
+
+
+export interface WidgetDefinition {
+    name:  string;              // The widget name. Example: 'my_shape
+    label:  string;             // The widget label. Example: 'My Shape'
+    icon:  string;              // The widget icon. Example: 'my_shape.png'
+    component: string;          // The Vue component used to render this widget
+    componentOptions?: any;     // The default Vue component options used to instantiate this widget
+
+}

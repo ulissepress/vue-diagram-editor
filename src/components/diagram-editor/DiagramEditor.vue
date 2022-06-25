@@ -2,12 +2,12 @@
     <div class="editor-container">
 
         <!-- Rulers -->
-        <Guides type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)', height: '30px' }" :style = "{ position: 'absolute', top: '0px'}" />
-        <Guides type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width: '30px' }" :style = "{ position: 'absolute', top: '0px'}" />
-        <div class="rulers-left-top-box" />
+        <Guides v-show='guidesVisible' type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)', height: '30px' }" :style = "{ position: 'absolute', top: '0px'}" />
+        <Guides v-show='guidesVisible' type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width: '30px' }" :style = "{ position: 'absolute', top: '0px'}" />
+        <div    v-show='guidesVisible' class="rulers-left-top-box" ></div>
 
         <!-- Editor Canvas -->
-        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor" @wheel="onScroll" @scroll="onScroll" @mousemove="logMouseMove" @click="onViewportClick" :style="{ cursor: currentTool == EditorTools.SELECT ? 'auto' : 'crosshair'}">
+        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor"  @wheel="onScroll" @scroll="onScroll"  @click="editable && onViewportClick" :style="{ cursor: currentTool == EditorTools.SELECT ? 'auto' : 'crosshair'}" @keypress="onKeyDown">
             <div ref="viewport" class="viewport" >
                 <!-- Render Connections -->
                 <component v-for="(c, i) in connections" 
@@ -27,18 +27,18 @@
                         :data-item-id  = "item.id"
                         :class         = "{ 'target': item.id === selectedItem?.id, 'locked': item.locked === true }" 
                         :style         = "getItemStyle(item)"
-                        @click.stop    = "currentTool == EditorTools.SELECT && selectItem(item)" 
-                        @dblclick.stop = "currentTool == EditorTools.SELECT && lockItem(item)"> 
+                        @click.stop    = "editable && currentTool == EditorTools.SELECT && selectItem(item)" 
+                        @dblclick.stop = "editable && currentTool == EditorTools.SELECT && lockItem(item)"> 
 
                         <component :is="item.component" :item="item" />
 
-                        <div class="decorator decorator-delete" v-if="item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
-                        <div class="decorator decorator-locked" v-if="item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
-                        <div class="decorator decorator-size"   v-if="item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
+                        <div class="decorator decorator-delete" v-if="editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
+                        <div class="decorator decorator-locked" v-if="editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
+                        <div class="decorator decorator-size"   v-if="editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
                 </div> <!-- item -->
                 
                 <!-- Manage drag / resize / rotate / rounding of selected item -->
-                <Moveable v-if = "currentTool == EditorTools.SELECT && targetDefined && isItem(selectedItem)"
+                <Moveable v-if = "editable === true && currentTool == EditorTools.SELECT && targetDefined && isItem(selectedItem)"
                         ref     = "moveable"
                         :target = "['.target']"                      
                         :zoom   = "1 / zoomFactor"
@@ -80,10 +80,10 @@
         </VueInfiniteViewer>
 
         <!-- Editor Toolbar -->
-        <Toolbar :selectedTool="currentTool" @toolSelected="selectCurrentTool"/>
+        <Toolbar v-if='editable' :selectedTool="currentTool" @toolSelected="selectCurrentTool"/>
 
         <!-- Editor Info Panel -->
-        <div class="info-panel">
+        <div v-if='editable' class="info-panel">
             ZOOM: <button @click="zoomOut">-</button> {{ zoomFactor * 100 }}% 
                 <button @click="zoomIn">+</button>&nbsp;&nbsp;
                 <button @click="zoomReset">Reset</button>
@@ -97,7 +97,7 @@
             <button @click="undo"            :disabled="!historyManager.canUndo()">Undo</button>&nbsp;
             <button @click="redo"            :disabled="!historyManager.canRedo()">Redo</button>
             
-            <pre>TOOL: {{ currentTool }}, Mouse: {{ mouseCoords }}</pre>         
+            <pre>TOOL: {{ currentTool }}</pre>         
             
             <div v-if="targetDefined">
                 <p>Press SHIFT key to keep aspect ratio while resizing</p>
@@ -133,7 +133,8 @@ import { DiagramElement, EditorTools, isConnection, isItem, Item, ItemConnection
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
-    elements: DiagramElement[]
+    elements: DiagramElement[],
+    editable?: boolean,
 }
 
 export interface DiagramEditorEvents {
@@ -144,8 +145,13 @@ export interface DiagramEditorEvents {
     (e: 'delete-connection', connection: ItemConnection): void
 }
 
-const { elements } = defineProps<DiagramEditorProps>();
-const emit         = defineEmits<DiagramEditorEvents>();
+// Define props
+const { elements, editable } = withDefaults(defineProps<DiagramEditorProps>(), {
+    editable: true,
+});
+
+// Define events
+const emit = defineEmits<DiagramEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 onMounted(() => {
@@ -174,8 +180,11 @@ const viewer             = ref();
 const viewport           = ref()
 const canvas             = ref<SVGElement>()
 const moveable           = ref();
+
 const hGuides            = ref();
 const vGuides            = ref();
+const guidesVisible      = computed(() => editable && zoomFactor.value >= 0.5);
+
 const selectedItem       = ref<DiagramElement | null>(null);
 const targetDefined      = computed(() => selectedItem.value !== null)
 
@@ -444,13 +453,9 @@ function onViewportClick(e: any): void {
     }
 }
 
-function logMouseMove(e: any) {
-   const x = e.pageX - e.currentTarget.offsetLeft; 
-   const y = e.pageY - e.currentTarget.offsetTop; 
 
-   mouseCoords.value = [x, y];
-
-   
+function onKeyDown(e: any) {
+    console.log('onKeyDown', e);
 }
 </script>
 
@@ -463,12 +468,14 @@ function logMouseMove(e: any) {
     border: 1px solid #ccc;
     width: 100%;
     height: 100%;    
+    background-color: white;
+
 }
 
 .info-panel {
     position: absolute;
+    top: 40px;
     right: 20px;
-    top: 60px;
     width: 260px;
     height: auto;
     border: 1px solid;
