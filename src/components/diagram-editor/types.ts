@@ -61,12 +61,15 @@ export enum ConnectionStyle {
 }
 
 export enum EditorTools {
-    SELECT = 'select',
-    TEXT   = 'text',
-    SHAPE  = 'shape',
-    IMAGE  = 'image',
-    WIDGET = 'widget',
-    
+    SELECT     = 'select',
+    TEXT       = 'text',
+    IMAGE      = 'image',
+    LINE       = 'line',
+    RECTANGLE  = 'rectangle',
+    TRIANGLE   = 'triangle',
+    ELLIPSE    = 'ellipse',
+    STAR       = 'star',
+    WIDGET     = 'widget',
     CONNECTION = 'connection'
 }
 
@@ -81,10 +84,14 @@ export function isConnection(e: DiagramElement | undefined | null) : e is ItemCo
 
 
 export interface WidgetDefinition {
-    name:  string;              // The widget name. Example: 'my_shape
-    label:  string;             // The widget label. Example: 'My Shape'
-    icon:  string;              // The widget icon. Example: 'my_shape.png'
-    component: string;          // The Vue component used to render this widget
+    type:      string;          // The widget type. Example: 'my_shape
+    label:     string;          // The widget label. Example: 'My Shape'
+    descr:     string;          // The widget description. Example: 'A shape with rounded borders'
+    thumbnail: string;          // The widget thumbnail. Example: 'my_shape.png'
+  
+    component:         string;  // The Vue component used to render this widget
     componentOptions?: any;     // The default Vue component options used to instantiate this widget
 
+    canBeResized?: boolean;     // Is the widget resizable? Default: true
+    canBeRounded?: boolean;     // Is the widget roundable? Default: true
 }

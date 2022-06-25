@@ -80,7 +80,10 @@
         </VueInfiniteViewer>
 
         <!-- Editor Toolbar -->
-        <Toolbar v-if='editable' :selectedTool="currentTool" @toolSelected="selectCurrentTool"/>
+        <Toolbar v-if='editable' 
+                :supportsCustomWidgets="true"
+                :selectedTool="currentTool" 
+                @toolSelected="selectCurrentTool"/>
 
         <!-- Editor Info Panel -->
         <div v-if='editable' class="info-panel">
@@ -128,7 +131,6 @@ import { createItem, findMaxZ, findMinZ } from './helpers';
 
 import Toolbar from './Toolbar.vue';
 import { DiagramElement, EditorTools, isConnection, isItem, Item, ItemConnection } from './types';
-
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
