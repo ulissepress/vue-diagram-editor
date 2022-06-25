@@ -1,12 +1,15 @@
 <template>
     <div class="toolbar">
         <div v-for = "t in tools" 
-            :key="t.type" 
-            :class="{'tool' : t.type !== 'separator', 'separator': t.type === 'separator', 'selected': selectedTool == t.type }"
-            :title="t.title"
-            @click="t.type !== 'separator' && onToolSelected(t.type, selectedTool)">  
-            
-            <Icon v-if="t.type !== 'separator'" :icon="t.icon" />
+            :key   = "t.type" 
+            :title = "t.title"
+            @click = "t.type !== 'separator' && onToolSelected(t.type, selectedTool)"
+            :class = "{
+                'tool'     : t.type !== 'separator', 
+                'selected' : selectedTool == t.type,
+                'separator': t.type === 'separator', 
+            }">
+                <Icon v-if="t.type !== 'separator'" :icon="t.icon || ''" />
         </div>
     </div>
 </template>
@@ -18,8 +21,8 @@ import { EditorTools } from './types';
 
 interface Tool {
     type:  EditorTools | "separator";
-    title: string;
-    icon:  string;
+    title?: string;
+    icon?:  string;
 }
 
 // The component props and events
@@ -43,21 +46,21 @@ onUpdated(()=> console.log('Toolbar updated', selectedTool))
 
 
 const tools: Tool[] = [
-    { type: EditorTools.SELECT,     title: 'Select',    icon: 'ads_click'   },    
-    { type: 'separator', title: '', icon: '' },    
-    { type: EditorTools.TEXT,       title: 'Text',      icon: 'text_fields' },
-    { type: EditorTools.IMAGE,      title: 'Image',     icon: 'image'       },
-    { type: EditorTools.CONNECTION, title: 'Link',      icon: 'share'       },    
-    { type: 'separator', title: '', icon: '' },    
-    { type: EditorTools.LINE,       title: 'Line',      icon: 'horizontal_rule'    },
-    { type: EditorTools.RECTANGLE,  title: 'Rectangle', icon: 'rectangle'    },
-    { type: EditorTools.TRIANGLE,   title: 'Triangle',  icon: 'change_history' },
-    { type: EditorTools.ELLIPSE,    title: 'Ellipse',   icon: 'circle'      },
-    { type: EditorTools.STAR,       title: 'Shape',     icon: 'grade'       },
+    { type: EditorTools.SELECT,     title: 'Select', icon: 'ads_click' },    
+    { type: 'separator' },    
+    { type: EditorTools.TEXT,       title: 'Text',       icon: 'text_fields' },
+    { type: EditorTools.IMAGE,      title: 'Image',      icon: 'image'       },
+    { type: EditorTools.CONNECTION, title: 'Connection', icon: 'share'       },    
+    { type: 'separator' },    
+    { type: EditorTools.LINE,       title: 'Line',      icon: 'horizontal_rule' },
+    { type: EditorTools.RECTANGLE,  title: 'Rectangle', icon: 'rectangle'       },
+    { type: EditorTools.TRIANGLE,   title: 'Triangle',  icon: 'change_history'  },
+    { type: EditorTools.ELLIPSE,    title: 'Ellipse',   icon: 'circle'          },
+    { type: EditorTools.STAR,       title: 'Shape',     icon: 'grade'           },
 ];
 
 if(supportsCustomWidgets) {
- tools.push({ type: 'separator', title: '', icon: '' });
+ tools.push({ type: 'separator' });
  tools.push({ type: EditorTools.WIDGET, title: 'Widget',  icon: 'grid_view' })
 }
 function onToolSelected(toolType: EditorTools, currentSelectedTool: EditorTools) {    

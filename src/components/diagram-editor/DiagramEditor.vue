@@ -7,7 +7,7 @@
         <div    v-show='guidesVisible' class="rulers-left-top-box" ></div>
 
         <!-- Editor Canvas -->
-        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor"  @wheel="onScroll" @scroll="onScroll"  @click="editable && onViewportClick" :style="{ cursor: currentTool == EditorTools.SELECT ? 'auto' : 'crosshair'}" @keypress="onKeyDown">
+        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor"  @wheel="onScroll" @scroll="onScroll"  @click="editable && onViewportClick($event)" :style="{ cursor: currentTool == EditorTools.SELECT ? 'auto' : 'crosshair'}" @keypress="onKeyDown">
             <div ref="viewport" class="viewport" >
                 <!-- Render Connections -->
                 <component v-for="(c, i) in connections" 
