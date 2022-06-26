@@ -19,7 +19,7 @@ export function createItem(item?: Partial<Item>) : Item {
         supportsResizable: true,
 
         backgroundColor: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
-        component: 'Shape',
+        component: 'Rectangle',
         
         locked: false,
 

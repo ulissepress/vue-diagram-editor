@@ -60,7 +60,7 @@ export enum ConnectionStyle {
     DOTTED = "dotted"
 }
 
-export enum EditorTools {
+export enum EditorTool {
     SELECT     = 'select',
     TEXT       = 'text',
     IMAGE      = 'image',
@@ -72,6 +72,34 @@ export enum EditorTools {
     WIDGET     = 'widget',
     CONNECTION = 'connection'
 }
+
+export interface ToolDefinition {
+    type:  EditorTool | "separator";
+    title?: string;
+    icon?:  string;
+    
+    item?: Partial<Item>
+}
+
+export const toolDefinitions: ToolDefinition[] = [
+    { type: EditorTool.SELECT,     title: 'Select', icon: 'ads_click' },    
+    { type: 'separator' },    
+    { type: EditorTool.TEXT,       title: 'Text',       icon: 'text_fields',     item: { component: "Text"       }},
+    { type: EditorTool.IMAGE,      title: 'Image',      icon: 'image',           item: { component: "Image"      }},
+    { type: EditorTool.CONNECTION, title: 'Connection', icon: 'share',           item: { component: "Connection" }},
+    { type: 'separator' },    
+    { type: EditorTool.LINE,       title: 'Line',       icon: 'horizontal_rule', item: { component: "Line"      }},
+    { type: EditorTool.RECTANGLE,  title: 'Rectangle',  icon: 'rectangle',       item: { component: "Rectangle" }},
+    { type: EditorTool.ELLIPSE,    title: 'Ellipse',    icon: 'circle',          item: { component: "Ellipse"   }},
+    { type: EditorTool.TRIANGLE,   title: 'Triangle',   icon: 'change_history',  item: { component: "Triangle"  }},
+    { type: EditorTool.STAR,       title: 'Star',       icon: 'grade',           item: { component: "Star"      }},
+];
+
+export function getToolDefinition(toolType: EditorTool) : ToolDefinition {
+    const t = toolDefinitions.find(t => t.type === toolType);
+    if(!t) throw new Error("Invalid tool type: " + toolType);
+    return t;
+} 
 
 
 export function isItem(e: DiagramElement | undefined | null) : e is Item {

@@ -7,7 +7,7 @@
         <div    v-show='guidesVisible' class="rulers-left-top-box" ></div>
 
         <!-- Editor Canvas -->
-        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor"  @wheel="onScroll" @scroll="onScroll"  @click="editable && onViewportClick($event)" :style="{ cursor: currentTool == EditorTools.SELECT ? 'auto' : 'crosshair'}" @keypress="onKeyDown">
+        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor"  @wheel="onScroll" @scroll="onScroll"  @click="editable && onViewportClick($event)" :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair'}" @keypress="onKeyDown">
             <div ref="viewport" class="viewport" >
                 <!-- Render Connections -->
                 <component v-for="(c, i) in connections" 
@@ -27,8 +27,8 @@
                         :data-item-id  = "item.id"
                         :class         = "{ 'target': item.id === selectedItem?.id, 'locked': item.locked === true }" 
                         :style         = "getItemStyle(item)"
-                        @click.stop    = "editable && currentTool == EditorTools.SELECT && selectItem(item)" 
-                        @dblclick.stop = "editable && currentTool == EditorTools.SELECT && lockItem(item)"> 
+                        @click.stop    = "editable && selectItem(item)" 
+                        @dblclick.stop = "editable && lockItem(item)"> 
 
                         <component :is="item.component" :item="item" />
 
@@ -38,7 +38,7 @@
                 </div> <!-- item -->
                 
                 <!-- Manage drag / resize / rotate / rounding of selected item -->
-                <Moveable v-if = "editable === true && currentTool == EditorTools.SELECT && targetDefined && isItem(selectedItem)"
+                <Moveable v-if = "editable === true && targetDefined && isItem(selectedItem)"
                         ref     = "moveable"
                         :target = "['.target']"                      
                         :zoom   = "1 / zoomFactor"
@@ -100,7 +100,7 @@
             <button @click="undo"            :disabled="!historyManager.canUndo()">Undo</button>&nbsp;
             <button @click="redo"            :disabled="!historyManager.canRedo()">Redo</button>
             
-            <pre>TOOL: {{ currentTool }}</pre>         
+            <pre>TOOL: {{ getToolDefinition(currentTool) }}</pre>
             
             <div v-if="targetDefined">
                 <p>Press SHIFT key to keep aspect ratio while resizing</p>
@@ -130,7 +130,7 @@ import RoundCommand from './commands/RoundCommand';
 import { createItem, findMaxZ, findMinZ } from './helpers';
 
 import Toolbar from './Toolbar.vue';
-import { DiagramElement, EditorTools, isConnection, isItem, Item, ItemConnection } from './types';
+import { DiagramElement, EditorTool, getToolDefinition, isConnection, isItem, Item, ItemConnection } from './types';
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
@@ -199,7 +199,7 @@ const selectedItemActive = computed(() => {
 
 const shiftPressed       = useKeyModifier('Shift')
 const historyManager     = ref(new HistoryManager());
-const currentTool        = ref(EditorTools.SELECT);
+const currentTool        = ref(EditorTool.SELECT);
 
 
 const items       = computed(() => elements.filter(e => isItem(e)) as Item[]);
@@ -417,7 +417,7 @@ function redo() {
 }
 
 
-function selectCurrentTool(tool: EditorTools) : void {
+function selectCurrentTool(tool: EditorTool) : void {
     console.log('selectCurrentTool', tool);
     
     currentTool.value = tool;
@@ -427,13 +427,13 @@ function selectCurrentTool(tool: EditorTools) : void {
 function onViewportClick(e: any): void {
     console.log('onViewportClick', e);
     
-    if(currentTool.value == EditorTools.SELECT) {
+    if(currentTool.value == EditorTool.SELECT) {
         selectNone();
         return;
     }
 
     // Clicking the viewport in NON-selection mode ==> Add a new element
-    if(currentTool.value == EditorTools.SHAPE) {
+    if(currentTool.value == EditorTool.RECTANGLE) {
         const x = viewer.value!.getScrollLeft();
         const y = viewer.value!.getScrollTop();
 

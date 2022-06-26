@@ -1,6 +1,6 @@
 <template>
     <div class="toolbar">
-        <div v-for = "t in tools" 
+        <div v-for = "t in toolDefinitions" 
             :key   = "t.type" 
             :title = "t.title"
             @click = "t.type !== 'separator' && onToolSelected(t.type, selectedTool)"
@@ -17,10 +17,10 @@
 <script setup lang="ts">
 import { onMounted, onUpdated } from 'vue';
 import Icon from './Icon.vue';
-import { EditorTools } from './types';
+import { EditorTool, toolDefinitions } from './types';
 
 interface Tool {
-    type:  EditorTools | "separator";
+    type:  EditorTool | "separator";
     title?: string;
     icon?:  string;
 }
@@ -28,7 +28,7 @@ interface Tool {
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 interface ToolbarProps {
-    selectedTool: EditorTools,
+    selectedTool: EditorTool,
     supportsCustomWidgets: boolean,
 }
 
@@ -36,7 +36,7 @@ interface ToolbarProps {
 const { selectedTool, supportsCustomWidgets } = defineProps<ToolbarProps>();
 
 interface ToolbarEvents {
-    (e: 'toolSelected', toolType: EditorTools): void    
+    (e: 'toolSelected', toolType: EditorTool): void    
 }
 
 const emit = defineEmits<ToolbarEvents>();
@@ -45,25 +45,11 @@ onMounted(()=> console.log('Toolbar mounted', selectedTool))
 onUpdated(()=> console.log('Toolbar updated', selectedTool))
 
 
-const tools: Tool[] = [
-    { type: EditorTools.SELECT,     title: 'Select', icon: 'ads_click' },    
-    { type: 'separator' },    
-    { type: EditorTools.TEXT,       title: 'Text',       icon: 'text_fields' },
-    { type: EditorTools.IMAGE,      title: 'Image',      icon: 'image'       },
-    { type: EditorTools.CONNECTION, title: 'Connection', icon: 'share'       },    
-    { type: 'separator' },    
-    { type: EditorTools.LINE,       title: 'Line',      icon: 'horizontal_rule' },
-    { type: EditorTools.RECTANGLE,  title: 'Rectangle', icon: 'rectangle'       },
-    { type: EditorTools.TRIANGLE,   title: 'Triangle',  icon: 'change_history'  },
-    { type: EditorTools.ELLIPSE,    title: 'Ellipse',   icon: 'circle'          },
-    { type: EditorTools.STAR,       title: 'Shape',     icon: 'grade'           },
-];
-
-if(supportsCustomWidgets) {
- tools.push({ type: 'separator' });
- tools.push({ type: EditorTools.WIDGET, title: 'Widget',  icon: 'grid_view' })
-}
-function onToolSelected(toolType: EditorTools, currentSelectedTool: EditorTools) {    
+// if(supportsCustomWidgets) {
+//  tools.push({ type: 'separator' });
+//  tools.push({ type: EditorTool.WIDGET, title: 'Widget',  icon: 'grid_view' })
+// }
+function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {    
     if(toolType == currentSelectedTool) return;
     
     console.log('Tool selected:', toolType);
@@ -87,6 +73,7 @@ function onToolSelected(toolType: EditorTools, currentSelectedTool: EditorTools)
     justify-content: center;
     align-items: center; 
     gap: 0px;
+    
     user-select: none;
 }
 
