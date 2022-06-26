@@ -7,8 +7,8 @@
         <div    v-show='guidesVisible' class="rulers-left-top-box" ></div>
 
         <!-- Editor Canvas -->
-        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor"  @wheel="onScroll" @scroll="onScroll"  @click="editable && onViewportClick($event)" :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair'}" @keypress="onKeyDown">
-            <div ref="viewport" class="viewport" >
+        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor"  @wheel="onScroll" @scroll="onScroll"  @click.stop="editable && onViewportClick($event)" :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair'}" @mousemove="onMouseMove">
+            <div ref="viewport" class="viewport" style="background-color: yellow;">
                 <!-- Render Connections -->
                 <component v-for="(c, i) in connections" 
                         :is       = "c.component" 
@@ -21,7 +21,7 @@
                         @selected = "selectedItem = c"/>
                         
                 <!-- Render Items -->
-                <div v-for="(item, i) in items" 
+                <div v-for="(item, i) in items"                 
                         class          = "item"
                         :key           = "item.id" 
                         :data-item-id  = "item.id"
@@ -101,6 +101,7 @@
             <button @click="redo"            :disabled="!historyManager.canRedo()">Redo</button>
             
             <pre>TOOL: {{ getToolDefinition(currentTool) }}</pre>
+            <pre>MOUSE: {{ mouseCoords }}</pre>
             
             <div v-if="targetDefined">
                 <p>Press SHIFT key to keep aspect ratio while resizing</p>
@@ -119,6 +120,7 @@ import { computed, nextTick, onMounted, onUpdated, ref, StyleValue } from "vue";
 import Guides from "vue-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
+import AddCommand from './commands/AddCommand';
 import ChangeBackgroundColorCommand from './commands/ChangeBackgroundColorCommand';
 import ChangeZOrderCommand from './commands/ChangeZOrderCommand';
 import HistoryManager from './commands/HistoryManager';
@@ -127,7 +129,7 @@ import MoveCommand from './commands/MoveCommand';
 import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
-import { createItem, findMaxZ, findMinZ } from './helpers';
+import { findMaxZ, findMinZ, getItemBlueprint, getUniqueId, randomInt, registerDefaultItemTypes } from './helpers';
 
 import Toolbar from './Toolbar.vue';
 import { DiagramElement, EditorTool, getToolDefinition, isConnection, isItem, Item, ItemConnection } from './types';
@@ -140,11 +142,11 @@ export interface DiagramEditorProps {
 }
 
 export interface DiagramEditorEvents {
-    (e: 'add-item', item: Item): void
+    (e: 'add-item',    item: Item, historyManager: HistoryManager): void
     (e: 'delete-item', item: Item, historyManager: HistoryManager): void
     
-    (e: 'add-connection',    connection: ItemConnection): void
-    (e: 'delete-connection', connection: ItemConnection): void
+    (e: 'add-connection',    connection: ItemConnection, historyManager: HistoryManager): void
+    (e: 'delete-connection', connection: ItemConnection, historyManager: HistoryManager): void
 }
 
 // Define props
@@ -157,8 +159,10 @@ const emit = defineEmits<DiagramEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 onMounted(() => {
-    console.log('DiagramEditor mounted')
-
+    console.log('DiagramEditor onMounted')
+    
+    registerDefaultItemTypes();
+    
     //@ts-ignore
     if(hGuides.value) hGuides.value.resize();
     //@ts-ignore
@@ -180,7 +184,6 @@ const guideUnits         = 50; // computed(() => zoomFactor.value < .5 ? 0 : 50)
 
 const viewer             = ref();
 const viewport           = ref()
-const canvas             = ref<SVGElement>()
 const moveable           = ref();
 
 const hGuides            = ref();
@@ -207,13 +210,16 @@ const connections = computed(() => elements.filter(e => isConnection(e)) as Item
 
 // Temporary variables
 // ------------------------------------------------------------------------------------------------------------------------
-let originPos:   [number, number] = [0, 0];
-let originSize:  [number, number] = [0, 0];
+let originPos:     [number, number] = [0, 0];
+let originSize:    [number, number] = [0, 0];
+let currentScroll: [number, number] = [0, 0];
 let originAngle: number = 0;
 let originRound: number = 0;
 
 const mouseCoords = ref<[number, number]>([0, 0]);
-
+function onMouseMove(e: any) {
+    mouseCoords.value = [e.offsetX, e.offsetY];
+}
 
 function getItemStyle(item: Item) : StyleValue {
     let t = `translate(${item.x}px, ${item.y}px)`;
@@ -235,15 +241,15 @@ function getItemStyle(item: Item) : StyleValue {
 function selectItem(item: Item)  : void {
     // Item already selected
     if(item === selectedItem.value) return;
-    
-    console.log('selecting item', item);
-    
+            
     selectNone();
-    nextTick(() => { selectedItem.value = item; })
+    nextTick(() => { 
+        console.log('Selecting item', item)
+        selectedItem.value = item; 
+    })
 }
 
 function selectNone() : void {
-    console.log('selectNone()');
     selectedItem.value = null;
 }
 
@@ -265,7 +271,12 @@ function onDrag(e: any) : void {
 }
 
 function onDragEnd(e: any) : void {
-    if(isItem(selectedItem.value)) historyManager.value.execute(new MoveCommand(selectedItem.value, originPos, [selectedItem.value.x, selectedItem.value.y]));
+    if(isItem(selectedItem.value)) {
+        // Item just cliked, no move ?
+        if(originPos[0] === selectedItem.value.x && originPos[1] === selectedItem.value.y) return;
+        
+        historyManager.value.execute(new MoveCommand(selectedItem.value, originPos, [selectedItem.value.x, selectedItem.value.y]));
+    }
 }
 
 
@@ -345,12 +356,8 @@ function onScroll(e: any) : void {
     //@ts-ignore
     if(vGuides.value) { vGuides.value.scroll(e.scrollTop); vGuides.value.scrollGuides(e.scrollLeft); }
 
-
-    if(!canvas.value) return;
-    console.log('onscroll', e);
-    canvas.value.style.transform = `translate(${e.scrollLeft}px, ${e.scrollTop}px)`;
-    //canvas.value.scrollTo(e.scrollLeft, e.scrollTop);
-
+    currentScroll = [e.scrollLeft, e.scrollTop];
+    //console.log('Viewer.onScroll', e, currentScroll);
 }
 
 
@@ -365,12 +372,12 @@ function bringToFront() : void {
 function changeBackColor() : void {
     if(isItem(selectedItem.value)) {
         const oldColor = selectedItem.value.backgroundColor;
-        const newColor = `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`;
+        const newColor = `hsl(${randomInt(0, 500)}, 90%, 50%)`;
         historyManager.value.execute(new ChangeBackgroundColorCommand(selectedItem.value, oldColor, newColor));
     }
     else if(isConnection(selectedItem.value)) {
         const oldColor = selectedItem.value.color;
-        const newColor = `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`;
+        const newColor = `hsl(${randomInt(0, 500) }, 90%, 50%)`;
         historyManager.value.execute(new ChangeBackgroundColorCommand(selectedItem.value, oldColor, newColor));
     }
 }
@@ -382,7 +389,7 @@ function deleteItem() {
     }
 
     if(isConnection(selectedItem.value)) {
-        emit('delete-connection', selectedItem.value);
+        emit('delete-connection', selectedItem.value, historyManager.value as HistoryManager);
         selectNone();
     }
 }
@@ -426,32 +433,33 @@ function selectCurrentTool(tool: EditorTool) : void {
 
 function onViewportClick(e: any): void {
     console.log('onViewportClick', e);
+
+    // Was just clicking the scrollbar for scrolling?
+    if(e.target?.classList?.contains('infinite-viewer-scroll-thumb')) return;
+
     
     if(currentTool.value == EditorTool.SELECT) {
+        console.log('Unselecting all');
         selectNone();
         return;
     }
 
-    // Clicking the viewport in NON-selection mode ==> Add a new element
-    if(currentTool.value == EditorTool.RECTANGLE) {
-        const x = viewer.value!.getScrollLeft();
-        const y = viewer.value!.getScrollTop();
 
-
-        console.log('onViewportClick', x, y, viewer.value);
+    const toolDef  = getToolDefinition(currentTool.value);
+    const itemType = toolDef.itemType;
+    if(itemType) {
+        const newItem = {
+            ...getItemBlueprint(itemType),
+            id: getUniqueId(),
+            x: e.offsetX /*+ currentScroll[0]*/,
+            y: e.offsetY /*+ currentScroll[1]*/,
+        }
         
-        
-        const item = createItem({
-            x,
-            y,
-            w: 200,
-            h: 100,
-            component: "Shape",
-            backgroundColor: "yellow",
-        });
-        console.log('creating item', item);
+        console.log('new coords', e.offsetX, e.offsetY, currentScroll);
+        console.log('creating new item', toolDef, itemType, newItem)
+        historyManager.value.execute(new AddCommand(elements, newItem));    
 
-        emit('add-item', item);        
+        //emit('add-item', newItem, historyManager.value as HistoryManager);
     }
 }
 

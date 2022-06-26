@@ -8,11 +8,13 @@ import Image from "./components/diagram-editor/blocks/Image.vue";
 import Line from "./components/diagram-editor/blocks/Line.vue";
 import Rectangle from "./components/diagram-editor/blocks/Rectangle.vue";
 import Star from "./components/diagram-editor/blocks/Star.vue";
+import Text from "./components/diagram-editor/blocks/Text.vue";
 import Triangle from "./components/diagram-editor/blocks/Triangle.vue";
 import { createApp } from 'vue';
 
 const app = createApp(App);
 
+app.component('Text',      Text);
 app.component('Line',      Line);
 app.component('Rectangle', Rectangle);
 app.component('Ellipse',   Ellipse);

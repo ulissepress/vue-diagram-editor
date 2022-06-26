@@ -78,21 +78,21 @@ export interface ToolDefinition {
     title?: string;
     icon?:  string;
     
-    item?: Partial<Item>
+    itemType?: string
 }
 
 export const toolDefinitions: ToolDefinition[] = [
     { type: EditorTool.SELECT,     title: 'Select', icon: 'ads_click' },    
     { type: 'separator' },    
-    { type: EditorTool.TEXT,       title: 'Text',       icon: 'text_fields',     item: { component: "Text"       }},
-    { type: EditorTool.IMAGE,      title: 'Image',      icon: 'image',           item: { component: "Image"      }},
-    { type: EditorTool.CONNECTION, title: 'Connection', icon: 'share',           item: { component: "Connection" }},
+    { type: EditorTool.TEXT,       title: 'Text',       icon: 'text_fields',     itemType: "Text"      },
+    { type: EditorTool.IMAGE,      title: 'Image',      icon: 'image',           itemType: "Image"     },
+    { type: EditorTool.CONNECTION, title: 'Connection', icon: 'share',           itemType: "Connection"},
     { type: 'separator' },    
-    { type: EditorTool.LINE,       title: 'Line',       icon: 'horizontal_rule', item: { component: "Line"      }},
-    { type: EditorTool.RECTANGLE,  title: 'Rectangle',  icon: 'rectangle',       item: { component: "Rectangle" }},
-    { type: EditorTool.ELLIPSE,    title: 'Ellipse',    icon: 'circle',          item: { component: "Ellipse"   }},
-    { type: EditorTool.TRIANGLE,   title: 'Triangle',   icon: 'change_history',  item: { component: "Triangle"  }},
-    { type: EditorTool.STAR,       title: 'Star',       icon: 'grade',           item: { component: "Star"      }},
+    { type: EditorTool.LINE,       title: 'Line',       icon: 'horizontal_rule', itemType: "Line"      },
+    { type: EditorTool.RECTANGLE,  title: 'Rectangle',  icon: 'rectangle',       itemType: "Rectangle" },
+    { type: EditorTool.ELLIPSE,    title: 'Ellipse',    icon: 'circle',          itemType: "Ellipse"   },
+    { type: EditorTool.TRIANGLE,   title: 'Triangle',   icon: 'change_history',  itemType: "Triangle"  },
+    { type: EditorTool.STAR,       title: 'Star',       icon: 'grade',           itemType: "Star"      },
 ];
 
 export function getToolDefinition(toolType: EditorTool) : ToolDefinition {

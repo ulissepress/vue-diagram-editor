@@ -78,7 +78,7 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
 }
 
 .tool {
-    width: 100%;
+    width: auto;
     height: auto;
     padding: 4px 2px;
 

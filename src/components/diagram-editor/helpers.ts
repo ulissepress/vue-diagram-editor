@@ -1,16 +1,21 @@
 import { ConnectionStyle, ConnectionType, Item, ItemConnection } from "./types";
 
-let counter = 0;
+export function getUniqueId(prefix: string = 'id_') : string {
+    const base = 36;
+    return prefix + Date.now().toString(base) + '_' + randomInt(1, 10000).toString(base);
+}
+
 
 export function createItem(item?: Partial<Item>) : Item {
     return {
-        id: "ID" + (++counter),
-        title: "Item " + counter,
+        id: getUniqueId(),
+        title: "Item",
+        component: 'Rectangle',
         
-        x: Math.floor(Math.random() * 400),
-        y: Math.floor(Math.random() * 200),
-        w: 100 + Math.floor(Math.random() * 400),
-        h: 50  + Math.floor(Math.random() * 200),
+        x: randomInt(200, 500),
+        y: randomInt(100, 300),
+        w: randomInt(100, 500),
+        h: randomInt(50, 300),
         z: 0,
         r: 0,
 
@@ -18,8 +23,7 @@ export function createItem(item?: Partial<Item>) : Item {
         supportsRoundable: true,
         supportsResizable: true,
 
-        backgroundColor: `hsl(${Math.floor(Math.random() * 500) }, 90%, 50%)`,
-        component: 'Rectangle',
+        backgroundColor: `hsl(${randomInt(0, 500) }, 90%, 50%)`,
         
         locked: false,
 
@@ -31,7 +35,7 @@ export function createConnection(from: string, to: string, options?: Partial<Ite
     return {
         component: 'Connection',
 
-        id: "ID" + (++counter),
+        id: getUniqueId(),
         from,
         to,
         type:  ConnectionType.LINE,
@@ -58,3 +62,131 @@ export function findMaxZ(items: Item[]): number {
     for(let v of items) if(v.z > max) max = v.z;
     return max;
 }
+
+
+// Shape medata definitions
+const registry: Record<string, Item> = {};
+
+export function registerItemType(item: Item, asName?: string) {
+    registry[item.component || asName || ''] = item;
+}
+
+export function getItemBlueprint(type: string): Item {
+    return registry[type];
+}
+
+let alreadyRegistered = false;
+export function registerDefaultItemTypes() {
+    if(alreadyRegistered) return;   // Already registered?
+    
+    alreadyRegistered = true;
+    
+    const defaults = {
+        id:    "", 
+        title: "",
+        
+        x: 100, 
+        y: 100, 
+        w: 200, 
+        h: 50, 
+        z: 0, 
+        r: 0, 
+        borderRadius: 0,
+
+        supportsRoundable: false,
+        supportsResizable: true,
+
+        backgroundColor: "green",
+        textColor: "black",
+        
+        locked: false
+    };
+
+
+    // ----------------------------------------------------------------------
+    let type = "Text"
+    registerItemType({
+        ...defaults,
+        title: "Hello World",
+
+        component: type,
+    });
+
+    // ----------------------------------------------------------------------
+    type = "Line"
+    registerItemType({
+        ...defaults,
+
+        component: type,
+        componentOptions: {
+            style: ConnectionStyle.SOLID,
+            thick: 2,
+        }
+    });
+
+
+    // ----------------------------------------------------------------------
+    type = "Rectangle"
+    registerItemType({
+        ...defaults,
+        
+        component: type,
+        supportsRoundable: true,
+    })
+
+    // ----------------------------------------------------------------------
+    type = "Ellipse"
+    registerItemType({
+        ...defaults,
+        component: type,
+
+        w: 90,
+        h: 70,
+        backgroundColor: 'lightblue',
+    })
+
+    // ----------------------------------------------------------------------
+    type = "Triangle"
+    registerItemType({
+        ...defaults,
+        component: type,
+
+        w: 90,
+        h: 70,
+        backgroundColor: 'red',
+    })
+
+    // ----------------------------------------------------------------------
+    type = "Star"
+    registerItemType({
+        ...defaults,
+        component: type,
+
+        w: 70,
+        h: 70,
+        backgroundColor: 'pink',
+
+    })
+
+
+    // ----------------------------------------------------------------------
+    type = "Image"
+    registerItemType({
+        ...defaults,
+        w: 300,
+        h: 200,
+        component: type,
+        componentOptions: {
+            src: 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
+        },
+        supportsRoundable: true,
+    })    
+} // func
+
+/**
+ * Return a random number between min and max
+ */
+export function randomInt(min: number, max: number) : number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+

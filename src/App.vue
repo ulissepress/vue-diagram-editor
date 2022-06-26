@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import { reactive } from 'vue';
+import AddCommand from './components/diagram-editor/commands/AddCommand';
 import DeleteCommand from './components/diagram-editor/commands/DeleteCommand';
 import HistoryManager from './components/diagram-editor/commands/HistoryManager';
 import DiagramEditor from './components/diagram-editor/DiagramEditor.vue';
@@ -26,19 +27,21 @@ let elements: DiagramElement[] = reactive([
     createConnection('a1', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DOTTED }),
     createConnection('a2', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DASHED, color: "red", thick: 5 }),
 
-    createItem( { title: 'Line 1',     w: 400, h: 30, component: "Line", supportsRoundable: false } ),
-    createItem( { title: 'Line 2',     w: 400, h: 30, component: "Line", backgroundColor: 'red', componentOptions: { thick: 5 },  supportsRoundable: false } ),
+    // createItem( { title: 'This is a text and can be quite long!', component: "Text", supportsRoundable: false } ),
+
+    // createItem( { title: 'Line 1',     w: 400, h: 30, component: "Line", supportsRoundable: false } ),
+    // createItem( { title: 'Line 2',     w: 400, h: 30, component: "Line", backgroundColor: 'red', componentOptions: { thick: 5 },  supportsRoundable: false } ),
     
-    createItem( { id: 't1', title: 'Triangle 1', w: 200, h: 150, component: "Triangle", supportsRoundable: false } ),
-    createItem( { id: 't2', title: 'Triangle 2', w: 200, h: 150, component: "Triangle", supportsRoundable: false } ),
-    createConnection('t1', 't2', { type: ConnectionType.CURVE, style: ConnectionStyle.DASHED, color: "green", thick: 3 }),
+    // createItem( { id: 't1', title: 'Triangle 1', w: 200, h: 150, component: "Triangle", supportsRoundable: false } ),
+    // createItem( { id: 't2', title: 'Triangle 2', w: 200, h: 150, component: "Triangle", supportsRoundable: false } ),
+    // createConnection('t1', 't2', { type: ConnectionType.CURVE, style: ConnectionStyle.DASHED, color: "green", thick: 3 }),
    
-    createItem( { id: 's1', title: 'Star 1', w: 100, h: 100, component: "Star", supportsRoundable: false } ),
-    createItem( { id: 's2', title: 'Star 2', w: 100, h: 100, component: "Star", supportsRoundable: false } ),
-    createItem( { id: 's3', title: 'Star 3', w: 100, h: 100, component: "Star", supportsRoundable: false } ),
-    createConnection('s1', 's2'),
-    createConnection('s2', 's3'),
-    createConnection('s3', 's1'),
+    // createItem( { id: 's1', title: 'Star 1', w: 100, h: 100, component: "Star", supportsRoundable: false } ),
+    // createItem( { id: 's2', title: 'Star 2', w: 60,  h: 60,  component: "Star", supportsRoundable: false } ),
+    // createItem( { id: 's3', title: 'Star 3', w: 130, h: 130, component: "Star", supportsRoundable: false } ),
+    // createConnection('s1', 's2'),
+    // createConnection('s2', 's3'),
+    // createConnection('s3', 's1'),
 
     //createItem( { title: 'Item (no resize)',  component: "Rectangle", supportsResizable: false } ),
     
@@ -52,8 +55,8 @@ let elements: DiagramElement[] = reactive([
 
 ]);
 
-function addNewItem(item: Item) {
-    elements.push(item);
+function addNewItem(item: Item, historyManager: HistoryManager) {
+    historyManager.execute(new AddCommand(elements, item));    
 }
 
 function deleteItem(item: Item, historyManager: HistoryManager) {
