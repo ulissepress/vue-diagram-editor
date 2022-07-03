@@ -64,23 +64,21 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
     left: 40px;
     width: auto;
     height: auto;
-
     background-color: #fefefe;
     border: 1px solid #ccc;
-
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
-    align-items: center; 
+    align-items: center;
     gap: 0px;
-    
     user-select: none;
+    box-shadow: 2px 2px 5px #ccc;
 }
 
 .tool {
     width: auto;
     height: auto;
-    padding: 4px 2px;
+    padding: 4px;
 
     color: #888;
     display: flex;

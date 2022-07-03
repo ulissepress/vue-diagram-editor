@@ -7,8 +7,9 @@
         <div    v-show='guidesVisible' class="rulers-left-top-box" ></div>
 
         <!-- Editor Canvas -->
-        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor"  @wheel="onScroll" @scroll="onScroll"  @click.stop="editable && onViewportClick($event)" :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair'}" @mousemove="onMouseMove">
-            <div ref="viewport" class="viewport" style="background-color: yellow;">
+        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor"  @wheel="onScroll" @scroll="onScroll"  @click.stop="editable && onCanvasClick($event)" :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair'}" @mousemove="onMouseMove">
+            <div ref="viewport" class="viewport" >
+                
                 <!-- Render Connections -->
                 <component v-for="(c, i) in connections" 
                         :is       = "c.component" 
@@ -18,27 +19,46 @@
                         :style    = "{ zIndex: c.z }"
                         :options  = "c" 
                         :selected = "c.id === selectedItem?.id"
-                        @selected = "selectedItem = c"/>
+                        @selected = "selectedItem = c" />
                         
+                <!-- Use to render a line during a new connection creation -->
+                <RawConnection v-if="creatingConnection && connectionInfo.startItem" 
+                                :x1   = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).x" 
+                                :y1   = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y" 
+                                :x2   = "mouseCoords.x" 
+                                :y2   = "mouseCoords.y"
+                                selected />
+                            
                 <!-- Render Items -->
                 <div v-for="(item, i) in items"                 
-                        class          = "item"
-                        :key           = "item.id" 
-                        :data-item-id  = "item.id"
-                        :class         = "{ 'target': item.id === selectedItem?.id, 'locked': item.locked === true }" 
-                        :style         = "getItemStyle(item)"
-                        @click.stop    = "editable && selectItem(item)" 
-                        @dblclick.stop = "editable && lockItem(item)"> 
+                    class          = "item"
+                    :key           = "item.id" 
+                    :data-item-id  = "item.id"
+                    :class         = "{ 'target': item.id === selectedItem?.id, 'locked': item.locked === true, 'mouse-hover': item.hover }" 
+                    :style         = "getItemStyle(item)"
+                    @click.stop    = "editable && selectItem(item)" 
+                    @dblclick.stop = "editable && lockItem(item)"
+                    
+                    @mouseover  = "() => { if(creatingConnection) item.hover = true }"
+                    @mouseleave = "() => { delete item.hover }" > 
 
                         <component :is="item.component" :item="item" />
 
-                        <div class="decorator decorator-delete" v-if="editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
-                        <div class="decorator decorator-locked" v-if="editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
-                        <div class="decorator decorator-size"   v-if="editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
+                        <div class="decorator decorator-delete" v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
+                        <div class="decorator decorator-locked" v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
+                        <div class="decorator decorator-size"   v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
+
+                        <!-- Connection Handles - When the item is rotated, only the center handle is active -->
+                        <div class="connection-handle connection-handle-left"   v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.LEFT)"></div>
+                        <div class="connection-handle connection-handle-right"  v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.RIGHT)"></div>
+                        <div class="connection-handle connection-handle-top"    v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.TOP)"></div>
+                        <div class="connection-handle connection-handle-bottom" v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.BOTTOM)"></div>
+                        <div class="connection-handle connection-handle-center" v-if="editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.CENTER)"></div>
+
                 </div> <!-- item -->
                 
                 <!-- Manage drag / resize / rotate / rounding of selected item -->
-                <Moveable v-if = "editable === true && targetDefined && isItem(selectedItem)"
+                <Moveable v-if = "editable === true && targetDefined && isItem(selectedItem) && !creatingConnection"
                         ref     = "moveable"
                         :target = "['.target']"                      
                         :zoom   = "1 / zoomFactor"
@@ -91,8 +111,6 @@
                 <button @click="zoomIn">+</button>&nbsp;&nbsp;
                 <button @click="zoomReset">Reset</button>
             <br/><br/>
-            <!-- <button @click="emit('add-item')">Add New</button> 
-            &nbsp;-->
             <button @click="deleteItem"      :disabled="!selectedItemActive">Delete</button>&nbsp;
             <button @click="changeBackColor" :disabled="!selectedItemActive">Change Color</button><br/><br/>
             <button @click="sendToBack"      :disabled="!selectedItemActive">Send to back</button>&nbsp;
@@ -101,7 +119,7 @@
             <button @click="redo"            :disabled="!historyManager.canRedo()">Redo</button>
             
             <pre>TOOL: {{ getToolDefinition(currentTool) }}</pre>
-            <pre>MOUSE: {{ mouseCoords }}</pre>
+            <pre>MOUSE: {{ mouseCoords }} </pre>
             
             <div v-if="targetDefined">
                 <p>Press SHIFT key to keep aspect ratio while resizing</p>
@@ -115,12 +133,11 @@
 
 <script setup lang="ts">
 
-import { useKeyModifier } from '@vueuse/core';
+import { useKeyModifier, useMouse } from '@vueuse/core';
 import { computed, nextTick, onMounted, onUpdated, ref, StyleValue } from "vue";
 import Guides from "vue-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
-import AddCommand from './commands/AddCommand';
 import ChangeBackgroundColorCommand from './commands/ChangeBackgroundColorCommand';
 import ChangeZOrderCommand from './commands/ChangeZOrderCommand';
 import HistoryManager from './commands/HistoryManager';
@@ -129,10 +146,14 @@ import MoveCommand from './commands/MoveCommand';
 import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
-import { findMaxZ, findMinZ, getItemBlueprint, getUniqueId, randomInt, registerDefaultItemTypes } from './helpers';
+import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBlueprint, getUniqueId, randomInt, registerDefaultItemTypes } from './helpers';
 
+import RawConnection from './blocks/RawConnection.vue';
+import AddItemCommand from './commands/AddItemCommand';
 import Toolbar from './Toolbar.vue';
-import { DiagramElement, EditorTool, getToolDefinition, isConnection, isItem, Item, ItemConnection } from './types';
+import { ConnectionPoint, DiagramElement, EditorTool, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
+
+export type Item = _Item & { hover?: boolean }
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
@@ -200,10 +221,13 @@ const selectedItemActive = computed(() => {
     return isItem(selectedItem.value) ? (!selectedItem.value.locked === true) : true;
 })
 
+const mouseXY = useMouse();
+
 const shiftPressed       = useKeyModifier('Shift')
 const historyManager     = ref(new HistoryManager());
 const currentTool        = ref(EditorTool.SELECT);
 
+const creatingConnection = computed<boolean>(() => currentTool.value === EditorTool.CONNECTION);
 
 const items       = computed(() => elements.filter(e => isItem(e)) as Item[]);
 const connections = computed(() => elements.filter(e => isConnection(e)) as ItemConnection[]);
@@ -216,10 +240,33 @@ let currentScroll: [number, number] = [0, 0];
 let originAngle: number = 0;
 let originRound: number = 0;
 
-const mouseCoords = ref<[number, number]>([0, 0]);
-function onMouseMove(e: any) {
-    mouseCoords.value = [e.offsetX, e.offsetY];
+const mouseCoords = ref<Position>({ x: 0, y: 0 });
+function onMouseMove(e: any) { 
+     if(!viewport.value) return;
+    
+    //console.log('onMouseMove', e.srcElement, e.offsetX, e.offsetY, e);
+
+    const rect = viewport.value.getBoundingClientRect();
+
+    // Mouse position
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    mouseCoords.value.x = Math.floor(x / zoomFactor.value);
+    mouseCoords.value.y = Math.floor(y / zoomFactor.value);
 }
+
+let connectionInfo : { 
+    startItem:  Item | null, 
+    endItem:    Item | null,
+    startPoint: ConnectionPoint,
+    endPoint:   ConnectionPoint,
+}= {
+    startItem:  null, 
+    endItem:    null,
+    startPoint: ConnectionPoint.CENTER,
+    endPoint:   ConnectionPoint.CENTER,
+}
+
 
 function getItemStyle(item: Item) : StyleValue {
     let t = `translate(${item.x}px, ${item.y}px)`;
@@ -429,35 +476,52 @@ function selectCurrentTool(tool: EditorTool) : void {
     
     currentTool.value = tool;
     selectNone();
+
+    if(tool == EditorTool.CONNECTION) {
+        console.log('Creating connection');
+        nextTick( () => {
+            connectionInfo.startItem = null;
+            connectionInfo.endItem   = null;
+        })
+
+        return;
+    }
+
 }
 
-function onViewportClick(e: any): void {
-    console.log('onViewportClick', e);
+function onCanvasClick(e: any): void {
+    console.log('onCanvasClick', e);
 
     // Was just clicking the scrollbar for scrolling?
     if(e.target?.classList?.contains('infinite-viewer-scroll-thumb')) return;
 
     
-    if(currentTool.value == EditorTool.SELECT) {
+    if(currentTool.value === EditorTool.SELECT) {
         console.log('Unselecting all');
         selectNone();
         return;
     }
 
-
+    // Clicking in the canvas resets the current connection creation
+    if(currentTool.value === EditorTool.CONNECTION) {
+        connectionInfo.startItem = null;
+        connectionInfo.endItem   = null;
+        return;
+    }
+    
     const toolDef  = getToolDefinition(currentTool.value);
     const itemType = toolDef.itemType;
     if(itemType) {
         const newItem = {
             ...getItemBlueprint(itemType),
             id: getUniqueId(),
-            x: e.offsetX /*+ currentScroll[0]*/,
-            y: e.offsetY /*+ currentScroll[1]*/,
+            x: mouseCoords.value.x,
+            y: mouseCoords.value.y
         }
         
         console.log('new coords', e.offsetX, e.offsetY, currentScroll);
         console.log('creating new item', toolDef, itemType, newItem)
-        historyManager.value.execute(new AddCommand(elements, newItem));    
+        historyManager.value.execute(new AddItemCommand(elements, newItem));    
 
         //emit('add-item', newItem, historyManager.value as HistoryManager);
     }
@@ -466,6 +530,34 @@ function onViewportClick(e: any): void {
 
 function onKeyDown(e: any) {
     console.log('onKeyDown', e);
+}
+
+
+function connectionHandleClick(item: Item   , point: ConnectionPoint) {
+    console.log('connectionHandleClick', item, point);
+    
+    // Shorter alias
+    const ci = connectionInfo;
+
+    // We are clicking the starting item/point
+    if(ci.startItem == null) {
+        
+        ci.startItem  = item;
+        ci.startPoint = point;
+        return;
+    }
+    
+    // We are clicking the ending item/point
+    ci.endItem  = item;
+    ci.endPoint = point;
+
+    const newConnection = createConnection(ci.startItem.id, ci.endItem.id, { fromPoint: ci.startPoint, toPoint: ci.endPoint });
+    
+    ci.startItem = null;
+    ci.endItem   = null;
+
+    emit('add-connection', newConnection, historyManager.value as HistoryManager);
+
 }
 </script>
 
@@ -586,5 +678,32 @@ function onKeyDown(e: any) {
     padding: 4px 8px;
     white-space: nowrap;
 }
+
+.item.mouse-hover {
+    border: 2px solid #4af;
+}
+
+.item .connection-handle {
+    position: absolute;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    color: white;
+    text-align: center;
+    font-weight: normal;
+    line-height: 1;
+} 
+
+.item .connection-handle:hover {
+    background-color: #4af;
+} 
+
+.item .connection-handle-left   { top: calc(50% - 7px); left: -7px; }
+.item .connection-handle-right  { top: calc(50% - 7px); right: -7px; }
+.item .connection-handle-top    { top: -7px; left: calc(50% - 7px); }
+.item .connection-handle-bottom { bottom: -7px; left: calc(50% - 7px); }
+.item .connection-handle-center { top: calc(50% - 7px); left: calc(50% - 7px); }
 </style>
 

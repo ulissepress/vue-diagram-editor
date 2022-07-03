@@ -1,4 +1,4 @@
-import { ConnectionStyle, ConnectionType, Item, ItemConnection } from "./types";
+import { ConnectionPoint, ConnectionStyle, ConnectionType, Item, ItemConnection, Position } from "./types";
 
 export function getUniqueId(prefix: string = 'id_') : string {
     const base = 36;
@@ -40,7 +40,7 @@ export function createConnection(from: string, to: string, options?: Partial<Ite
         to,
         type:  ConnectionType.LINE,
         style: ConnectionStyle.SOLID,
-        thick: 2,
+        thick: 1,
         color: "#333",
         
         ...options
@@ -190,3 +190,13 @@ export function randomInt(min: number, max: number) : number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+export function getHandlePosition(item: Item, cp: ConnectionPoint): Position {
+    // If item is rotated always use the center handle
+    if(item.r !== 0) return { x: item.x + item.w / 2, y: item.y + item.h / 2 };
+
+    if(cp === ConnectionPoint.LEFT)        return { x: item.x,              y: item.y + item.h / 2 };
+    else if(cp === ConnectionPoint.RIGHT)  return { x: item.x + item.w,     y: item.y + item.h / 2 };
+    else if(cp === ConnectionPoint.TOP)    return { x: item.x + item.w / 2, y: item.y              };
+    else if(cp === ConnectionPoint.BOTTOM) return { x: item.x + item.w / 2, y: item.y + item.h     };
+    else /*  ConnectionPoint.CENTER */     return { x: item.x + item.w / 2, y: item.y + item.h / 2 };    
+}

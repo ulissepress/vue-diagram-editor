@@ -1,8 +1,8 @@
-import Command from './Command';
-import { DiagramElement } from '../types';
-import { Item } from './../types';
+import { DiagramElement, Item } from '../types';
 
-export default class AddCommand implements Command {
+import Command from './Command';
+
+export default class AddItemCommand implements Command {
     
     constructor(private elements: DiagramElement[], private elementToAdd: Item) {
         this.elementToAdd = { ... elementToAdd };

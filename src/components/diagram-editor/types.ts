@@ -1,3 +1,21 @@
+
+export interface Position {
+    x: number;
+    y: number;
+}
+
+export interface Rect extends Position {
+    w: number;
+    h: number;
+}
+
+export interface Frame extends Rect {
+    z: number;
+    r: number;
+}
+
+
+
 export interface DiagramElement {
     id:     string;             // The unique element ID
     title:  string;             // The element title / label
@@ -45,7 +63,7 @@ export enum ConnectionPoint {
     BOTTOM = "bottom",
     LEFT   = "left",
     RIGHT  = "right",
-    //CENTER = "center"
+    CENTER = "center"
 }
 
 export enum ConnectionType {
