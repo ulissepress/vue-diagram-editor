@@ -1,17 +1,18 @@
 
 export interface Position {
-    x: number;
-    y: number;
+    x: number;              // X Coordinate
+    y: number;              // Y Coordinate
 }
 
 export interface Rect extends Position {
-    w: number;
-    h: number;
+    w: number;              // Width
+    h: number;              // Height
 }
 
 export interface Frame extends Rect {
-    z: number;
-    r: number;
+    z: number;              // Z-Index
+    r: number;              // Rotation angle
+    borderRadius: number;   // Border radius
 }
 
 

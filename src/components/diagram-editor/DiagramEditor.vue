@@ -7,7 +7,17 @@
         <div    v-show='guidesVisible' class="rulers-left-top-box" ></div>
 
         <!-- Editor Canvas -->
-        <VueInfiniteViewer ref="viewer" class="viewer" :useWheelScroll="true" :zoom="zoomFactor"  @wheel="onScroll" @scroll="onScroll"  @click.stop="editable && onCanvasClick($event)" :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair'}" @mousemove="onMouseMove">
+        <VueInfiniteViewer 
+            ref             = "viewer" 
+            class           = "viewer" 
+            :useWheelScroll = "true" 
+            :zoom           = "zoomFactor"  
+            :style          = "{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair'}" 
+            @wheel          = "onScroll" 
+            @scroll         = "onScroll"              
+            @mousemove      = "onMouseMove"
+            @click.stop     = "editable && onCanvasClick($event)">
+            
             <div ref="viewport" class="viewport" >
                 
                 <!-- Render Connections -->
@@ -154,7 +164,7 @@ import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBluepri
 import RawConnection from './blocks/RawConnection.vue';
 import AddItemCommand from './commands/AddItemCommand';
 import Toolbar from './Toolbar.vue';
-import { ConnectionPoint, DiagramElement, EditorTool, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
+import { ConnectionPoint, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 
 export type Item = _Item & { hover?: boolean }
 
@@ -186,10 +196,11 @@ onMounted(() => {
     console.log('DiagramEditor onMounted')
     
     registerDefaultItemTypes();
-        
+
+    // Initialize rulers and infinite viewer
     hGuides.value.resize();    
     vGuides.value.resize();
-
+    
     viewer.value.scrollCenter();
 });
 
@@ -213,8 +224,8 @@ const moveable           = ref();
 const hGuides            = ref();
 const vGuides            = ref();
 const guidesVisible      = computed(() => editable && zoomFactor.value >= 0.5);
-let   hGuideValues       = ref<number[]>([]);
-let   vGuideValues       = ref<number[]>([]);
+const hGuideValues       = ref<number[]>([]);       // Horizontal guides added by the user
+const vGuideValues       = ref<number[]>([]);       // Vertical guides added by the user
 
 const selectedItem       = ref<DiagramElement | null>(null);
 const targetDefined      = computed(() => selectedItem.value !== null)
@@ -239,11 +250,7 @@ const connections = computed(() => elements.filter(e => isConnection(e)) as Item
 
 // Temporary variables
 // ------------------------------------------------------------------------------------------------------------------------
-let originPos:     [number, number] = [0, 0];
-let originSize:    [number, number] = [0, 0];
-let currentScroll: [number, number] = [0, 0];
-let originAngle: number = 0;
-let originRound: number = 0;
+const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0};
 
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 function onMouseMove(e: any) { 
@@ -310,7 +317,10 @@ function selectNone() : void {
 // Drag item
 // ---------------------------------------------------------------------------------------------------------------------
 function onDragStart(e: any) : void {
-    if(isItem(selectedItem.value)) originPos = [selectedItem.value.x, selectedItem.value.y];
+    if(!isItem(selectedItem.value)) return;
+    
+    origin.x = selectedItem.value.x;
+    origin.y = selectedItem.value.y;    
 }
 
 function onDrag(e: any) : void {
@@ -325,9 +335,9 @@ function onDrag(e: any) : void {
 function onDragEnd(e: any) : void {
     if(isItem(selectedItem.value)) {
         // Item just cliked, no move ?
-        if(originPos[0] === selectedItem.value.x && originPos[1] === selectedItem.value.y) return;
+        if(origin.x === selectedItem.value.x && origin.y === selectedItem.value.y) return;
         
-        historyManager.value.execute(new MoveCommand(selectedItem.value, originPos, [selectedItem.value.x, selectedItem.value.y]));
+        historyManager.value.execute(new MoveCommand(selectedItem.value, [origin.x, origin.y], [selectedItem.value.x, selectedItem.value.y]));
     }
 }
 
@@ -336,8 +346,12 @@ function onDragEnd(e: any) : void {
 // Resize item
 // ---------------------------------------------------------------------------------------------------------------------
 function onResizeStart(e: any) : void {
-    if(isItem(selectedItem.value)) originSize = [selectedItem.value.w, selectedItem.value.h];
+    if(!isItem(selectedItem.value)) return;
+    
+    origin.w = selectedItem.value.w;
+    origin.h = selectedItem.value.h;
 }
+
 
 function onResize(e: any) : void {
     if(!isItem(selectedItem.value)) return;
@@ -351,7 +365,7 @@ function onResize(e: any) : void {
 }
 
 function onResizeEnd(e: any) : void {
-    if(isItem(selectedItem.value)) historyManager.value.execute(new ResizeCommand(selectedItem.value, originSize, [selectedItem.value.w, selectedItem.value.h]));
+    if(isItem(selectedItem.value)) historyManager.value.execute(new ResizeCommand(selectedItem.value, [origin.w, origin.h], [selectedItem.value.w, selectedItem.value.h]));
 }
 
 
@@ -359,7 +373,7 @@ function onResizeEnd(e: any) : void {
 // Rotate item
 // ---------------------------------------------------------------------------------------------------------------------
 function onRotateStart(e: any) : void {
-    if(isItem(selectedItem.value)) originAngle = selectedItem.value.r;
+    if(isItem(selectedItem.value)) origin.r = selectedItem.value.r;
 }
 
 function onRotate(e: any) : void {
@@ -371,7 +385,7 @@ function onRotate(e: any) : void {
 }
 
 function onRotateEnd(e: any) : void {
-    if(isItem(selectedItem.value)) historyManager.value.execute(new RotateCommand(selectedItem.value, originAngle, selectedItem.value.r));
+    if(isItem(selectedItem.value)) historyManager.value.execute(new RotateCommand(selectedItem.value, origin.r, selectedItem.value.r));
 }
 
 
@@ -379,7 +393,7 @@ function onRotateEnd(e: any) : void {
 // Round item
 // ---------------------------------------------------------------------------------------------------------------------
 function onRoundStart(e: any) : void {
-    if(isItem(selectedItem.value)) originRound = selectedItem.value.borderRadius;
+    if(isItem(selectedItem.value)) origin.borderRadius = selectedItem.value.borderRadius;
 }
 
 function onRound(e: any) : void {
@@ -391,7 +405,7 @@ function onRound(e: any) : void {
 }
 
 function onRoundEnd(e: any) : void {
-    if(isItem(selectedItem.value)) historyManager.value.execute(new RoundCommand(selectedItem.value, originRound, selectedItem.value.borderRadius));        
+    if(isItem(selectedItem.value)) historyManager.value.execute(new RoundCommand(selectedItem.value, origin.borderRadius, selectedItem.value.borderRadius));        
 }
 
 
@@ -403,14 +417,10 @@ function onRoundEnd(e: any) : void {
 function onScroll(e: any) : void {
     if(e.ctrlKey) e.deltaY < 0 ? zoomIn() : zoomOut();
 
-    //@ts-ignore
-    if(hGuides.value) { hGuides.value.scroll(e.scrollLeft); hGuides.value.scrollGuides(e.scrollTop); }
-    //@ts-ignore
-    if(vGuides.value) { vGuides.value.scroll(e.scrollTop); vGuides.value.scrollGuides(e.scrollLeft); }
-
-    currentScroll = [e.scrollLeft, e.scrollTop];
-    //console.log('Viewer.onScroll', e, currentScroll);
+    if(hGuides.value) { hGuides.value.scroll(e.scrollLeft); hGuides.value.scrollGuides(e.scrollTop);  }
+    if(vGuides.value) { vGuides.value.scroll(e.scrollTop);  vGuides.value.scrollGuides(e.scrollLeft); }
 }
+ 
 
 
 function sendToBack() : void {
@@ -524,7 +534,6 @@ function onCanvasClick(e: any): void {
             y: mouseCoords.value.y
         }
         
-        console.log('new coords', e.offsetX, e.offsetY, currentScroll);
         console.log('creating new item', toolDef, itemType, newItem)
         historyManager.value.execute(new AddItemCommand(elements, newItem));    
 
@@ -568,12 +577,11 @@ function connectionHandleClick(item: Item   , point: ConnectionPoint) {
     emit('add-connection', newConnection, historyManager.value as HistoryManager);
 
 }
+
 </script>
 
 
 <style scoped>
-
-
 .editor-container {
     position: relative;
     border: 1px solid #ccc;
@@ -713,12 +721,17 @@ function connectionHandleClick(item: Item   , point: ConnectionPoint) {
     border: 2px solid #4af;
 }
 
+.item  {
+    --handle-width:  10px;
+    --handle-size:    7px;
+    --handle-offset: -7px;
+}
 .item .connection-handle {
     position: absolute;
     border: 2px solid white;
     border-radius: 50%;
-    width: 10px;
-    height: 10px;
+    width:  var(--handle-width);
+    height: var(--handle-width);
     background-color: red;
     color: white;
     text-align: center;
@@ -730,10 +743,12 @@ function connectionHandleClick(item: Item   , point: ConnectionPoint) {
     background-color: #4af;
 } 
 
-.item .connection-handle-left   { top: calc(50% - 7px); left: -7px; }
-.item .connection-handle-right  { top: calc(50% - 7px); right: -7px; }
-.item .connection-handle-top    { top: -7px; left: calc(50% - 7px); }
-.item .connection-handle-bottom { bottom: -7px; left: calc(50% - 7px); }
-.item .connection-handle-center { top: calc(50% - 7px); left: calc(50% - 7px); }
+
+
+.item .connection-handle-left   { left:   var(--handle-offset); top:  calc(50% - var(--handle-size)); }
+.item .connection-handle-right  { right:  var(--handle-offset); top:  calc(50% - var(--handle-size)); }
+.item .connection-handle-top    { top:    var(--handle-offset); left: calc(50% - var(--handle-size)); }
+.item .connection-handle-bottom { bottom: var(--handle-offset); left: calc(50% - var(--handle-size)); }
+.item .connection-handle-center { top: calc(50% - var(--handle-size)); left: calc(50% - var(--handle-size)); }
 </style>
 
