@@ -12,6 +12,8 @@
             class           = "viewer" 
             :useWheelScroll = "true" 
             :zoom           = "zoomFactor"  
+            :zoomOffsetX    = "mouseCoords.x"
+            :zoomOffsetY    = "mouseCoords.y"
             :style          = "{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair'}" 
             @wheel          = "onScroll" 
             @scroll         = "onScroll"              
