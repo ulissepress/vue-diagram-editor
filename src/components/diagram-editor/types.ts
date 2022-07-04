@@ -100,11 +100,12 @@ export interface ToolDefinition {
 }
 
 export const toolDefinitions: ToolDefinition[] = [
-    { type: EditorTool.SELECT,     title: 'Select', icon: 'ads_click' },    
+    { type: EditorTool.SELECT,     title: 'Select',     icon: 'ads_click' },    
+    { type: 'separator' },    
+    { type: EditorTool.CONNECTION, title: 'Connection', icon: 'share',           itemType: "Connection"},
     { type: 'separator' },    
     { type: EditorTool.TEXT,       title: 'Text',       icon: 'text_fields',     itemType: "Text"      },
     { type: EditorTool.IMAGE,      title: 'Image',      icon: 'image',           itemType: "Image"     },
-    { type: EditorTool.CONNECTION, title: 'Connection', icon: 'share',           itemType: "Connection"},
     { type: 'separator' },    
     { type: EditorTool.LINE,       title: 'Line',       icon: 'horizontal_rule', itemType: "Line"      },
     { type: EditorTool.RECTANGLE,  title: 'Rectangle',  icon: 'rectangle',       itemType: "Rectangle" },

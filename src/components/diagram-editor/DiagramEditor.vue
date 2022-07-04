@@ -2,8 +2,8 @@
     <div class="editor-container">
 
         <!-- Rulers -->
-        <Guides v-show='guidesVisible' type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)', height: '30px' }" :style = "{ position: 'absolute', top: '0px'}" />
-        <Guides v-show='guidesVisible' type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width: '30px' }" :style = "{ position: 'absolute', top: '0px'}" />
+        <Guides v-show='guidesVisible' class="ruler ruler-horizontal" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width': 'calc(100% - 30px)', height: '30px' }" />
+        <Guides v-show='guidesVisible' class="ruler ruler-vertical"   @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': 'calc(100% - 30px)', width: '30px',top: '-30px' }" />
         <div    v-show='guidesVisible' class="rulers-left-top-box" ></div>
 
         <!-- Editor Canvas -->
@@ -74,7 +74,10 @@
                         :snapDirections          = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
                         :elementSnapDirections   = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
                         :isDisplayInnerSnapDigit = "true"
+                        :horizontalGuidelines    = "hGuideValues"
+                        :verticalGuidelines      = "vGuideValues"
                         :elementGuidelines       = "elementGuidelines()"
+                        
                         
                         :roundable = "selectedItemActive && selectedItem?.supportsRoundable === true"
                         :draggable = "selectedItemActive"
@@ -183,11 +186,11 @@ onMounted(() => {
     console.log('DiagramEditor onMounted')
     
     registerDefaultItemTypes();
-    
-    //@ts-ignore
-    if(hGuides.value) hGuides.value.resize();
-    //@ts-ignore
-    if(vGuides.value) vGuides.value.resize();
+        
+    hGuides.value.resize();    
+    vGuides.value.resize();
+
+    viewer.value.scrollCenter();
 });
 
 onUpdated(() => {
@@ -210,6 +213,8 @@ const moveable           = ref();
 const hGuides            = ref();
 const vGuides            = ref();
 const guidesVisible      = computed(() => editable && zoomFactor.value >= 0.5);
+let   hGuideValues       = ref<number[]>([]);
+let   vGuideValues       = ref<number[]>([]);
 
 const selectedItem       = ref<DiagramElement | null>(null);
 const targetDefined      = computed(() => selectedItem.value !== null)
@@ -527,6 +532,10 @@ function onCanvasClick(e: any): void {
     }
 }
 
+function onGuidesChanged(e: any) {
+    console.log('onGuidesChanged', e);
+
+}
 
 function onKeyDown(e: any) {
     console.log('onKeyDown', e);
@@ -602,6 +611,27 @@ function connectionHandleClick(item: Item   , point: ConnectionPoint) {
     width: 100%;
     height: 100%;
 }
+
+.ruler {    
+    position: absolute !important;
+    top: 0px;
+    left: 0px;
+    transform: translateZ(1px);
+}
+
+
+.ruler.ruler-horizontal {
+    left: 30px !important;
+    width: calc(100% - 30px) !important;
+    height: 30px !important;
+}
+
+.ruler.ruler-vertical {
+    top: 30px !important;
+    height: calc(100% - 30px) !important;
+    width: 30px !important;
+}
+
 
 .rulers-left-top-box {
     position: absolute; 
