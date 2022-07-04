@@ -51,12 +51,19 @@ const props = withDefaults(defineProps<RawConnectionProps>(), {
 
 
 const boundingBox = computed<Rect>(() => {
-    const x1 = Math.min(props.x1, props.x2);
-    const y1 = Math.min(props.y1, props.y2);
+    const x  = Math.min(props.x1, props.x2);
+    const y  = Math.min(props.y1, props.y2);
     const x2 = Math.max(props.x1, props.x2);
     const y2 = Math.max(props.y1, props.y2);
+
+    // Width and height cannot be 0...at least we need the space for the connecion thick
+    let w = Math.max(Math.abs(x2 - x), props.thick);
+    let h = Math.max(Math.abs(y2 - y), props.thick);
+
+    // If we are drawing a selected connection, the minimum space is 5px
+    if(props.selected) { w = Math.max(w, 5); h = Math.max(h, 5); }
     
-    return { x: x1, y: y1, w: Math.abs(x2 - x1), h: Math.abs(y2 - y1) };
+    return { x, y, w, h };
 });
 
 
@@ -116,8 +123,8 @@ const linePath = computed( () => {
 .raw-connection {
     position: absolute;
     fill: none;
-    /* stroke-linecap: round; */
-    /* stroke-linejoin: round; */
+    stroke-linecap: round; 
+    stroke-linejoin: round;
     pointer-events: none;
     /* border: 1px dashed red;   */
 }

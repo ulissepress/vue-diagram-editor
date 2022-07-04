@@ -1,9 +1,9 @@
 <template>
     <div class="editor-container">
-
+    
         <!-- Rulers -->
-        <Guides v-show='guidesVisible' class="ruler ruler-horizontal" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width': 'calc(100% - 30px)', height: '30px' }" />
-        <Guides v-show='guidesVisible' class="ruler ruler-vertical"   @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': 'calc(100% - 30px)', width: '30px',top: '-30px' }" />
+        <Guides v-show='guidesVisible' class="ruler ruler-horizontal" :showGuides="showGuides" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width': 'calc(100% - 30px)', height: '30px' }" />
+        <Guides v-show='guidesVisible' class="ruler ruler-vertical"   :showGuides="showGuides" @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': 'calc(100% - 30px)', width: '30px',top: '-30px' }" />
         <div    v-show='guidesVisible' class="rulers-left-top-box" ></div>
 
         <!-- Editor Canvas -->
@@ -20,23 +20,24 @@
             
             <div ref="viewport" class="viewport" >
                 
-                <!-- Render Connections -->
-                <component v-for="(c, i) in connections" 
-                        :is       = "c.component" 
-                        :key      = "c.id" 
-                        :from     = "getItemById(c.from)" 
-                        :to       = "getItemById(c.to)"
-                        :style    = "{ zIndex: c.z }"
-                        :options  = "c" 
-                        :selected = "c.id === selectedItem?.id"
-                        @selected = "selectedItem = c" />
+                <!-- Render Connections (default component='Connection') -->
+                 <component v-for="(c, i) in connections"
+                    :is       = "c.component"
+                    :key      = "c.id"
+                    :from     = "getItemById(c.from)!"
+                    :to       = "getItemById(c.to)!"
+                    :style    = "{ zIndex: c.z }"
+                    :options  = "c"
+                    :selected = "c.id === selectedItem?.id"
+                    @selected = "selectedItem = c" />
                         
-                <!-- Use to render a line during a new connection creation -->
+                <!-- Use to render a connection line during a new connection creation -->
                 <RawConnection v-if="creatingConnection && connectionInfo.startItem" 
-                                :x1   = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).x" 
-                                :y1   = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y" 
-                                :x2   = "mouseCoords.x" 
-                                :y2   = "mouseCoords.y"
+                                :x1    = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).x" 
+                                :y1    = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y" 
+                                :x2    = "mouseCoords.x" 
+                                :y2    = "mouseCoords.y"
+                                :type  = "ConnectionType.LINE"                                
                                 selected />
                             
                 <!-- Render Items -->
@@ -46,8 +47,8 @@
                     :data-item-id  = "item.id"
                     :class         = "{ 'target': item.id === selectedItem?.id, 'locked': item.locked === true, 'mouse-hover': item.hover }" 
                     :style         = "getItemStyle(item)"
-                    @click.stop    = "editable && selectItem(item)" 
-                    @dblclick.stop = "editable && lockItem(item)"
+                    @click.stop    = "!creatingConnection && editable && selectItem(item)" 
+                    @dblclick.stop = "!creatingConnection && editable && lockItem(item)"
                     
                     @mouseover  = "() => { if(creatingConnection) item.hover = true }"
                     @mouseleave = "() => { delete item.hover }" > 
@@ -64,51 +65,50 @@
                         <div class="connection-handle connection-handle-top"    v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.TOP)"></div>
                         <div class="connection-handle connection-handle-bottom" v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.BOTTOM)"></div>
                         <div class="connection-handle connection-handle-center" v-if="editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.CENTER)"></div>
-
                 </div> <!-- item -->
                 
                 <!-- Manage drag / resize / rotate / rounding of selected item -->
                 <Moveable v-if = "editable === true && targetDefined && isItem(selectedItem) && !creatingConnection"
-                        ref     = "moveable"
-                        :target = "['.target']"                      
-                        :zoom   = "1 / zoomFactor"
-                        :origin = "false"  
-                        
-                        :throttleDrag   = "1"
-                        :throttleResize = "1"
-                        :throttleRotate = "shiftPressed ? 45 : 1"
-                        :keepRatio      = "shiftPressed"
+                    ref     = "moveable"
+                    :target = "['.target']"                      
+                    :zoom   = "1 / zoomFactor"
+                    :origin = "false"  
+                    
+                    :throttleDrag   = "1"
+                    :throttleResize = "1"
+                    :throttleRotate = "shiftPressed ? 45 : 1"
+                    :keepRatio      = "shiftPressed"
 
-                        :snappable               = "true"
-                        :snapGap                 = "false"
-                        :snapDirections          = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
-                        :elementSnapDirections   = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
-                        :isDisplayInnerSnapDigit = "true"
-                        :horizontalGuidelines    = "hGuideValues"
-                        :verticalGuidelines      = "vGuideValues"
-                        :elementGuidelines       = "elementGuidelines()"
-                        
-                        
-                        :roundable = "selectedItemActive && selectedItem?.supportsRoundable === true"
-                        :draggable = "selectedItemActive"
-                        :rotatable = "selectedItemActive"
-                        :resizable = "selectedItemActive && selectedItem?.supportsResizable === true"
+                    :snappable               = "showGuides"
+                    :snapGap                 = "true"
+                    :snapDirections          = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
+                    :elementSnapDirections   = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
+                    :isDisplayInnerSnapDigit = "true"
+                    :horizontalGuidelines    = "showGuides ? hGuideValues : []"
+                    :verticalGuidelines      = "showGuides ? vGuideValues : []"
+                    :elementGuidelines       = "showGuides ? elementGuidelines() : []"
+                    
+                    
+                    :roundable = "selectedItemActive && selectedItem?.supportsRoundable === true"
+                    :draggable = "selectedItemActive"
+                    :rotatable = "selectedItemActive"
+                    :resizable = "selectedItemActive && selectedItem?.supportsResizable === true"
 
-                        @dragStart   = "onDragStart"
-                        @drag        = "onDrag"
-                        @dragEnd     = "onDragEnd"
+                    @dragStart   = "onDragStart"
+                    @drag        = "onDrag"
+                    @dragEnd     = "onDragEnd"
 
-                        @resizeStart = "onResizeStart"
-                        @resize      = "onResize"
-                        @resizeEnd   = "onResizeEnd"
-                        
-                        @rotateStart = "onRotateStart"
-                        @rotate      = "onRotate"
-                        @rotateEnd   = "onRotateEnd"
+                    @resizeStart = "onResizeStart"
+                    @resize      = "onResize"
+                    @resizeEnd   = "onResizeEnd"
+                    
+                    @rotateStart = "onRotateStart"
+                    @rotate      = "onRotate"
+                    @rotateEnd   = "onRotateEnd"
 
-                        @roundStart  = "onRoundStart"
-                        @round       = "onRound"
-                        @roundEnd    = "onRoundEnd" />
+                    @roundStart  = "onRoundStart"
+                    @round       = "onRound"
+                    @roundEnd    = "onRoundEnd" />
             </div> <!-- viewport -->
         </VueInfiniteViewer>
 
@@ -129,7 +129,9 @@
             <button @click="sendToBack"      :disabled="!selectedItemActive">Send to back</button>&nbsp;
             <button @click="bringToFront"    :disabled="!selectedItemActive">Bring to front</button><br/><br/>
             <button @click="undo"            :disabled="!historyManager.canUndo()">Undo</button>&nbsp;
-            <button @click="redo"            :disabled="!historyManager.canRedo()">Redo</button>
+            <button @click="redo"            :disabled="!historyManager.canRedo()">Redo</button>&nbsp;&nbsp;
+            
+            <button @click="showGuides = !showGuides">{{ showGuides ? 'Hide Guides' : 'Show Guides'}}</button>
             
             <pre>TOOL: {{ getToolDefinition(currentTool) }}</pre>
             <pre>MOUSE: {{ mouseCoords }} </pre>
@@ -146,7 +148,7 @@
 
 <script setup lang="ts">
 
-import { useKeyModifier, useMouse } from '@vueuse/core';
+import { useKeyModifier } from '@vueuse/core';
 import { computed, nextTick, onMounted, onUpdated, ref, StyleValue } from "vue";
 import Guides from "vue-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
@@ -164,7 +166,7 @@ import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBluepri
 import RawConnection from './blocks/RawConnection.vue';
 import AddItemCommand from './commands/AddItemCommand';
 import Toolbar from './Toolbar.vue';
-import { ConnectionPoint, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
+import { ConnectionPoint, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 
 export type Item = _Item & { hover?: boolean }
 
@@ -172,7 +174,7 @@ export type Item = _Item & { hover?: boolean }
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
     elements: DiagramElement[],
-    editable?: boolean,
+    editable?: boolean,    
 }
 
 export interface DiagramEditorEvents {
@@ -226,6 +228,7 @@ const vGuides            = ref();
 const guidesVisible      = computed(() => editable && zoomFactor.value >= 0.5);
 const hGuideValues       = ref<number[]>([]);       // Horizontal guides added by the user
 const vGuideValues       = ref<number[]>([]);       // Vertical guides added by the user
+const showGuides         = ref(true);               // Show or hide all the guides
 
 const selectedItem       = ref<DiagramElement | null>(null);
 const targetDefined      = computed(() => selectedItem.value !== null)
@@ -237,8 +240,6 @@ const selectedItemActive = computed(() => {
     return isItem(selectedItem.value) ? (!selectedItem.value.locked === true) : true;
 })
 
-const mouseXY = useMouse();
-
 const shiftPressed       = useKeyModifier('Shift')
 const historyManager     = ref(new HistoryManager());
 const currentTool        = ref(EditorTool.SELECT);
@@ -247,6 +248,8 @@ const creatingConnection = computed<boolean>(() => currentTool.value === EditorT
 
 const items       = computed(() => elements.filter(e => isItem(e)) as Item[]);
 const connections = computed(() => elements.filter(e => isConnection(e)) as ItemConnection[]);
+
+
 
 // Temporary variables
 // ------------------------------------------------------------------------------------------------------------------------
@@ -333,12 +336,12 @@ function onDrag(e: any) : void {
 }
 
 function onDragEnd(e: any) : void {
-    if(isItem(selectedItem.value)) {
-        // Item just cliked, no move ?
-        if(origin.x === selectedItem.value.x && origin.y === selectedItem.value.y) return;
-        
-        historyManager.value.execute(new MoveCommand(selectedItem.value, [origin.x, origin.y], [selectedItem.value.x, selectedItem.value.y]));
-    }
+    if(!isItem(selectedItem.value)) return;
+    
+    // Item just cliked, no move ?
+    if(origin.x === selectedItem.value.x && origin.y === selectedItem.value.y) return;
+    
+    historyManager.value.execute(new MoveCommand(selectedItem.value, [origin.x, origin.y], [selectedItem.value.x, selectedItem.value.y]));
 }
 
 
@@ -365,7 +368,9 @@ function onResize(e: any) : void {
 }
 
 function onResizeEnd(e: any) : void {
-    if(isItem(selectedItem.value)) historyManager.value.execute(new ResizeCommand(selectedItem.value, [origin.w, origin.h], [selectedItem.value.w, selectedItem.value.h]));
+    if(!isItem(selectedItem.value)) return;
+    
+    historyManager.value.execute(new ResizeCommand(selectedItem.value, [origin.w, origin.h], [selectedItem.value.w, selectedItem.value.h]));
 }
 
 
