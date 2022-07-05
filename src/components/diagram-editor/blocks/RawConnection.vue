@@ -1,6 +1,6 @@
 <template>
     <svg class="raw-connection"
-         :style            = "style" 
+         :style            = "computedStyle" 
          :viewBox          = "viewBox" 
          :stroke-dasharray = "dashArray"
          :stroke           = "selected ? '#4af' : props.color" 
@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed, CSSProperties } from 'vue';
-import { ConnectionStyle, ConnectionType, Rect } from '../types';
+import { ConnectionMarker, ConnectionStyle, ConnectionType, Rect } from '../types';
 
 export interface RawConnectionProps {
     x1: number, 
@@ -24,8 +24,12 @@ export interface RawConnectionProps {
     x2: number, 
     y2: number,
 
-    type?: ConnectionType,
-    style?: ConnectionStyle,
+    type?:      ConnectionType,         // line, curve, ...
+    lineStyle?: ConnectionStyle,        // solid, dashed, ...
+
+    startMarker?: ConnectionMarker,     // none, circle, square, arrow, ...
+    endMarker?:   ConnectionMarker,
+
     thick?: number,
     color?: string,
 
@@ -42,11 +46,16 @@ const props = withDefaults(defineProps<RawConnectionProps>(), {
     y1: 0,
     x2: 0,
     y2: 0,
-    type:  ConnectionType.LINE,
-    style: ConnectionStyle.SOLID,
-    thick: 1,
-    color: '#000',
-    selected: false
+
+    type:        ConnectionType.LINE,
+    style:       ConnectionStyle.SOLID,
+
+    startMarker: ConnectionMarker.NONE, 
+    endMarker:   ConnectionMarker.NONE,
+    
+    thick:       1,
+    color:       '#000',
+    selected:    false
 });
 
 
@@ -67,7 +76,7 @@ const boundingBox = computed<Rect>(() => {
 });
 
 
-const style = computed<CSSProperties>(() => {
+const computedStyle = computed<CSSProperties>(() => {
     let b = boundingBox.value;
 
     return {
@@ -79,13 +88,11 @@ const style = computed<CSSProperties>(() => {
 });
 
 const dashArray = computed(() => {
-    if(props.style == ConnectionStyle.DASHED) return '8,10';
-    if(props.style == ConnectionStyle.DOTTED) return '2,4';
+    if(props.lineStyle == ConnectionStyle.DASHED) return '8,10';
+    if(props.lineStyle == ConnectionStyle.DOTTED) return '2,4';
 
     return '';  // ConnectionStyle.SOLID
 });
-
-
 
 
 const viewBox = computed(() => {
@@ -113,7 +120,7 @@ const linePath = computed( () => {
     if(props.type === ConnectionType.LINE) return `M ${x1} ${y1} L ${x2} ${y2}`;
     
     // Curve line
-    const d = (x2 - x1) * 0.4;
+    const d = (x2 - x1) * 0.7;      // Curve tension: 0=direct line, 1=full curved. PS: 0.7 seems a good value
     return `M ${x1} ${y1} C ${x1 + d} ${y1} ${x2 - d} ${y2} ${x2} ${y2}`;
 })
 </script>

@@ -24,14 +24,14 @@
                 
                 <!-- Render Connections (default component='Connection') -->
                  <component v-for="(c, i) in connections"
-                    :is       = "c.component"
-                    :key      = "c.id"
-                    :from     = "getItemById(c.from)!"
-                    :to       = "getItemById(c.to)!"
-                    :style    = "{ zIndex: c.z }"
-                    :options  = "c"
-                    :selected = "c.id === selectedItem?.id"
-                    @selected = "selectedItem = c" />
+                    :is         = "c.component"
+                    :key        = "c.id"
+                    :from       = "getItemById(c.from.item)!"
+                    :to         = "getItemById(c.to.item)!"
+                    :connection = "c"
+                    :style      = "{ zIndex: c.z }"
+                    :selected   = "c.id === selectedItem?.id"
+                    @selected   = "selectedItem = c" />
                         
                 <!-- Use to render a connection line during a new connection creation -->
                 <RawConnection v-if="creatingConnection && connectionInfo.startItem" 
@@ -62,11 +62,11 @@
                         <div class="decorator decorator-size"   v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
 
                         <!-- Connection Handles - When the item is rotated, only the center handle is active -->
-                        <div class="connection-handle connection-handle-left"   v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.LEFT)"></div>
-                        <div class="connection-handle connection-handle-right"  v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.RIGHT)"></div>
-                        <div class="connection-handle connection-handle-top"    v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.TOP)"></div>
-                        <div class="connection-handle connection-handle-bottom" v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.BOTTOM)"></div>
-                        <div class="connection-handle connection-handle-center" v-if="editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionPoint.CENTER)"></div>
+                        <div class="connection-handle connection-handle-left"   v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.LEFT)"></div>
+                        <div class="connection-handle connection-handle-right"  v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.RIGHT)"></div>
+                        <div class="connection-handle connection-handle-top"    v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.TOP)"></div>
+                        <div class="connection-handle connection-handle-bottom" v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.BOTTOM)"></div>
+                        <div class="connection-handle connection-handle-center" v-if="editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.CENTER)"></div>
                 </div> <!-- item -->
                 
                 <!-- Manage drag / resize / rotate / rounding of selected item -->
@@ -168,7 +168,7 @@ import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBluepri
 import RawConnection from './blocks/RawConnection.vue';
 import AddItemCommand from './commands/AddItemCommand';
 import Toolbar from './Toolbar.vue';
-import { ConnectionPoint, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
+import { ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 
 export type Item = _Item & { hover?: boolean }
 
@@ -275,13 +275,13 @@ function onMouseMove(e: any) {
 let connectionInfo : { 
     startItem:  Item | null, 
     endItem:    Item | null,
-    startPoint: ConnectionPoint,
-    endPoint:   ConnectionPoint,
+    startPoint: ConnectionHandle,
+    endPoint:   ConnectionHandle,
 }= {
     startItem:  null, 
     endItem:    null,
-    startPoint: ConnectionPoint.CENTER,
-    endPoint:   ConnectionPoint.CENTER,
+    startPoint: ConnectionHandle.CENTER,
+    endPoint:   ConnectionHandle.CENTER,
 }
 
 
@@ -439,16 +439,11 @@ function bringToFront() : void {
 }
 
 function changeBackColor() : void {
-    if(isItem(selectedItem.value)) {
-        const oldColor = selectedItem.value.backgroundColor;
-        const newColor = `hsl(${randomInt(0, 500)}, 90%, 50%)`;
-        historyManager.value.execute(new ChangeBackgroundColorCommand(selectedItem.value, oldColor, newColor));
-    }
-    else if(isConnection(selectedItem.value)) {
-        const oldColor = selectedItem.value.color;
-        const newColor = `hsl(${randomInt(0, 500) }, 90%, 50%)`;
-        historyManager.value.execute(new ChangeBackgroundColorCommand(selectedItem.value, oldColor, newColor));
-    }
+    if(!selectedItem.value) return;
+
+    const oldColor = selectedItem.value.backgroundColor;
+    const newColor = `hsl(${randomInt(0, 500)}, 90%, 50%)`;
+    historyManager.value.execute(new ChangeBackgroundColorCommand(selectedItem.value, oldColor, newColor));
 }
 
 function deleteItem() {
@@ -558,7 +553,7 @@ function onKeyDown(e: any) {
 }
 
 
-function connectionHandleClick(item: Item   , point: ConnectionPoint) {
+function connectionHandleClick(item: Item   , point: ConnectionHandle) {
     console.log('connectionHandleClick', item, point);
     
     // Shorter alias
@@ -576,7 +571,13 @@ function connectionHandleClick(item: Item   , point: ConnectionPoint) {
     ci.endItem  = item;
     ci.endPoint = point;
 
-    const newConnection = createConnection(ci.startItem.id, ci.endItem.id, { fromPoint: ci.startPoint, toPoint: ci.endPoint });
+    const newConnection = createConnection(
+        ci.startItem.id, 
+        ci.endItem.id, 
+        {
+            from: { handle: ci.startPoint },
+            to:   { handle: ci.endPoint   }
+        });
     
     ci.startItem = null;
     ci.endItem   = null;

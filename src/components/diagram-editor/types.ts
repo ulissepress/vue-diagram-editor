@@ -23,8 +23,9 @@ export interface DiagramElement {
     z:      number;             // The element z-index
     
     backgroundColor:  string;   // The element background color (item background, connection stroke color)
+    textColor:        string;   // The element text color (text inside the element, etc.)
     
-    component: string;          // The Vue component used to render this element
+    component:         string;  // The Vue component used to render this element
     componentOptions?: any;     // The Vue component options / config
 }
 
@@ -38,28 +39,28 @@ export interface Item extends DiagramElement {
     borderRadius: number;           // border radius (in px)
     
     supportsRoundable: boolean;     // The item can be rounded (user can change border radius)
-    supportsResizable: boolean;     // The item can be resized
-
-    textColor:        string;       // The item background color
+    supportsResizable: boolean;     // The item can be resized (user can change width / height)
 
     locked: boolean;                // The item is locked (cannot be moved / resized / rotated / ...)
 }
 
-export interface ItemConnection extends DiagramElement {
-    from:      string;
-    to:        string;
-    
-    fromPoint: ConnectionPoint;
-    toPoint:   ConnectionPoint;
-
-    type:      ConnectionType;
-    style:     ConnectionStyle;
-
-    thick:     number;
-    color:     string;
+export interface ConnectionPoint {
+    item:   string;                   // The item ID which this connection point is referring to
+    handle: ConnectionHandle;         // The handle this point is connected to
+    marker: ConnectionMarker;         // The marker used by this connection point
 }
 
-export enum ConnectionPoint {
+export interface ItemConnection extends DiagramElement {
+    from:     ConnectionPoint;       // The connection starting point
+    to:       ConnectionPoint;       // The connection ending point
+    
+    type:     ConnectionType;        // The connection type (line, curve, ...)
+    style:    ConnectionStyle;       // The connection style (solid, dashed, ...)
+
+    thick:    number;                // The connection thickness (in px)
+}
+
+export enum ConnectionHandle {
     TOP    = "top",
     BOTTOM = "bottom",
     LEFT   = "left",
@@ -67,11 +68,17 @@ export enum ConnectionPoint {
     CENTER = "center"
 }
 
+export enum ConnectionMarker {
+    NONE   = "none",
+    CIRCLE = "circle",
+    SQUARE = "square",
+    ARROW  = "arrow"    
+}
+
 export enum ConnectionType {
     LINE  = "line",
     CURVE = "curve"
 }
-
 
 export enum ConnectionStyle {
     SOLID  = "solid",
@@ -93,7 +100,7 @@ export enum EditorTool {
 }
 
 export interface ToolDefinition {
-    type:  EditorTool | "separator";
+    type:   EditorTool | "separator";
     title?: string;
     icon?:  string;
     

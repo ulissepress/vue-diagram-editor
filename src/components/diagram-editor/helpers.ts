@@ -1,12 +1,15 @@
-import { ConnectionPoint, ConnectionStyle, ConnectionType, Item, ItemConnection, Position } from "./types";
+import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, Item, ItemConnection, Position } from "./types";
+
+type DeepPartial<T> = T extends object ? {
+    [P in keyof T]?: DeepPartial<T[P]>;
+} : T;
 
 export function getUniqueId(prefix: string = 'id_') : string {
     const base = 36;
     return prefix + Date.now().toString(base) + '_' + randomInt(1, 10000).toString(base);
 }
 
-
-export function createItem(item?: Partial<Item>) : Item {
+export function createItem(item?: DeepPartial<Item>) : Item {
     return {
         id: getUniqueId(),
         title: "Item",
@@ -31,19 +34,30 @@ export function createItem(item?: Partial<Item>) : Item {
     } as Item
 }
 
-export function createConnection(from: string, to: string, options?: Partial<ItemConnection>) : ItemConnection {
+export function createConnection(fromID: string, toID: string, c?: DeepPartial<ItemConnection>) : ItemConnection {
     return {
         component: 'Connection',
 
         id: getUniqueId(),
-        from,
-        to,
-        type:  ConnectionType.LINE,
-        style: ConnectionStyle.SOLID,
-        thick: 1,
-        color: "#333",
+
+        from: { 
+            item:   fromID, 
+            handle: c?.from?.handle || ConnectionHandle.CENTER,
+            marker: c?.from?.marker || ConnectionMarker.NONE
+        },
         
-        ...options
+        to: { 
+            item:   toID, 
+            handle: c?.to?.handle || ConnectionHandle.CENTER,
+            marker: c?.to?.marker || ConnectionMarker.NONE
+        },
+        
+        type:  c?.type  || ConnectionType.LINE,
+        style: c?.style || ConnectionStyle.SOLID,
+        thick: c?.thick || 1,
+
+        backgroundColor: c?.backgroundColor || "#333",
+        
     } as ItemConnection
 }
 
@@ -190,13 +204,13 @@ export function randomInt(min: number, max: number) : number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function getHandlePosition(item: Item, cp: ConnectionPoint): Position {
+export function getHandlePosition(item: Item, cp: ConnectionHandle): Position {
     // If item is rotated always use the center handle
     if(item.r !== 0) return { x: item.x + item.w / 2, y: item.y + item.h / 2 };
 
-    if(cp === ConnectionPoint.LEFT)        return { x: item.x,              y: item.y + item.h / 2 };
-    else if(cp === ConnectionPoint.RIGHT)  return { x: item.x + item.w,     y: item.y + item.h / 2 };
-    else if(cp === ConnectionPoint.TOP)    return { x: item.x + item.w / 2, y: item.y              };
-    else if(cp === ConnectionPoint.BOTTOM) return { x: item.x + item.w / 2, y: item.y + item.h     };
-    else /*  ConnectionPoint.CENTER */     return { x: item.x + item.w / 2, y: item.y + item.h / 2 };    
+    if(cp === ConnectionHandle.LEFT)        return { x: item.x,              y: item.y + item.h / 2 };
+    else if(cp === ConnectionHandle.RIGHT)  return { x: item.x + item.w,     y: item.y + item.h / 2 };
+    else if(cp === ConnectionHandle.TOP)    return { x: item.x + item.w / 2, y: item.y              };
+    else if(cp === ConnectionHandle.BOTTOM) return { x: item.x + item.w / 2, y: item.y + item.h     };
+    else /*  ConnectionHandle.CENTER */     return { x: item.x + item.w / 2, y: item.y + item.h / 2 };    
 }

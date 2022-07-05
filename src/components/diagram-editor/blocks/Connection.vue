@@ -1,13 +1,13 @@
 <template>
-    <RawConnection :x1="fromPos.x" :y1="fromPos.y" 
-                   :x2="toPos.x"   :y2="toPos.y" 
+    <RawConnection :x1 = "fromPos.x" :y1 = "fromPos.y" 
+                   :x2 = "toPos.x"   :y2 = "toPos.y" 
                    
-                   :type     = "options.type" 
-                   :style    = "options.style" 
-                   :thick    = "options.thick" 
-                   :color    = "options.color" 
-                   :selected = "selected" 
-                   @selected = "emit('selected')" />
+                   :type      = "connection.type" 
+                   :lineStyle = "connection.style" 
+                   :thick     = "connection.thick" 
+                   :color     = "connection.backgroundColor" 
+                   :selected  = "selected" 
+                   @selected  = "emit('selected')" />
 </template>
 
 <script setup lang="ts">
@@ -21,13 +21,10 @@ export interface ConnectionEvents {
     (e: 'selected' ): void    
 }
 
-const { from, to, options, selected } = defineProps<{from: Item, to: Item, options: ItemConnection, selected: boolean }>();
+const { from, to, connection, selected } = defineProps<{from: Item, to: Item, connection: ItemConnection, selected: boolean }>();
 const emit = defineEmits<ConnectionEvents>();
 
-const fromPos = computed<Position>(() => getHandlePosition(from, options.fromPoint));
-const toPos   = computed<Position>(() => getHandlePosition(to,   options.toPoint));
+const fromPos = computed<Position>(() => getHandlePosition(from, connection.from.handle));
+const toPos   = computed<Position>(() => getHandlePosition(to,   connection.to.handle));
     
-
-
-
 </script>

@@ -19,7 +19,7 @@ import HistoryManager from './components/diagram-editor/commands/HistoryManager'
 import DiagramEditor from './components/diagram-editor/DiagramEditor.vue';
 import { createConnection, createItem } from './components/diagram-editor/helpers';
 
-import { ConnectionPoint, DiagramElement, Item, ItemConnection } from './components/diagram-editor/types';
+import { ConnectionStyle, ConnectionType, DiagramElement, Item, ItemConnection } from './components/diagram-editor/types';
 
 
 let elements: DiagramElement[] = reactive([
@@ -29,9 +29,9 @@ let elements: DiagramElement[] = reactive([
     createItem({ id: 'a2', title: 'a2', w: 90,  h: 90 }),
     createItem({ id: 'a3', title: 'a3', w: 200, h: 70 }),
     
-    //createConnection('a1', 'a2'),
-    //createConnection('a1', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DOTTED }),
-    //createConnection('a2', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DASHED, color: "red", thick: 5 }),
+    createConnection('a1', 'a2'),
+    createConnection('a1', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DOTTED }),
+    createConnection('a2', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DASHED, backgroundColor: "red", thick: 5 }),
 
     // createItem( { title: 'This is a text and can be quite long!', component: "Text", supportsRoundable: false } ),
 
@@ -59,25 +59,6 @@ let elements: DiagramElement[] = reactive([
 
 ]);
 
-
-function createTestConnections(): DiagramElement[] {
-    return [
-        createItem({ id: 's1', title: 's1', w: 100, h: 80 }),
-
-        createItem({ id: 't1', title: 't1', w: 90,  h: 90 }),
-        createItem({ id: 't2', title: 't2', w: 90,  h: 90 }),
-        createItem({ id: 't3', title: 't3', w: 90,  h: 90 }),
-        createItem({ id: 't4', title: 't4', w: 90,  h: 90 }),
-        createItem({ id: 't5', title: 't5', w: 90,  h: 90 }),
-
-        createConnection('s1', 't1', { fromPoint: ConnectionPoint.RIGHT, toPoint: ConnectionPoint.LEFT   }),
-        createConnection('s1', 't2', { fromPoint: ConnectionPoint.RIGHT, toPoint: ConnectionPoint.RIGHT  }),
-        createConnection('s1', 't4', { fromPoint: ConnectionPoint.RIGHT, toPoint: ConnectionPoint.TOP    }),
-        createConnection('s1', 't3', { fromPoint: ConnectionPoint.RIGHT, toPoint: ConnectionPoint.BOTTOM }),
-        createConnection('s1', 't5', { fromPoint: ConnectionPoint.RIGHT, toPoint: ConnectionPoint.CENTER }),
-
-    ];
-}
 
 function addNewItem(item: Item, historyManager: HistoryManager) {
     historyManager.execute(new AddItemCommand(elements, item));    
