@@ -120,6 +120,8 @@ export const toolDefinitions: ToolDefinition[] = [
     { type: EditorTool.ELLIPSE,    title: 'Ellipse',    icon: 'circle',          itemType: "Ellipse"   },
     { type: EditorTool.TRIANGLE,   title: 'Triangle',   icon: 'change_history',  itemType: "Triangle"  },
     { type: EditorTool.STAR,       title: 'Star',       icon: 'grade',           itemType: "Star"      },
+    { type: 'separator' },
+    { type: EditorTool.WIDGET,     title: 'Widgets',    icon: 'view_in_ar' },
 ];
 
 export function getToolDefinition(toolType: EditorTool) : ToolDefinition {

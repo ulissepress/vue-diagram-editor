@@ -1,6 +1,6 @@
 <template>
     <div class="toolbar">
-        <div v-for = "t in toolDefinitions" 
+        <div v-for = "t in toolList" 
             :key   = "t.type" 
             :title = "t.title"
             @click = "t.type !== 'separator' && onToolSelected(t.type, selectedTool)"
@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from '@vue/reactivity';
 import { onMounted, onUpdated } from 'vue';
 import Icon from './Icon.vue';
 import { EditorTool, toolDefinitions } from './types';
@@ -29,11 +30,11 @@ interface Tool {
 // ------------------------------------------------------------------------------------------------------------------------
 interface ToolbarProps {
     selectedTool: EditorTool,
-    supportsCustomWidgets: boolean,
+    customWidgets: boolean,
 }
 
 
-const { selectedTool, supportsCustomWidgets } = defineProps<ToolbarProps>();
+const { selectedTool, customWidgets } = defineProps<ToolbarProps>();
 
 interface ToolbarEvents {
     (e: 'toolSelected', toolType: EditorTool): void    
@@ -45,10 +46,11 @@ onMounted(()=> console.log('Toolbar mounted', selectedTool))
 onUpdated(()=> console.log('Toolbar updated', selectedTool))
 
 
-// if(supportsCustomWidgets) {
-//  tools.push({ type: 'separator' });
-//  tools.push({ type: EditorTool.WIDGET, title: 'Widget',  icon: 'grid_view' })
-// }
+const toolList = computed(() => {
+    return customWidgets ? toolDefinitions : toolDefinitions.filter(t => t.type !== EditorTool.WIDGET);
+})
+
+
 function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {    
     if(toolType == currentSelectedTool) return;
     
@@ -98,8 +100,8 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
 }
 
 .separator {
-    width: 100%;
-    height: 8px;
+    width: 12px;
+    height: 100%;
     user-select: none;
 }
 

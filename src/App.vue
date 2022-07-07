@@ -1,11 +1,11 @@
 <template>
     <div style="width: 100%; height: 95%; padding-top: 16px; margin: 0 auto;">
-        <DiagramEditor  :editable    = "true"
-                        :elements    = "elements"
-                        @add-item    = "addNewItem" 
-                        @delete-item = "deleteItem" 
-                        
-                        @add-connection="addNewConnection"
+        <DiagramEditor  :editable       = "true"
+                        :customWidgets  = "true"
+                        :elements       = "elements"
+                        @add-item       = "addNewItem" 
+                        @delete-item    = "deleteItem"                          
+                        @add-connection = "addNewConnection"
                         />
     </div>
 </template>

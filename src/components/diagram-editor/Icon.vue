@@ -3,6 +3,6 @@
 </template>
 
 <script setup lang="ts">
-
+// https://fonts.google.com/icons?icon.set=Material+Icons
 const { icon } = defineProps<{ icon: string }>();
 </script>

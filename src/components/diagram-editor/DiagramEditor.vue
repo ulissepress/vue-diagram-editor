@@ -2,9 +2,9 @@
     <div class="editor-container">
     
         <!-- Rulers -->
-        <Guides v-show='guidesVisible' class="ruler ruler-horizontal" :showGuides="showGuides" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width': 'calc(100% - 30px)', height: '30px' }" />
-        <Guides v-show='guidesVisible' class="ruler ruler-vertical"   :showGuides="showGuides" @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': 'calc(100% - 30px)', width: '30px',top: '-30px' }" />
-        <div    v-show='guidesVisible' class="rulers-left-top-box" ></div>
+        <Guides v-show='guidesVisible' class="ruler ruler-horizontal" :showGuides="showGuides" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width' : '100%', height: '30px' }" />
+        <Guides v-show='guidesVisible' class="ruler ruler-vertical"   :showGuides="showGuides" @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': '100%', width:  '30px', top: '-30px' }" />
+        <div    v-show='guidesVisible' class="rulers-left-top-box"></div>
 
         <!-- Editor Canvas -->
         <VueInfiniteViewer 
@@ -57,6 +57,7 @@
 
                         <component :is="item.component" :item="item" />
 
+                        <!-- Item decorators (delete, locked, size info) -->
                         <div class="decorator decorator-delete" v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
                         <div class="decorator decorator-locked" v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
                         <div class="decorator decorator-size"   v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
@@ -116,9 +117,9 @@
 
         <!-- Editor Toolbar -->
         <Toolbar v-if='editable' 
-                :supportsCustomWidgets="true"
-                :selectedTool="currentTool" 
-                @toolSelected="selectCurrentTool"/>
+            :customWidgets = "customWidgets"
+            :selectedTool  = "currentTool" 
+            @toolSelected  = "selectCurrentTool" />
 
         <!-- Editor Info Panel -->
         <div v-if='editable' class="info-panel">
@@ -177,6 +178,7 @@ export type Item = _Item & { hover?: boolean }
 export interface DiagramEditorProps {
     elements: DiagramElement[],
     editable?: boolean,    
+    customWidgets?: boolean,    
 }
 
 export interface DiagramEditorEvents {
@@ -190,6 +192,7 @@ export interface DiagramEditorEvents {
 // Define props
 const { elements, editable } = withDefaults(defineProps<DiagramEditorProps>(), {
     editable: true,
+    customWidgets: false,
 });
 
 // Define events
