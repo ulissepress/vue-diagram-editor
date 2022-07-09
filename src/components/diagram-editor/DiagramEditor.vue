@@ -123,7 +123,10 @@
 
         <!-- Editor Info Panel -->
         <div v-if='editable' class="info-panel">
-            ZOOM: <button @click="zoomOut">-</button> {{ zoomFactor * 100 }}% 
+                <ObjectInspector :schema="itemObjectInspectorModel"
+                                 :object="selectedItem" />
+
+            <!-- ZOOM: <button @click="zoomOut">-</button> {{ zoomFactor * 100 }}% 
                 <button @click="zoomIn">+</button>&nbsp;&nbsp;
                 <button @click="zoomReset">Reset</button>
             <br/><br/>
@@ -143,7 +146,7 @@
                 <p>Press SHIFT key to keep aspect ratio while resizing</p>
                 <h3>Selected Item</h3>
                 <pre>{{ selectedItem }}</pre>            
-            </div> 
+            </div>  -->
         </div> <!-- info-panel -->
         
     </div> <!-- editor-container -->    
@@ -170,6 +173,9 @@ import RawConnection from './blocks/RawConnection.vue';
 import AddItemCommand from './commands/AddItemCommand';
 import Toolbar from './Toolbar.vue';
 import { ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
+
+import ObjectInspector from '../inspector/ObjectInspector.vue';
+import { itemObjectInspectorModel } from './helpers';
 
 export type Item = _Item & { hover?: boolean }
 
@@ -607,11 +613,9 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
     top: 40px;
     right: 20px;
     width: 260px;
-    height: auto;
-    border: 1px solid;
-    padding: 8px;
-    background-color: lightyellow;
-    overflow: hidden;
+    height: 80%;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 .viewer {
     box-sizing: border-box;

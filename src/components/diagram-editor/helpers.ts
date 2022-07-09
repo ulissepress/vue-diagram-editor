@@ -1,4 +1,5 @@
 import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, Item, ItemConnection, Position } from "./types";
+import { ObjectInspectorModel, PropertyType } from './../inspector/types';
 
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
@@ -213,4 +214,61 @@ export function getHandlePosition(item: Item, cp: ConnectionHandle): Position {
     else if(cp === ConnectionHandle.TOP)    return { x: item.x + item.w / 2, y: item.y              };
     else if(cp === ConnectionHandle.BOTTOM) return { x: item.x + item.w / 2, y: item.y + item.h     };
     else /*  ConnectionHandle.CENTER */     return { x: item.x + item.w / 2, y: item.y + item.h / 2 };    
+}
+
+
+export const itemObjectInspectorModel : ObjectInspectorModel = {
+    tabs: [
+        {
+            title: "Style",
+            sections: [
+                {
+                    title: "Position and size",
+                    properties: [
+                        {
+                            name: "x",
+                            label: "X",
+                            type: PropertyType.NUMBER
+                        },
+                        {
+                            name: "y",
+                            label: "Y",
+                            type: PropertyType.NUMBER
+                        },
+                        {
+                            name: "w",
+                            label: "Width",
+                            type: PropertyType.NUMBER
+                        },
+                        {
+                            name: "h",
+                            label: "Height",
+                            type: PropertyType.NUMBER
+                        }
+                    ] // props
+                }, // section
+                {
+                    title: "Rotation",
+                    properties: []
+                }
+            ] // sections
+        }, // tab
+        {
+            title: "Other",
+
+            sections: [
+                {
+                    title: "Component Info",
+                    properties: [
+                        {
+                            name: "component",
+                            label: "Component",
+                            type: PropertyType.TEXT,
+                            readonly: true
+                        }
+                    ] // props
+                } // section
+            ] // sections
+        }, // tab
+    ]
 }
