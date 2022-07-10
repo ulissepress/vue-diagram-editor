@@ -123,8 +123,11 @@
 
         <!-- Editor Info Panel -->
         <div v-if='editable' class="info-panel">
-                <ObjectInspector :schema="itemObjectInspectorModel"
-                                 :object="selectedItem" />
+                <ObjectInspector
+                    :title  = "selectedItem ? selectedItem.component + ' (' + selectedItem.id + ')' : 'No object selected'" 
+                    :schema = "itemObjectInspectorModel"
+                    :object = "selectedItem"
+                    @property-changed="onPropertyChange" />
 
             <!-- ZOOM: <button @click="zoomOut">-</button> {{ zoomFactor * 100 }}% 
                 <button @click="zoomIn">+</button>&nbsp;&nbsp;
@@ -175,6 +178,7 @@ import Toolbar from './Toolbar.vue';
 import { ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 
 import ObjectInspector from '../inspector/ObjectInspector.vue';
+import { ObjectProperty } from '../inspector/types';
 import { itemObjectInspectorModel } from './helpers';
 
 export type Item = _Item & { hover?: boolean }
@@ -221,7 +225,6 @@ onUpdated(() => {
     //console.log('DiagramEditor updated')
 })
 
-
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
 const zooms              = [5, 10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 500];        // must contain the value 100
@@ -259,7 +262,6 @@ const creatingConnection = computed<boolean>(() => currentTool.value === EditorT
 
 const items       = computed(() => elements.filter(e => isItem(e)) as Item[]);
 const connections = computed(() => elements.filter(e => isConnection(e)) as ItemConnection[]);
-
 
 
 // Temporary variables
@@ -547,8 +549,6 @@ function onCanvasClick(e: any): void {
         
         console.log('creating new item', toolDef, itemType, newItem)
         historyManager.value.execute(new AddItemCommand(elements, newItem));    
-
-        //emit('add-item', newItem, historyManager.value as HistoryManager);
     }
 }
 
@@ -595,6 +595,11 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
 
 }
 
+
+function onPropertyChange(p: ObjectProperty) {
+    console.log('onPropertyChange', p);
+    nextTick(() => moveable.value?.updateRect());
+}
 </script>
 
 

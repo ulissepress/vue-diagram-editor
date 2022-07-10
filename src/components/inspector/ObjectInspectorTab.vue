@@ -42,6 +42,8 @@ const emit = defineEmits<ObjectInspectorTabEvents>();
     padding: 4px;
     text-transform: uppercase;
     cursor: pointer;
+    user-select: none;
+
 }
 
 .inspector-tab:hover:not(.tab-selected) {

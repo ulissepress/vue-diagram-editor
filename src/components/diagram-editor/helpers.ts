@@ -223,6 +223,7 @@ export const itemObjectInspectorModel : ObjectInspectorModel = {
             title: "Style",
             sections: [
                 {
+                    name: "pos_size",
                     title: "Position and size",
                     properties: [
                         {
@@ -248,8 +249,20 @@ export const itemObjectInspectorModel : ObjectInspectorModel = {
                     ] // props
                 }, // section
                 {
-                    title: "Rotation",
-                    properties: []
+                    name: "rotation_radius",
+                    title: "Rotation & Radius",
+                    properties: [
+                        {
+                            name: "r",
+                            label: "Rotation",
+                            type: PropertyType.NUMBER
+                        },
+                        {
+                            name: "borderRadius",
+                            label: "Radius",
+                            type: PropertyType.NUMBER
+                        }
+                    ]
                 }
             ] // sections
         }, // tab
@@ -258,6 +271,7 @@ export const itemObjectInspectorModel : ObjectInspectorModel = {
 
             sections: [
                 {
+                    name: "comp_info",
                     title: "Component Info",
                     properties: [
                         {

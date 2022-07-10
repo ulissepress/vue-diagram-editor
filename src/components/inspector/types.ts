@@ -23,6 +23,7 @@ export function getComponentEditor(propertyType: PropertyType) : Vue.Component {
 }
 
 export interface InspectorSection {
+    name:   string;                 // Section name. Example: 'general'
     title: string;                  // Section title. Example: 'General'
     properties: ObjectProperty[];   // Properties in this section.
 }

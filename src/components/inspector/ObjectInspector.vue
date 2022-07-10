@@ -4,6 +4,7 @@
             <i>No selected object</i>
         </div>
         <template v-else>
+            <div class="inspector-title">{{ title }}</div>
             <div class="tab-container">
                 <ObjectInspectorTab v-for="(tab, index) in schema.tabs" 
                     :key      = "tab.title" 
@@ -14,11 +15,12 @@
             </div>
             
             <ObjectInspectorSection v-for="(section, index) in schema.tabs[currentTab].sections" 
-                :key      = "index" 
+                :key      = "section.name" 
                 :section  = "section" 
-                :object   = "object"  />
+                :object   = "object"  
+                @property-changed = "e => emit('property-changed', e)" />
         
-            <hr />
+            <br /><hr />
             <pre>{{ object }}</pre>
         </template>
     </div>
@@ -34,6 +36,7 @@ import { ObjectInspectorModel, ObjectProperty } from "./types";
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface ObjectInspectorProps {
+    title: string;
     object?: any;
     schema: ObjectInspectorModel;
 }
@@ -66,6 +69,14 @@ const currentTab = ref(0)
     overflow-y: auto;
 }
 
+.inspector-title {
+    background-color: rgb(90, 90, 90);
+    color: white;
+    padding: 4px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1;
+}
 .tab-container {
     display: flex;
     gap: 4px;
