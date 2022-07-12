@@ -49,9 +49,11 @@
                     :data-item-id  = "item.id"
                     :class         = "{ 'target': item.id === selectedItem?.id, 'locked': item.locked === true, 'mouse-hover': item.hover }" 
                     :style         = "getItemStyle(item)"
-                    @click.stop    = "!creatingConnection && editable && selectItem(item)" 
-                    @dblclick.stop = "!creatingConnection && editable && lockItem(item)"
+                   
+                    @click.stop     = "!creatingConnection && editable && selectItem(item)" 
+                    @dblclick.stop  = "!creatingConnection && editable && lockItem(item)"
                     
+                    @mousedown  = "!creatingConnection && editable && selectItem(item, $event)" 
                     @mouseover  = "() => { if(creatingConnection) item.hover = true }"
                     @mouseleave = "() => { delete item.hover }" > 
 
@@ -71,9 +73,9 @@
                 </div> <!-- item -->
                 
                 <!-- Manage drag / resize / rotate / rounding of selected item -->
-                <Moveable v-if = "editable === true && targetDefined && isItem(selectedItem) && !creatingConnection"
+                <Moveable 
                     ref     = "moveable"
-                    :target = "['.target']"                      
+                    :target = "isItem(selectedItem) ? [`[data-item-id='${selectedItem.id}']`] : []"
                     :zoom   = "1 / zoomFactor"
                     :origin = "false"  
                     
@@ -311,15 +313,23 @@ function getItemStyle(item: Item) : StyleValue {
     return style;
 }
 
-function selectItem(item: Item)  : void {
-    // Item already selected
-    if(item === selectedItem.value) return;
-            
-    selectNone();
-    nextTick(() => { 
-        console.log('Selecting item', item)
-        selectedItem.value = item; 
-    })
+function selectItem(item: Item, e?: MouseEvent)  : void {
+  console.log('selectItem', item, e);
+  e?.preventDefault();
+  e?.stopPropagation();
+  // Item already selected
+  if (item === selectedItem.value) return;
+
+  selectNone();
+  nextTick(() => {
+    selectedItem.value = item;
+
+    if (e) {
+      nextTick(() => {
+        moveable.value?.dragStart(e);
+      });
+    }
+  });
 }
 
 function selectNone() : void {
