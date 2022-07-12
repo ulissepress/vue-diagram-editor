@@ -1,11 +1,18 @@
 <template>
     <div class="object-inspector">
-        <div v-if="object === null || object === undefined">
-            <i>No selected object</i>
+        <div class="inspector-title" @click="expanded = !expanded">
+            <div>Object Inspector</div>
+            <div style="flex-grow: 1"></div>
+            <div>
+                <Icon v-show="expanded"  size='16px' icon="keyboard_arrow_down" color="white" /> 
+                <Icon v-show="!expanded" size='16px' icon="keyboard_arrow_right" color="white" /> 
+            </div>
+        </div>
+        <div v-if="expanded && (object === null || object === undefined)">
+            <div style="color: #aaa; font-size: 12px; text-align: center; margin-bottom: 8px; font-style: italic;">No selected object</div>
         </div>
         <template v-else>
-            <div class="inspector-title">{{ title }}</div>
-            <div class="tab-container">
+            <div v-if="expanded" class="tab-container">
                 <ObjectInspectorTab v-for="(tab, index) in schema.tabs" 
                     :key      = "tab.title" 
                     :tab      = "tab" 
@@ -14,21 +21,26 @@
                     @click    = "currentTab = index" />
             </div>
             
-            <ObjectInspectorSection v-for="(section, index) in schema.tabs[currentTab].sections" 
+            <ObjectInspectorSection v-if="expanded" v-for="(section, index) in schema.tabs[currentTab].sections" 
                 :key      = "section.name" 
                 :section  = "section" 
-                :object   = "object"  
-                @property-changed = "e => emit('property-changed', e)" />
-        
-            <br /><hr />
-            <pre>{{ object }}</pre>
+                :object   = "object"
+                @property-changed = "(changedProperty, newValue) => emit('property-changed', changedProperty, newValue)" />
+
+            <!-- Debug -->
+            <div v-if="expanded">
+                <hr />
+                <pre style="color: #ddd;">{{ object }}</pre>
+            </div>
         </template>
     </div>
 </template>
 
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
+import Icon from "../diagram-editor/Icon.vue";
+import { registerPredefinedEditors } from './helpers';
 import ObjectInspectorSection from './ObjectInspectorSection.vue';
 import ObjectInspectorTab from './ObjectInspectorTab.vue';
 import { ObjectInspectorModel, ObjectProperty } from "./types";
@@ -42,7 +54,7 @@ export interface ObjectInspectorProps {
 }
 
 export interface ObjectInspectorEvents {
-    (e: 'property-changed', property: ObjectProperty): void
+    (e: 'property-changed', property: ObjectProperty, newValue: any): void
 }
 
 // Define props
@@ -52,35 +64,54 @@ const { schema } = defineProps<ObjectInspectorProps>();
 const emit = defineEmits<ObjectInspectorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
+onBeforeMount(() => {
+    registerPredefinedEditors();
+});
+
 const currentTab = ref(0)
+const expanded   = ref(true);
 </script>
 
 
 <style  scoped>
 .object-inspector {
     width: 100%;
-    height: 100%;
-    min-height: 100px;
+    height: auto;
     max-height: 100%;
 
-    background-color: #f5f5f5;
+    background-color: #333;
     
     overflow-x: hidden;
     overflow-y: auto;
 }
 
+.object-inspector::-webkit-scrollbar {
+  width: 12px;               /* width of the entire scrollbar */
+}
+
+.object-inspector::-webkit-scrollbar-track {
+  background: orange;        /* color of the tracking area */
+}
+
+.object-inspector::-webkit-scrollbar-thumb {
+  background-color: blue;    /* color of the scroll thumb */
+  border-radius: 20px;       /* roundness of the scroll thumb */
+  border: 3px solid orange;  /* creates padding around scroll thumb */
+}
+
 .inspector-title {
-    background-color: rgb(90, 90, 90);
+    display: flex;   
     color: white;
-    padding: 4px;
+    padding: 8px;
     text-align: center;
-    font-size: 14px;
+    font-size: 11px;
     line-height: 1;
+    cursor: pointer;
 }
 .tab-container {
+    letter-spacing: 2px;
     display: flex;
-    gap: 4px;
-    border-bottom: 2px solid #4af;
-    margin-bottom: 4px;
+    gap: 4px;    
+    margin-left: 8px;
 }
 </style>

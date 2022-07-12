@@ -1,5 +1,10 @@
 <template>
-    <div class="shape" :style="{ backgroundColor: item.backgroundColor, borderRadius: item.borderRadius + 'px' }">{{ item.title }}</div>
+    <div class="shape" :style="{ 
+            backgroundColor: item.backgroundColor, 
+            color:           item.textColor, 
+            borderRadius:    item.borderRadius + 'px',
+            fontSize:        item.fontSize + 'px',
+        }">{{ item.title }}</div>
 </template>
 
 <script setup lang="ts">
@@ -22,5 +27,6 @@ onUpdated(()=> console.log('Shape updated'))
     display: flex;
     justify-content: center;
     align-items: center; 
+    overflow: hidden;
 }
 </style>

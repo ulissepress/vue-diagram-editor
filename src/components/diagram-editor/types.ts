@@ -24,6 +24,8 @@ export interface DiagramElement {
     
     backgroundColor:  string;   // The element background color (item background, connection stroke color)
     textColor:        string;   // The element text color (text inside the element, etc.)
+
+    fontSize:        number;    // The element text font size
     
     component:         string;  // The Vue component used to render this element
     componentOptions?: any;     // The Vue component options / config

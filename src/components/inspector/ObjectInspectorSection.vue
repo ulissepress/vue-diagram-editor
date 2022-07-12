@@ -1,17 +1,22 @@
 <template>
     <div class="section-container">
-        <div class="section-title" @click="expanded = !expanded">{{ section.title }}</div>
-        <ObjectInspectorProperty v-if="expanded" v-for="p in section.properties" 
-            :key      = "p.name" 
-            :property = "p"
+        <div class="section-title" @click="expanded = !expanded">
+            <Icon v-show="expanded"  size='16px' icon="keyboard_arrow_down" /> 
+            <Icon v-show="!expanded" size='16px' icon="keyboard_arrow_right" /> 
+            {{ section.title }}
+        </div>
+        <ObjectInspectorProperty v-if="expanded" v-for="property in section.properties" 
+            :key      = "property.name" 
+            :property = "property"
             :object   = "object" 
-            @property-changed = "e => emit('property-changed', e)" />
+            @property-changed = "(propertyChanged, newValue) => emit('property-changed', propertyChanged, newValue)" />
     </div>
 </template>
 
 
 <script setup lang="ts">
 import { ref } from "vue";
+import Icon from "../diagram-editor/Icon.vue";
 import ObjectInspectorProperty from "./ObjectInspectorProperty.vue";
 import { InspectorSection, ObjectProperty } from "./types";
 
@@ -23,7 +28,7 @@ export interface ObjectInspectorSectionProps {
 }
 
 export interface ObjectInspectorSectionvents {
-    (e: 'property-changed', property: ObjectProperty): void
+    (e: 'property-changed', property: ObjectProperty, newValue: any): void
 }
 
 // Define props
@@ -42,19 +47,22 @@ const expanded = ref(true);
 .section-container {
     width: 100%;
     height: auto;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     user-select: none;
 }
 
 .section-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     user-select: none;
-    background-color: rgb(216, 216, 216);
-    color: #333;
+    background-color: #515151;
+    color: #dbdbdb;
     text-align: left;
-    font-size: 12px;
+    font-size: 11px;    
     padding: 4px;
-    color: #111;
     cursor: pointer;
+    margin-bottom: 4px;
 }
 
 .tab-selected {

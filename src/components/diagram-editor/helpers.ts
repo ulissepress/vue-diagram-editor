@@ -1,5 +1,4 @@
 import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, Item, ItemConnection, Position } from "./types";
-import { ObjectInspectorModel, PropertyType } from './../inspector/types';
 
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
@@ -27,7 +26,9 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         supportsRoundable: true,
         supportsResizable: true,
 
-        backgroundColor: `hsl(${randomInt(0, 500) }, 90%, 50%)`,
+        backgroundColor: '#bbbbbb',
+        teextColor: '#000000',
+        fontSize: 14,
         
         locked: false,
 
@@ -113,6 +114,7 @@ export function registerDefaultItemTypes() {
 
         backgroundColor: "green",
         textColor: "black",
+        fontSize: 14,
         
         locked: false
     };
@@ -214,75 +216,4 @@ export function getHandlePosition(item: Item, cp: ConnectionHandle): Position {
     else if(cp === ConnectionHandle.TOP)    return { x: item.x + item.w / 2, y: item.y              };
     else if(cp === ConnectionHandle.BOTTOM) return { x: item.x + item.w / 2, y: item.y + item.h     };
     else /*  ConnectionHandle.CENTER */     return { x: item.x + item.w / 2, y: item.y + item.h / 2 };    
-}
-
-
-export const itemObjectInspectorModel : ObjectInspectorModel = {
-    tabs: [
-        {
-            title: "Style",
-            sections: [
-                {
-                    name: "pos_size",
-                    title: "Position and size",
-                    properties: [
-                        {
-                            name: "x",
-                            label: "X",
-                            type: PropertyType.NUMBER
-                        },
-                        {
-                            name: "y",
-                            label: "Y",
-                            type: PropertyType.NUMBER
-                        },
-                        {
-                            name: "w",
-                            label: "Width",
-                            type: PropertyType.NUMBER
-                        },
-                        {
-                            name: "h",
-                            label: "Height",
-                            type: PropertyType.NUMBER
-                        }
-                    ] // props
-                }, // section
-                {
-                    name: "rotation_radius",
-                    title: "Rotation & Radius",
-                    properties: [
-                        {
-                            name: "r",
-                            label: "Rotation",
-                            type: PropertyType.NUMBER
-                        },
-                        {
-                            name: "borderRadius",
-                            label: "Radius",
-                            type: PropertyType.NUMBER
-                        }
-                    ]
-                }
-            ] // sections
-        }, // tab
-        {
-            title: "Other",
-
-            sections: [
-                {
-                    name: "comp_info",
-                    title: "Component Info",
-                    properties: [
-                        {
-                            name: "component",
-                            label: "Component",
-                            type: PropertyType.TEXT,
-                            readonly: true
-                        }
-                    ] // props
-                } // section
-            ] // sections
-        }, // tab
-    ]
 }

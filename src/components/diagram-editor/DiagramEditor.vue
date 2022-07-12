@@ -122,7 +122,7 @@
             @toolSelected  = "selectCurrentTool" />
 
         <!-- Editor Info Panel -->
-        <div v-if='editable' class="info-panel">
+        <div v-if='editable' class="object-inspector-container">
                 <ObjectInspector
                     :title  = "selectedItem ? selectedItem.component + ' (' + selectedItem.id + ')' : 'No object selected'" 
                     :schema = "itemObjectInspectorModel"
@@ -134,7 +134,6 @@
                 <button @click="zoomReset">Reset</button>
             <br/><br/>
             <button @click="deleteItem"      :disabled="!selectedItemActive">Delete</button>&nbsp;
-            <button @click="changeBackColor" :disabled="!selectedItemActive">Change Color</button><br/><br/>
             <button @click="sendToBack"      :disabled="!selectedItemActive">Send to back</button>&nbsp;
             <button @click="bringToFront"    :disabled="!selectedItemActive">Bring to front</button><br/><br/>
             <button @click="undo"            :disabled="!historyManager.canUndo()">Undo</button>&nbsp;
@@ -150,7 +149,7 @@
                 <h3>Selected Item</h3>
                 <pre>{{ selectedItem }}</pre>            
             </div>  -->
-        </div> <!-- info-panel -->
+        </div> <!-- object-inspector-container -->
         
     </div> <!-- editor-container -->    
 </template>
@@ -162,7 +161,6 @@ import { computed, nextTick, onMounted, onUpdated, ref, StyleValue } from "vue";
 import Guides from "vue-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
-import ChangeBackgroundColorCommand from './commands/ChangeBackgroundColorCommand';
 import ChangeZOrderCommand from './commands/ChangeZOrderCommand';
 import HistoryManager from './commands/HistoryManager';
 import { LockCommand, UnlockCommand } from './commands/LockCommand';
@@ -170,7 +168,7 @@ import MoveCommand from './commands/MoveCommand';
 import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
-import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBlueprint, getUniqueId, randomInt, registerDefaultItemTypes } from './helpers';
+import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBlueprint, getUniqueId, registerDefaultItemTypes } from './helpers';
 
 import RawConnection from './blocks/RawConnection.vue';
 import AddItemCommand from './commands/AddItemCommand';
@@ -179,7 +177,7 @@ import { ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, ge
 
 import ObjectInspector from '../inspector/ObjectInspector.vue';
 import { ObjectProperty } from '../inspector/types';
-import { itemObjectInspectorModel } from './helpers';
+import itemObjectInspectorModel from './item-properties';
 
 export type Item = _Item & { hover?: boolean }
 
@@ -449,14 +447,6 @@ function bringToFront() : void {
     if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, findMaxZ(items.value as Item[]) + 1));    
 }
 
-function changeBackColor() : void {
-    if(!selectedItem.value) return;
-
-    const oldColor = selectedItem.value.backgroundColor;
-    const newColor = `hsl(${randomInt(0, 500)}, 90%, 50%)`;
-    historyManager.value.execute(new ChangeBackgroundColorCommand(selectedItem.value, oldColor, newColor));
-}
-
 function deleteItem() {
     if(isItem(selectedItem.value)) {
         emit('delete-item', selectedItem.value, historyManager.value as HistoryManager);
@@ -596,8 +586,8 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
 }
 
 
-function onPropertyChange(p: ObjectProperty) {
-    console.log('onPropertyChange', p);
+function onPropertyChange(p: ObjectProperty, newValue: any) {
+    // console.log('onPropertyChange', p, 'New value:', newValue);
     nextTick(() => moveable.value?.updateRect());
 }
 </script>
@@ -613,12 +603,13 @@ function onPropertyChange(p: ObjectProperty) {
 
 }
 
-.info-panel {
+.object-inspector-container {
     position: absolute;
     top: 40px;
     right: 20px;
-    width: 260px;
-    height: 80%;
+    width: 240px;
+    height: auto;
+    max-height: 90%;
     overflow-x: hidden;
     overflow-y: auto;
 }

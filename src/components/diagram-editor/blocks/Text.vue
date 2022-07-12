@@ -1,5 +1,9 @@
 <template>
-    <div class="text" :style="{ backgroundColor: 'transparent' }">{{ item.title }}</div>
+    <div class="text" :style="{  
+            color:           item.textColor, 
+            borderRadius:    item.borderRadius + 'px',
+            fontSize:        item.fontSize + 'px',
+        }">{{ item.title }}</div>
 </template>
 
 <script setup lang="ts">

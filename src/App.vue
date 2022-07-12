@@ -25,9 +25,9 @@ import { ConnectionStyle, ConnectionType, DiagramElement, Item, ItemConnection }
 let elements: DiagramElement[] = reactive([
     //...createTestConnections(),
 
-    createItem({ id: 'a1', title: 'a1', w: 100, h: 80 }),
-    createItem({ id: 'a2', title: 'a2', w: 90,  h: 90 }),
-    createItem({ id: 'a3', title: 'a3', w: 200, h: 70 }),
+    createItem({ id: 'a1', title: 'Angelo', x: 100, y: 150, w: 100, h: 80, backgroundColor: '#ff0000', textColor: '#ffffff' }),
+    createItem({ id: 'a2', title: 'Mario',  x: 600, y: 130, w: 90,  h: 90, backgroundColor: '#00ff00', textColor: '#333333' }),
+    createItem({ id: 'a3', title: 'Luca',   x: 300, y: 400, w: 200, h: 70, backgroundColor: '#0000ff', textColor: '#f7ff2d' }),
     
     createConnection('a1', 'a2'),
     createConnection('a1', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DOTTED }),

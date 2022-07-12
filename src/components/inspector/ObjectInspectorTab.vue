@@ -31,11 +31,9 @@ const emit = defineEmits<ObjectInspectorTabEvents>();
 
 <style  scoped>
 .inspector-tab {
-    width: 100px;
-
-    background-color: rgb(226, 226, 226);
-    color: #333;
+    width: auto;
     
+    color: #aaa;    
     
     text-align: center;
     font-size: 12px;
@@ -47,11 +45,12 @@ const emit = defineEmits<ObjectInspectorTabEvents>();
 }
 
 .inspector-tab:hover:not(.tab-selected) {
-    background-color: rgb(188, 186, 186);
+    color: #4af;    
 }
 
 .tab-selected {
-    background-color: #4af;
-    color: white;
+    color: #4af;
+    font-weight: bold;
+    
 }
 </style>

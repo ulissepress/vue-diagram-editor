@@ -1,6 +1,21 @@
 <template>
-   <div class="shape-ellipse" :style="{'backgroundColor': item.backgroundColor }">{{ item.title }}</div>
+   <div class="shape-ellipse" :style="{ 
+            backgroundColor: item.backgroundColor, 
+            color:           item.textColor,
+            fontSize:        item.fontSize + 'px',
+        }">{{ item.title }}</div>
 </template>
+
+<script setup lang="ts">
+import { onMounted, onUpdated } from 'vue';
+import { Item } from '../types';
+
+const { item } = defineProps<{item: Item}>();
+
+onMounted(()=> console.log('Ellipse mounted'))
+onUpdated(()=> console.log('Ellipse updated'))
+
+</script>
 
 <style scoped>
 .shape-ellipse {
@@ -15,15 +30,3 @@
 
 }
 </style>
-
-<script setup lang="ts">
-import { onMounted, onUpdated } from 'vue';
-import { Item } from '../types';
-
-const { item } = defineProps<{item: Item}>();
-
-onMounted(()=> console.log('Ellipse mounted'))
-onUpdated(()=> console.log('Ellipse updated'))
-
-</script>
-

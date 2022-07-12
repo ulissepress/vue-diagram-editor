@@ -1,4 +1,3 @@
-import TextEditor from './TextEditor.vue';
 import Vue from 'vue';
 
 export enum PropertyType {
@@ -6,6 +5,8 @@ export enum PropertyType {
     NUMBER  = "number",
     BOOLEAN = "boolean",
     LIST    = "list",
+    COLOR   = "color",
+    RANGE   = "range",
 }
 
 export interface ObjectProperty {
@@ -14,13 +15,14 @@ export interface ObjectProperty {
 
     type?:   PropertyType;   // Property type. Default: PropertyType.TEXT
 
-    readonly?: boolean;      // Property is readonly. Default: false
-    editor?:   Vue.Component;  // Custom editor component. Default: TextEditor    
+    readonly?: boolean;         // Property is readonly. Default: false
+    formatValue?: (property: ObjectProperty, object: any) => string; // Function to format the value. Default: value => value.toString()
+
+    editor?:         Vue.Component;   // Custom editor component. Default: TextEditor    
+    editorOptions?:  any              // Config options to pass to the editor component
+    editorFullsize?: boolean;         // If true the editor will take the full row (not 50%). Default: false
 }
 
-export function getComponentEditor(propertyType: PropertyType) : Vue.Component {
-    return TextEditor;
-}
 
 export interface InspectorSection {
     name:   string;                 // Section name. Example: 'general'
