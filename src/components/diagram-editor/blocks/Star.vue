@@ -1,8 +1,8 @@
 <template>
    <svg xmlns="http://www.w3.org/2000/svg"
         viewBox         = "0 0 16 16" 
-        stroke          = "transparent" 
-        stroke-width    = "0"  
+        stroke          = "currentColor" 
+        stroke-width    = "0.2"  
         stroke-linecap  = "round" 
         stroke-linejoin = "round"
 

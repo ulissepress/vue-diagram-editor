@@ -8,7 +8,8 @@
     - Delete
 
 - Items toolbar (select, connection, text, rectangle, image, ...)
-
+    - Add Custom Widget
+    
 - Change item text directly in the canvs (contenteditable)
 
 - Actions toolbar: 

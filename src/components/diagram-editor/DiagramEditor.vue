@@ -94,10 +94,10 @@
                     :elementGuidelines       = "showGuides ? elementGuidelines() : []"
                     
                     
-                    :roundable = "selectedItemActive && selectedItem?.supportsRoundable === true"
+                    :roundable = "selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
                     :draggable = "selectedItemActive"
                     :rotatable = "selectedItemActive"
-                    :resizable = "selectedItemActive && selectedItem?.supportsResizable === true"
+                    :resizable = "selectedItemActive && (selectedItem as Item)?.supportsResizable === true"
 
                     @dragStart   = "onDragStart"
                     @drag        = "onDrag"
@@ -125,8 +125,7 @@
 
         <!-- Editor Info Panel -->
         <div v-if='editable' class="object-inspector-container">
-                <ObjectInspector
-                    :title  = "selectedItem ? selectedItem.component + ' (' + selectedItem.id + ')' : 'No object selected'" 
+                <ObjectInspector                    
                     :schema = "itemObjectInspectorModel"
                     :object = "selectedItem"
                     @property-changed="onPropertyChange" />
@@ -266,7 +265,7 @@ const connections = computed(() => elements.filter(e => isConnection(e)) as Item
 
 // Temporary variables
 // ------------------------------------------------------------------------------------------------------------------------
-const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0};
+const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0, opacity: 1};
 
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 function onMouseMove(e: any) { 

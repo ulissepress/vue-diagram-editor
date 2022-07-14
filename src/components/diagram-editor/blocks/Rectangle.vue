@@ -4,6 +4,7 @@
             color:           item.textColor, 
             borderRadius:    item.borderRadius + 'px',
             fontSize:        item.fontSize + 'px',
+            opacity:         item.opacity / 100,
         }">{{ item.title }}</div>
 </template>
 

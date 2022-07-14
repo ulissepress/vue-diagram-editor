@@ -1,22 +1,23 @@
 <template>
-    <input class="editor-slider" type="range"  
-        :value="object[property.name]" 
-        :min="property.editorOptions?.min || 0"
-        :max="property.editorOptions?.max || 100" 
-        @input="onChange" />
+    <input class  = "editor-slider" 
+           type   = "range"  
+           :value = "object[property.name]" 
+           :min   = "property.editorOptions?.min || 0"
+           :max   = "property.editorOptions?.max || 100" 
+           @input = "onChange" />
 
-    <input class="editor-input"  type="text" maxlength="5"
-        :value="object[property.name]"
-        @keypress="onKeyPress"
-        @keyup.enter="onChange"
-        @change="onChange" />
+    <input class        = "editor-input"  
+           type         = "text" 
+           maxlength    = "6"
+           :value       = "object[property.name]"
+           @keypress    = "onKeyPress"
+           @keyup.enter = "onChange"
+           @change      = "onChange" />
 
 </template>
 
 <script lang="ts">
-export default {
-  inheritAttrs: false
-}
+export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">

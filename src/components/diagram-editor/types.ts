@@ -1,3 +1,4 @@
+import { ObjectInspectorModel } from './../inspector/types';
 
 export interface Position {
     x: number;              // X Coordinate
@@ -13,6 +14,7 @@ export interface Frame extends Rect {
     z: number;              // Z-Index
     r: number;              // Rotation angle
     borderRadius: number;   // Border radius
+    opacity: number;        // Opacity (0=full transparent, 100=full opaque). Default = 100
 }
 
 
@@ -24,11 +26,14 @@ export interface DiagramElement {
     
     backgroundColor:  string;   // The element background color (item background, connection stroke color)
     textColor:        string;   // The element text color (text inside the element, etc.)
+    opacity:          number;   // Opacity (0=full transparent, 100=full opaque). Default = 100
 
     fontSize:        number;    // The element text font size
     
     component:         string;  // The Vue component used to render this element
     componentOptions?: any;     // The Vue component options / config
+
+    getInspectorModel?: () => ObjectInspectorModel  // Return the list of properties to display in the inspector
 }
 
 export interface Item extends DiagramElement {
@@ -152,5 +157,4 @@ export interface WidgetDefinition {
     componentOptions?: any;     // The default Vue component options used to instantiate this widget
 
     canBeResized?: boolean;     // Is the widget resizable? Default: true
-    canBeRounded?: boolean;     // Is the widget roundable? Default: true
 }

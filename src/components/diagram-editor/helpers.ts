@@ -9,6 +9,7 @@ export function getUniqueId(prefix: string = 'id_') : string {
     return prefix + Date.now().toString(base) + '_' + randomInt(1, 10000).toString(base);
 }
 
+// TODO: to be removed (used only for demo/startup purposes)
 export function createItem(item?: DeepPartial<Item>) : Item {
     return {
         id: getUniqueId(),
@@ -23,6 +24,8 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         r: 0,
 
         borderRadius: 0,
+        opacity: 100,
+        
         supportsRoundable: true,
         supportsResizable: true,
 
@@ -38,9 +41,9 @@ export function createItem(item?: DeepPartial<Item>) : Item {
 
 export function createConnection(fromID: string, toID: string, c?: DeepPartial<ItemConnection>) : ItemConnection {
     return {
-        component: 'Connection',
-
         id: getUniqueId(),
+    
+        component: 'Connection',
 
         from: { 
             item:   fromID, 
@@ -108,6 +111,7 @@ export function registerDefaultItemTypes() {
         z: 0, 
         r: 0, 
         borderRadius: 0,
+        opacity: 100,
 
         supportsRoundable: false,
         supportsResizable: true,

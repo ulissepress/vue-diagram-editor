@@ -1,7 +1,7 @@
 <template>
     <div class="object-inspector">
         <div class="inspector-title" @click="expanded = !expanded">
-            <div>Object Inspector</div>
+            <div>Inspector</div>
             <div style="flex-grow: 1"></div>
             <div>
                 <Icon v-show="expanded"  size='16px' icon="keyboard_arrow_down" color="white" /> 
@@ -12,7 +12,7 @@
             <div style="color: #aaa; font-size: 12px; text-align: center; margin-bottom: 8px; font-style: italic;">No selected object</div>
         </div>
         <template v-else>
-            <div v-if="expanded" class="tab-container">
+            <div v-show="expanded" class="tab-container">
                 <ObjectInspectorTab v-for="(tab, index) in schema.tabs" 
                     :key      = "tab.title" 
                     :tab      = "tab" 
@@ -21,14 +21,14 @@
                     @click    = "currentTab = index" />
             </div>
             
-            <ObjectInspectorSection v-if="expanded" v-for="(section, index) in schema.tabs[currentTab].sections" 
+            <ObjectInspectorSection v-show="expanded" v-for="(section, index) in schema.tabs[currentTab].sections" 
                 :key      = "section.name" 
                 :section  = "section" 
                 :object   = "object"
                 @property-changed = "(changedProperty, newValue) => emit('property-changed', changedProperty, newValue)" />
 
             <!-- Debug -->
-            <div v-if="expanded">
+            <div v-show="expanded">
                 <hr />
                 <pre style="color: #ddd;">{{ object }}</pre>
             </div>
@@ -48,7 +48,6 @@ import { ObjectInspectorModel, ObjectProperty } from "./types";
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface ObjectInspectorProps {
-    title: string;
     object?: any;
     schema: ObjectInspectorModel;
 }
