@@ -159,7 +159,7 @@
 
 import { useKeyModifier } from '@vueuse/core';
 import { computed, nextTick, onMounted, onUpdated, ref, StyleValue } from "vue";
-import Guides from "vue-guides";
+import Guides from "vue3-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
 import ChangeZOrderCommand from './commands/ChangeZOrderCommand';

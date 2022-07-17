@@ -10,9 +10,9 @@
   "dependencies": {
     "@vueuse/core": "^8.6.0",
     "vue": "^3.2.25",
-    "vue-guides": "^0.17.1",
-    "vue3-infinite-viewer": "^0.3.0",
-    "vue3-moveable": "^0.4.8"
+    "vue3-guides": "^0.1.1",
+    "vue3-infinite-viewer": "^0.3.1",
+    "vue3-moveable": "^0.6.3"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",
