@@ -1,19 +1,24 @@
+import { Item, Rect } from '../types';
+
 import Command from './Command';
-import { Item } from '../types';
 
 type Size = [number, number];
 
 export default class ResizeCommand implements Command {
 
-    constructor(private item: Item, private oldSize: Size, private newSize: Size) {}
+    constructor(private item: Item, private oldRect: Rect, private newRect: Rect) {}
 
     do() : void {
-        this.item.w = this.newSize[0];
-        this.item.h = this.newSize[1];        
+        this.item.x = this.newRect.x;
+        this.item.y = this.newRect.y;
+        this.item.w = this.newRect.w;
+        this.item.h = this.newRect.h;         
     }
 
     undo(): void {
-        this.item.w = this.oldSize[0];
-        this.item.h = this.oldSize[1];        
+        this.item.x = this.oldRect.x;
+        this.item.y = this.oldRect.y;
+        this.item.w = this.oldRect.w;
+        this.item.h = this.oldRect.h;         
     }
 }

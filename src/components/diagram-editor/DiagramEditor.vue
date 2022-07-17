@@ -371,6 +371,8 @@ function onDragEnd(e: any) : void {
 function onResizeStart(e: any) : void {
     if(!isItem(selectedItem.value)) return;
     
+    origin.x = selectedItem.value.x;
+    origin.y = selectedItem.value.y;
     origin.w = selectedItem.value.w;
     origin.h = selectedItem.value.h;
 }
@@ -380,17 +382,20 @@ function onResize(e: any) : void {
     if(!isItem(selectedItem.value)) return;
 
     // console.log('onresize', e);
+    selectedItem.value.x = Math.floor(e.drag.beforeTranslate[0]);
+    selectedItem.value.y = Math.floor(e.drag.beforeTranslate[1]);
     selectedItem.value.w = Math.floor(e.width);
     selectedItem.value.h = Math.floor(e.height);
 
-    e.target.style.width  = `${Math.floor(e.width)}px`;
-    e.target.style.height = `${Math.floor(e.height)}px`;
+    e.target.style.transform = e.drag.transform;  
+    e.target.style.width     = `${Math.floor(e.width)}px`;
+    e.target.style.height    = `${Math.floor(e.height)}px`;
 }
 
 function onResizeEnd(e: any) : void {
     if(!isItem(selectedItem.value)) return;
     
-    historyManager.value.execute(new ResizeCommand(selectedItem.value, [origin.w, origin.h], [selectedItem.value.w, selectedItem.value.h]));
+    historyManager.value.execute(new ResizeCommand(selectedItem.value, { ...origin }, { ...selectedItem.value }));
 }
 
 
