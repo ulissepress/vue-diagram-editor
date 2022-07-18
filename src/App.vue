@@ -1,8 +1,6 @@
 <template>
     <div style="width: 100%; height: 95%; padding-top: 16px; margin: 0 auto;">
-        <DiagramEditor  :editable          = "true"
-                        :customWidgets     = "true"
-                        :elements          = "elements" />
+        <DiagramEditor editable customWidgets :elements = "elements" />
     </div>
 </template>
 
@@ -10,7 +8,6 @@
 import { reactive } from 'vue';
 import DiagramEditor from './components/diagram-editor/DiagramEditor.vue';
 import { createConnection, createItem } from './components/diagram-editor/helpers';
-
 import { ConnectionStyle, ConnectionType, DiagramElement } from './components/diagram-editor/types';
 
 

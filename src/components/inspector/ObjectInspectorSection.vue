@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import Icon from "../diagram-editor/Icon.vue";
+import Icon from "../diagram-editor/components/Icon.vue";
 import ObjectInspectorProperty from "./ObjectInspectorProperty.vue";
 import { InspectorSection, ObjectProperty } from "./types";
 

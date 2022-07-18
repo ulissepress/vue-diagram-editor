@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue';
-import Icon from "../diagram-editor/Icon.vue";
+import Icon from "../diagram-editor/components/Icon.vue";
 import { registerPredefinedEditors } from './helpers';
 import ObjectInspectorSection from './ObjectInspectorSection.vue';
 import ObjectInspectorTab from './ObjectInspectorTab.vue';

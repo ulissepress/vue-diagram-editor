@@ -11,20 +11,13 @@ import { InspectorTab } from "./types";
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface ObjectInspectorTabProps {
-    object?: any;
-    tab: InspectorTab;
-    selected: boolean
-}
-
-export interface ObjectInspectorTabEvents {
+    object?:    any;
+    tab:        InspectorTab;
+    selected:   boolean
 }
 
 // Define props
 const { object, tab } = defineProps<ObjectInspectorTabProps>();
-
-// Define events
-const emit = defineEmits<ObjectInspectorTabEvents>();
-// ------------------------------------------------------------------------------------------------------------------------
 
 </script>
 

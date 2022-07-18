@@ -18,7 +18,7 @@
 import { computed } from '@vue/reactivity';
 import { onMounted, onUpdated } from 'vue';
 import Icon from './Icon.vue';
-import { EditorTool, toolDefinitions } from './types';
+import { EditorTool, toolDefinitions } from '../types';
 
 interface Tool {
     type:  EditorTool | "separator";

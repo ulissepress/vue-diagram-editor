@@ -174,15 +174,15 @@ import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBluepri
 
 import RawConnection from './blocks/RawConnection.vue';
 import AddItemCommand from './commands/AddItemCommand';
-import ToolsToolbar from './ToolsToolbar.vue';
+import ToolsToolbar from './components/ToolsToolbar.vue';
+import ZoomToolbar from './components/ZoomToolbar.vue';
 import { ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
-import ZoomToolbar from './ZoomToolbar.vue';
 
 import ObjectInspector from '../inspector/ObjectInspector.vue';
 import { ObjectProperty } from '../inspector/types';
 import AddConnectionCommand from './commands/AddConnectionCommand';
 import DeleteCommand from './commands/DeleteCommand';
-import Icon from './Icon.vue';
+import Icon from './components/Icon.vue';
 import itemObjectInspectorModel from './item-properties';
 
 export type Item = _Item & { hover?: boolean }
@@ -591,7 +591,7 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
     ci.startItem = null;
     ci.endItem   = null;
 
-    historyManager.value.execute(new AddConnectionCommand(elements, c));
+    historyManager.value.execute(new AddConnectionCommand(elements, newConnection));
     emit('add-connection', newConnection);
 }
 
