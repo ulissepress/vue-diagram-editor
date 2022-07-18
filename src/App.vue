@@ -1,12 +1,13 @@
 <template>
     <div style="width: 100%; height: 95%; padding-top: 16px; margin: 0 auto;">
-        <DiagramEditor  :editable       = "true"
-                        :customWidgets  = "true"
-                        :elements       = "elements"
-                        @add-item       = "addNewItem" 
-                        @delete-item    = "deleteItem"                          
-                        @add-connection = "addNewConnection"
-                        />
+        <DiagramEditor  :editable          = "true"
+                        :customWidgets     = "true"
+                        :elements          = "elements"
+                        
+                        @add-item          = "addNewItem" 
+                        @delete-item       = "deleteItem"                          
+                        @delete-connection = "deleteConnection"                          
+                        @add-connection    = "addNewConnection" />
     </div>
 </template>
 
@@ -66,6 +67,10 @@ function addNewItem(item: Item, historyManager: HistoryManager) {
 
 function deleteItem(item: Item, historyManager: HistoryManager) {
     historyManager.execute(new DeleteCommand(elements, item));    
+}
+
+function deleteConnection(c: ItemConnection, historyManager: HistoryManager) {
+    historyManager.execute(new DeleteCommand(elements, c));    
 }
 
 function addNewConnection(c: ItemConnection, historyManager: HistoryManager) {

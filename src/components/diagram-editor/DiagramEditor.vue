@@ -129,8 +129,16 @@
                 <div class='toolbar-item-separator'></div>
                 <button class='toolbar-item' @click="deleteItem"      :disabled="!selectedItemActive" title="Delete"><Icon icon="delete"/></button>
                 <div class='toolbar-item-separator'></div>
-                <button class='toolbar-item' @click="sendToBack"      :disabled="!selectedItemActive" title="Send to back"><Icon icon="layers"/></button>
-                <button class='toolbar-item' @click="bringToFront"    :disabled="!selectedItemActive" title="Bring to front"><Icon icon="layers_clear"/></button>
+                <button class='toolbar-item' @click="sendToBack"      :disabled="!selectedItemActive" title="Send to back">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" style="transform: scale(1.5);">
+                        <path d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"  />
+                    </svg>
+                </button>
+                <button class='toolbar-item' @click="bringToFront"    :disabled="!selectedItemActive" title="Bring to front">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="transform: scale(1.5);" viewBox="0 0 24 24">
+                        <g><path fill="none" d="M0 0H24V24H0z"/> <path d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"/> </g> 
+                    </svg>
+                </button>
                 <div class='toolbar-item-separator'></div>
                 <button class='toolbar-item' @click="showGuides    = !showGuides"    title="Show / Hide guidelines" :style="{ backgroundColor: showGuides    ? '#4af': '' }"><Icon icon="border_style" /></button>
                 <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"  :style="{ backgroundColor: showInspector ? '#4af': '' }"><Icon icon="brush" /></button>
