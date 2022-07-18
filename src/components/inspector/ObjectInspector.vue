@@ -12,7 +12,7 @@
             <div style="color: #aaa; font-size: 12px; text-align: center; margin-bottom: 8px; font-style: italic;">No selected object</div>
         </div>
         <template v-else>
-            <div v-show="expanded" class="tab-container">
+            <div v-if="schema !== null" v-show="expanded" class="tab-container">
                 <ObjectInspectorTab v-for="(tab, index) in schema.tabs" 
                     :key      = "tab.title" 
                     :tab      = "tab" 
@@ -21,7 +21,7 @@
                     @click    = "currentTab = index" />
             </div>
             
-            <ObjectInspectorSection v-show="expanded" v-for="(section, index) in schema.tabs[currentTab].sections" 
+            <ObjectInspectorSection v-if="schema !== null" v-show="expanded" v-for="(section, index) in schema.tabs[currentTab].sections" 
                 :key      = "section.name" 
                 :section  = "section" 
                 :object   = "object"
@@ -38,7 +38,7 @@
 
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, onUpdated, ref } from 'vue';
 import Icon from "../diagram-editor/components/Icon.vue";
 import { registerPredefinedEditors } from './helpers';
 import ObjectInspectorSection from './ObjectInspectorSection.vue';
@@ -49,7 +49,7 @@ import { ObjectInspectorModel, ObjectProperty } from "./types";
 // ------------------------------------------------------------------------------------------------------------------------
 export interface ObjectInspectorProps {
     object?: any;
-    schema: ObjectInspectorModel;
+    schema: ObjectInspectorModel | null;
 }
 
 export interface ObjectInspectorEvents {
@@ -64,8 +64,14 @@ const emit = defineEmits<ObjectInspectorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 onBeforeMount(() => {
+    console.log('ObjectInspector.vue: onBeforeMount');
     registerPredefinedEditors();
 });
+
+onUpdated(() => {
+    console.log('ObjectInspector.vue: onUpdated');
+});
+
 
 const currentTab = ref(0)
 const expanded   = ref(true);

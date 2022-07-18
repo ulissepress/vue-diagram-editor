@@ -4,7 +4,7 @@ export enum PropertyType {
     TEXT    = "text",
     NUMBER  = "number",
     BOOLEAN = "boolean",
-    LIST    = "list",
+    SELECT  = "select",
     COLOR   = "color",
     RANGE   = "range",
 }

@@ -13,12 +13,7 @@
 - Change item text directly in the canvs (contenteditable)
 
 - Actions toolbar: 
-    - Zoom: in, out, reset (CMD+0) 
-    - Bring to front / Send to back 
-    - Show/hide rulers
-    - Show/hide guidelines 
     - Snap to grid: 0/5/10/20/50 px 
-    - Undo / Redo 
 
 - Copy, Cut & Paste Items (CMD+C, CMD+X, CMD+V)
 

@@ -1,32 +1,30 @@
 <template>
-    <input class="editor" type="text" :value="object[property.name]" @input="onChange" />
+    <select class="editor" :value="object[property.name]" @change="onChange">
+        <option v-for="option in property.editorOptions.items">{{ option }}</option>
+    </select>
 </template>
 
 <script setup lang="ts">
-import { onUpdated } from "vue";
 import { ObjectProperty } from "../types";
 
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
-export interface TextEditorProps {
+export interface SelectEditorProps {
     object?: any;
     property: ObjectProperty;
 }
 
-export interface TextEditorEvents {
+export interface SelectEditorEvents {
     (e: 'property-changed', property: ObjectProperty, newValue: any): void
 }
 
 // Define props
-const { object, property } = defineProps<TextEditorProps>();
+const { object, property } = defineProps<SelectEditorProps>();
 
 // Define events
-const emit = defineEmits<TextEditorEvents>();
+const emit = defineEmits<SelectEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
-onUpdated(() => {
-    console.log('TextEditor: onUpdated');
-});
 
 function onChange(e: any) {
     object[property.name] = e.target.value;

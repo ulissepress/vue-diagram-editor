@@ -1,3 +1,4 @@
+import { basicModel, connectionModel, shapeModel } from './item-properties';
 import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, Item, ItemConnection, Position } from "./types";
 
 type DeepPartial<T> = T extends object ? {
@@ -35,6 +36,8 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         
         locked: false,
 
+        inspectorModel: shapeModel,
+
         ...item
     } as Item
 }
@@ -62,6 +65,8 @@ export function createConnection(fromID: string, toID: string, c?: DeepPartial<I
         thick: c?.thick || 1,
 
         backgroundColor: c?.backgroundColor || "#333",
+
+        inspectorModel: connectionModel,
         
     } as ItemConnection
 }
@@ -120,7 +125,9 @@ export function registerDefaultItemTypes() {
         textColor: "black",
         fontSize: 14,
         
-        locked: false
+        locked: false,
+        
+        inspectorModel: basicModel  
     };
 
 
@@ -131,6 +138,8 @@ export function registerDefaultItemTypes() {
         title: "Hello World",
 
         component: type,
+
+        inspectorModel: shapeModel,
     });
 
     // ----------------------------------------------------------------------
@@ -142,7 +151,8 @@ export function registerDefaultItemTypes() {
         componentOptions: {
             style: ConnectionStyle.SOLID,
             thick: 2,
-        }
+        },
+        inspectorModel: shapeModel,
     });
 
 
@@ -153,6 +163,7 @@ export function registerDefaultItemTypes() {
         
         component: type,
         supportsRoundable: true,
+        inspectorModel: shapeModel,
     })
 
     // ----------------------------------------------------------------------
@@ -164,6 +175,7 @@ export function registerDefaultItemTypes() {
         w: 90,
         h: 70,
         backgroundColor: 'lightblue',
+        inspectorModel: shapeModel,
     })
 
     // ----------------------------------------------------------------------
@@ -175,6 +187,7 @@ export function registerDefaultItemTypes() {
         w: 90,
         h: 70,
         backgroundColor: 'red',
+        inspectorModel: shapeModel,
     })
 
     // ----------------------------------------------------------------------
@@ -186,7 +199,7 @@ export function registerDefaultItemTypes() {
         w: 70,
         h: 70,
         backgroundColor: 'pink',
-
+        inspectorModel: shapeModel,
     })
 
 

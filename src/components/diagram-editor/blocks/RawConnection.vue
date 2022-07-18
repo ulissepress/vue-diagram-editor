@@ -3,8 +3,8 @@
          :style            = "computedStyle" 
          :viewBox          = "viewBox" 
          :stroke-dasharray = "dashArray"
-         :stroke           = "selected ? '#4af' : props.color" 
-         :stroke-width     = "selected ? '3'    : props.thick">
+         :stroke           = "props.color" 
+         :stroke-width     = "props.thick">
          
         <!-- Real connection -->
         <path :d="linePath" class="realpath" />
@@ -88,10 +88,11 @@ const computedStyle = computed<CSSProperties>(() => {
 });
 
 const dashArray = computed(() => {
-    if(props.lineStyle == ConnectionStyle.DASHED) return '8,10';
-    if(props.lineStyle == ConnectionStyle.DOTTED) return '2,4';
+    let w = 10 + props.thick;
+    if(props.lineStyle == ConnectionStyle.DASHED) return `${10 + props.thick}`;
+    if(props.lineStyle == ConnectionStyle.DOTTED) return `${2},${3 + props.thick*2}`;;
 
-    return '';  // ConnectionStyle.SOLID
+    return '0';  // ConnectionStyle.SOLID
 });
 
 
@@ -130,8 +131,8 @@ const linePath = computed( () => {
 .raw-connection {
     position: absolute;
     fill: none;
-    stroke-linecap: round; 
-    stroke-linejoin: round;
+    stroke-linecap: square; 
+    stroke-linejoin: square;
     pointer-events: none;
     /* border: 1px dashed red;   */
 }

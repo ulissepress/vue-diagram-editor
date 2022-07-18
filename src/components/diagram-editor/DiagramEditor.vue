@@ -148,7 +148,7 @@
         <!-- Object Inspector -->
         <div v-if='editable && showInspector' class="object-inspector-container">
                 <ObjectInspector                    
-                    :schema = "itemObjectInspectorModel"
+                    :schema = "selectedItem ? selectedItem.inspectorModel : null"
                     :object = "selectedItem"
                     @property-changed="onPropertyChange" />                                
         </div> 
@@ -179,12 +179,10 @@ import ZoomToolbar from './components/ZoomToolbar.vue';
 import { ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 
 import ObjectInspector from '../inspector/ObjectInspector.vue';
-import { ObjectProperty } from '../inspector/types';
+import { ObjectInspectorModel, ObjectProperty } from '../inspector/types';
 import AddConnectionCommand from './commands/AddConnectionCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import Icon from './components/Icon.vue';
-import itemObjectInspectorModel from './item-properties';
-
 export type Item = _Item & { hover?: boolean }
 
 // The component props and events
@@ -607,6 +605,13 @@ function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
     zoomFactor.value = newZoomFactor;
     
     if(scrollViewerToCenter === true) nextTick(() => viewer.value?.scrollCenter());
+}
+
+
+function getInspectorModel(e: DiagramElement | null) : ObjectInspectorModel | null {
+    if(e === null) return null;
+    let m = e.inspectorModel;
+    return m ? m : null;
 }
 </script>
 

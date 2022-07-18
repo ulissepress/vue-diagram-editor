@@ -33,7 +33,7 @@ export interface DiagramElement {
     component:         string;  // The Vue component used to render this element
     componentOptions?: any;     // The Vue component options / config
 
-    getInspectorModel?: () => ObjectInspectorModel  // Return the list of properties to display in the inspector
+    inspectorModel: ObjectInspectorModel | null // Return the list of properties to display in the inspector
 }
 
 export interface Item extends DiagramElement {
