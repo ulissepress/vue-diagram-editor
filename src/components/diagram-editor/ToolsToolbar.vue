@@ -61,11 +61,6 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
 
 <style scoped>
 .toolbar {
-    position: absolute;
-    top: 40px;
-    left: 40px;
-    width: auto;
-    height: auto;
     background-color: #fefefe;
     border: 1px solid #ccc;
     display: flex;

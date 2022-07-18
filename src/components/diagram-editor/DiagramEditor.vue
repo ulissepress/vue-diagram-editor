@@ -117,40 +117,33 @@
             </div> <!-- viewport -->
         </VueInfiniteViewer>
 
-        <!-- Editor Toolbar -->
-        <Toolbar v-if='editable' 
-            :customWidgets = "customWidgets"
-            :selectedTool  = "currentTool" 
-            @toolSelected  = "selectCurrentTool" />
+        <div class="toolbars-container">
+            <!-- Editor Toolbar -->
+            <ToolsToolbar v-if='editable'  :customWidgets = "customWidgets" :selectedTool  = "currentTool"  @toolSelected  = "selectCurrentTool" />
+            <div class='toolbar-separator'></div>
+            <ZoomToolbar :zoomFactor="zoomFactor" @zoomChanged="onZoomChanged" />
+            <div class='toolbar-separator'></div>
+            <div class="toolbar">
+                <button class='toolbar-item' @click="undo"            :disabled="!historyManager.canUndo()" title="Undo"><Icon icon="undo"/></button>
+                <button class='toolbar-item' @click="redo"            :disabled="!historyManager.canRedo()" title="Redo"><Icon icon="redo"/></button>
+                <div class='toolbar-item-separator'></div>
+                <button class='toolbar-item' @click="deleteItem"      :disabled="!selectedItemActive" title="Delete"><Icon icon="delete"/></button>
+                <div class='toolbar-item-separator'></div>
+                <button class='toolbar-item' @click="sendToBack"      :disabled="!selectedItemActive" title="Send to back"><Icon icon="layers"/></button>
+                <button class='toolbar-item' @click="bringToFront"    :disabled="!selectedItemActive" title="Bring to front"><Icon icon="layers_clear"/></button>
+                <div class='toolbar-item-separator'></div>
+                <button class='toolbar-item' @click="showGuides    = !showGuides"    title="Show / Hide guidelines" :style="{ backgroundColor: showGuides    ? '#4af': '' }"><Icon icon="border_style" /></button>
+                <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"  :style="{ backgroundColor: showInspector ? '#4af': '' }"><Icon icon="brush" /></button>
+            </div>
+        </div>
 
-        <!-- Editor Info Panel -->
-        <div v-if='editable' class="object-inspector-container">
+        <!-- Object Inspector -->
+        <div v-if='editable && showInspector' class="object-inspector-container">
                 <ObjectInspector                    
                     :schema = "itemObjectInspectorModel"
                     :object = "selectedItem"
-                    @property-changed="onPropertyChange" />
-
-            <!-- ZOOM: <button @click="zoomOut">-</button> {{ zoomFactor * 100 }}% 
-                <button @click="zoomIn">+</button>&nbsp;&nbsp;
-                <button @click="zoomReset">Reset</button>
-            <br/><br/>
-            <button @click="deleteItem"      :disabled="!selectedItemActive">Delete</button>&nbsp;
-            <button @click="sendToBack"      :disabled="!selectedItemActive">Send to back</button>&nbsp;
-            <button @click="bringToFront"    :disabled="!selectedItemActive">Bring to front</button><br/><br/>
-            <button @click="undo"            :disabled="!historyManager.canUndo()">Undo</button>&nbsp;
-            <button @click="redo"            :disabled="!historyManager.canRedo()">Redo</button>&nbsp;&nbsp;
-            
-            <button @click="showGuides = !showGuides">{{ showGuides ? 'Hide Guides' : 'Show Guides'}}</button>
-            
-            <pre>TOOL: {{ getToolDefinition(currentTool) }}</pre>
-            <pre>MOUSE: {{ mouseCoords }} </pre>
-            
-            <div v-if="targetDefined">
-                <p>Press SHIFT key to keep aspect ratio while resizing</p>
-                <h3>Selected Item</h3>
-                <pre>{{ selectedItem }}</pre>            
-            </div>  -->
-        </div> <!-- object-inspector-container -->
+                    @property-changed="onPropertyChange" />                                
+        </div> 
         
     </div> <!-- editor-container -->    
 </template>
@@ -173,11 +166,13 @@ import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBluepri
 
 import RawConnection from './blocks/RawConnection.vue';
 import AddItemCommand from './commands/AddItemCommand';
-import Toolbar from './Toolbar.vue';
+import ToolsToolbar from './ToolsToolbar.vue';
 import { ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
+import ZoomToolbar from './ZoomToolbar.vue';
 
 import ObjectInspector from '../inspector/ObjectInspector.vue';
 import { ObjectProperty } from '../inspector/types';
+import Icon from './Icon.vue';
 import itemObjectInspectorModel from './item-properties';
 
 export type Item = _Item & { hover?: boolean }
@@ -226,10 +221,7 @@ onUpdated(() => {
 
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
-const zooms              = [5, 10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 500];        // must contain the value 100
-const defaultZoomIndex   = zooms.findIndex(v => v === 100);     
-const zoom               = ref(defaultZoomIndex); 
-const zoomFactor         = computed(() => zooms[zoom.value] / 100);
+const zoomFactor         = ref(1);
 const guideUnits         = 50; // computed(() => zoomFactor.value < .5 ? 0 : 50);
 
 const viewer             = ref();
@@ -242,9 +234,9 @@ const guidesVisible      = computed(() => editable && zoomFactor.value >= 0.5);
 const hGuideValues       = ref<number[]>([]);       // Horizontal guides added by the user
 const vGuideValues       = ref<number[]>([]);       // Vertical guides added by the user
 const showGuides         = ref(true);               // Show or hide all the guides
+const showInspector      = ref(true);               // Show or hide all the guides
 
 const selectedItem       = ref<DiagramElement | null>(null);
-const targetDefined      = computed(() => selectedItem.value !== null)
 
 const selectedItemActive = computed(() => {
     if(!selectedItem.value) return false;
@@ -313,22 +305,16 @@ function getItemStyle(item: Item) : StyleValue {
 }
 
 function selectItem(item: Item, e?: MouseEvent)  : void {
-  console.log('selectItem', item, e);
-  e?.preventDefault();
-  e?.stopPropagation();
-  // Item already selected
-  if (item === selectedItem.value) return;
+    console.log('selectItem', item, e);
 
-  selectNone();
-  nextTick(() => {
-    selectedItem.value = item;
+    // Item already selected
+    if (item === selectedItem.value) return;
 
-    if (e) {
-      nextTick(() => {
-        moveable.value?.dragStart(e);
-      });
-    }
-  });
+    selectNone();
+    nextTick(() => {
+        selectedItem.value = item;
+        if (e) nextTick(() => { moveable.value?.dragStart(e); });        
+    });
 }
 
 function selectNone() : void {
@@ -477,10 +463,6 @@ function lockItem(item: Item) {
     historyManager.value.execute(item.locked === true ? new UnlockCommand(item) : new LockCommand(item));
 }
 
-//@ts-ignore
-function zoomReset() { zoom.value = defaultZoomIndex; viewer.value!.scrollCenter(); }
-function zoomIn()    { if(zoom.value < zooms.length - 1) zoom.value++; }
-function zoomOut()   { if(zoom.value > 0)                zoom.value--; }
 
 function elementGuidelines() {   
     if(!viewport.value) return [];
@@ -604,6 +586,14 @@ function onPropertyChange(p: ObjectProperty, newValue: any) {
     // console.log('onPropertyChange', p, 'New value:', newValue);
     nextTick(() => moveable.value?.updateRect());
 }
+
+
+function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
+    console.log('onZoomChanged', newZoomFactor, scrollViewerToCenter);
+    zoomFactor.value = newZoomFactor;
+    
+    if(scrollViewerToCenter === true) nextTick(() => viewer.value?.scrollCenter());
+}
 </script>
 
 
@@ -675,6 +665,50 @@ function onPropertyChange(p: ObjectProperty, newValue: any) {
     background-color: #333;
 }
 
+.toolbars-container {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    width: auto;
+    height: auto;
+    
+    display: flex;
+    align-items: center;
+}
+
+.toolbar-separator {
+    width: 24px;
+}
+.toolbar-item-separator {
+    width: 12px;
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+ 
+    width: auto;
+    height: auto;
+    background-color: #fefefe;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px #ccc;
+    gap: 0px;
+    user-select: none;
+}
+
+.toolbar-item {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    background-color: #fefefe;
+    border: 0px;
+}
 .item {
     box-sizing: border-box;
     position: absolute;
