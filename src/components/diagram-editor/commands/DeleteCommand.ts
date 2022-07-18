@@ -14,7 +14,7 @@ export default class DeleteCommand implements Command {
         this.deleteElement(this.elementToDelete);
         
         // Delete linked connections
-        this.deletedConnections = [ ...this.elements.filter(e => isConnection(e) && (e.from == this.elementToDelete.id || e.to == this.elementToDelete.id)) ];
+        this.deletedConnections = [ ...this.elements.filter(e => isConnection(e) && (e.from.item == this.elementToDelete.id || e.to.item == this.elementToDelete.id)) ];
         for(let c of this.deletedConnections) this.deleteElement(c);
     }
 
