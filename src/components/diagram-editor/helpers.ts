@@ -30,7 +30,7 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         supportsResizable: true,
 
         backgroundColor: '#bbbbbb',
-        teextColor: '#000000',
+        textColor: '#000000',
         fontSize: 14,
         
         locked: false,

@@ -180,6 +180,8 @@ import ZoomToolbar from './ZoomToolbar.vue';
 
 import ObjectInspector from '../inspector/ObjectInspector.vue';
 import { ObjectProperty } from '../inspector/types';
+import AddConnectionCommand from './commands/AddConnectionCommand';
+import DeleteCommand from './commands/DeleteCommand';
 import Icon from './Icon.vue';
 import itemObjectInspectorModel from './item-properties';
 
@@ -194,11 +196,11 @@ export interface DiagramEditorProps {
 }
 
 export interface DiagramEditorEvents {
-    (e: 'add-item',    item: Item, historyManager: HistoryManager): void
-    (e: 'delete-item', item: Item, historyManager: HistoryManager): void
+    (e: 'add-item',    item: Item): void
+    (e: 'delete-item', item: Item): void
     
-    (e: 'add-connection',    connection: ItemConnection, historyManager: HistoryManager): void
-    (e: 'delete-connection', connection: ItemConnection, historyManager: HistoryManager): void
+    (e: 'add-connection',    connection: ItemConnection): void
+    (e: 'delete-connection', connection: ItemConnection): void
 }
 
 // Define props
@@ -457,12 +459,14 @@ function bringToFront() : void {
 
 function deleteItem() {
     if(isItem(selectedItem.value)) {
-        emit('delete-item', selectedItem.value, historyManager.value as HistoryManager);
+        historyManager.value.execute(new DeleteCommand(elements, selectedItem.value));
+        emit('delete-item', selectedItem.value);
         selectNone();
     }
 
     if(isConnection(selectedItem.value)) {
-        emit('delete-connection', selectedItem.value, historyManager.value as HistoryManager);
+        historyManager.value.execute(new DeleteCommand(elements, selectedItem.value));
+        emit('delete-connection', selectedItem.value);
         selectNone();
     }
 }
@@ -542,7 +546,8 @@ function onCanvasClick(e: any): void {
         }
         
         console.log('creating new item', toolDef, itemType, newItem)
-        historyManager.value.execute(new AddItemCommand(elements, newItem));    
+        historyManager.value.execute(new AddItemCommand(elements, newItem));
+        emit('add-item', newItem);
     }
 }
 
@@ -580,13 +585,14 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
         {
             from: { handle: ci.startPoint },
             to:   { handle: ci.endPoint   }
-        });
+        }
+    );
     
     ci.startItem = null;
     ci.endItem   = null;
 
-    emit('add-connection', newConnection, historyManager.value as HistoryManager);
-
+    historyManager.value.execute(new AddConnectionCommand(elements, c));
+    emit('add-connection', newConnection);
 }
 
 
