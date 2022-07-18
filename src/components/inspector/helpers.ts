@@ -1,10 +1,11 @@
-import Vue from 'vue';
+import BooleanEditor from './property-editors/BooleanEditor.vue';
 import ColorEditor from './property-editors/ColorEditor.vue';
 import NumberEditor from './property-editors/NumberEditor.vue';
+import { PropertyType } from './types';
 import RangeEditor from './property-editors/RangeEditor.vue';
 import SelectEditor from './property-editors/SelectEditor.vue';
 import TextEditor from './property-editors/TextEditor.vue';
-import { PropertyType } from './types';
+import Vue from 'vue';
 
 const editorsRegistry : Record<PropertyType | string, Vue.Component> = {};
 
@@ -34,9 +35,11 @@ export function registerPredefinedEditors()
     alreadyRegistered = true;
 
     // Register predefined editors
-    registerEditor(PropertyType.TEXT,   TextEditor);
-    registerEditor(PropertyType.NUMBER, NumberEditor);
-    registerEditor(PropertyType.RANGE,  RangeEditor);
-    registerEditor(PropertyType.COLOR,  ColorEditor);
-    registerEditor(PropertyType.SELECT, SelectEditor);
+    registerEditor(PropertyType.TEXT,    TextEditor);
+    registerEditor(PropertyType.NUMBER,  NumberEditor);
+    registerEditor(PropertyType.RANGE,   RangeEditor);
+    registerEditor(PropertyType.BOOLEAN, BooleanEditor);
+    registerEditor(PropertyType.COLOR,   ColorEditor);
+    registerEditor(PropertyType.SELECT,  SelectEditor);
+    
 }

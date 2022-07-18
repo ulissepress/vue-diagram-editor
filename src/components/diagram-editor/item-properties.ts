@@ -1,6 +1,6 @@
+import { ConnectionStyle, ConnectionType } from './types';
 import { InspectorTab, PropertyType } from '../inspector/types';
 import { ObjectInspectorModel, ObjectProperty } from './../inspector/types';
-import { ConnectionStyle, ConnectionType } from './types';
 
 export const id$    : ObjectProperty = { name: "id",     label: "ID",   type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (p, obj) => obj[p.name] + ' (' + obj.component + ')' };
 export const title$ : ObjectProperty = { name: "title",  label: "Text", type: PropertyType.TEXT,  editorFullsize: true };
@@ -9,6 +9,7 @@ export const fontSize$ : ObjectProperty = { name: "fontSize", label: "Font Size"
 
 export const backColor$ : ObjectProperty = { name: "backgroundColor",  label: "Back Color", type: PropertyType.COLOR };
 export const textColor$ : ObjectProperty = { name: "textColor",        label: "Text Color", type: PropertyType.COLOR };
+export const locked$    : ObjectProperty = { name: "locked",           label: "Locked",     type: PropertyType.BOOLEAN };
 
 
 export const x$ : ObjectProperty = { name: "x", label: "X",      type: PropertyType.NUMBER };
@@ -43,7 +44,7 @@ export const basicModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Style",
-                    properties: [id$, backColor$, opacity$]
+                    properties: [id$, backColor$, opacity$, locked$]
                 },         
                 {   // Position & size
                     name: "pos_size",
@@ -67,7 +68,7 @@ export const shapeModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [ id$, title$, fontSize$, backColor$, textColor$, opacity$ ]
+                    properties: [ id$, title$, fontSize$, backColor$, textColor$, opacity$, locked$]
                 },         
                 {   // Position & size
                     name: "pos_size",
@@ -89,7 +90,7 @@ export const shapeWithTextModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [ id$, title$, fontSize$, backColor$, textColor$, opacity$ ]
+                    properties: [ id$, title$, fontSize$, backColor$, textColor$, opacity$, locked$ ]
                 },         
                 {   // Position & size
                     name: "pos_size",
