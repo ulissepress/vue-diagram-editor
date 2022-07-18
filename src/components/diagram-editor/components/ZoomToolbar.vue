@@ -81,6 +81,10 @@ function zoomOut() {
     text-align: center;
 }
 
+
+.btn:hover {
+    background-color: #efefef;
+}
 .zoom-info {
     width: 40px;
     font-size: 12px;

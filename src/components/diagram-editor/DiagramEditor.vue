@@ -60,7 +60,7 @@
                         <component :is="item.component" :item="item" />
 
                         <!-- Item decorators (delete, locked, size info) -->
-                        <div class="decorator decorator-delete" v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
+                        <div class="decorator decorator-delete" v-if="!creatingConnection && editable && item.id === selectedItem?.id && selectedItem?.locked !== true" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
                         <div class="decorator decorator-locked" v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
                         <div class="decorator decorator-size"   v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
 
@@ -696,10 +696,10 @@ function getInspectorModel(e: DiagramElement | null) : ObjectInspectorModel | nu
 }
 
 .toolbar-separator {
-    width: 24px;
+    width: 16px;
 }
 .toolbar-item-separator {
-    width: 12px;
+    width: 10px;
 }
 
 .toolbar {
@@ -728,6 +728,11 @@ function getInspectorModel(e: DiagramElement | null) : ObjectInspectorModel | nu
     background-color: #fefefe;
     border: 0px;
 }
+
+.toolbar-item:hover {
+    background-color: #efefef;
+}
+
 .item {
     box-sizing: border-box;
     position: absolute;
@@ -774,8 +779,8 @@ function getInspectorModel(e: DiagramElement | null) : ObjectInspectorModel | nu
 }
 
 .item .decorator-locked {
-    top: 32px;
-    right: -30px;
+    top: 0px;
+    right: -20px;
     width: auto;
     height: auto;
     font-size: 16px;
