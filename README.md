@@ -10,20 +10,9 @@
 - Items toolbar (select, connection, text, rectangle, image, ...)
     - Add Custom Widget
     
-- Change item text directly in the canvs (contenteditable)
-
-- Actions toolbar: 
-    - Snap to grid: 0/5/10/20/50 px 
+- Change item text directly in the canvas (contenteditable)
 
 - Copy, Cut & Paste Items (CMD+C, CMD+X, CMD+V)
 
-- Keyboard commands: 
-    - Arrows = move 1px, Shift+Arrows = move 10px 
-    - Backspace / Delete: Delete current item 
-    - S = Select tool 
-    - C = Connection 
-    - CMD+Z = Undo, SHIFT+CMD+Z = Redo
-
 - Object Inspector 
-    - Custom editors for Item & Connection 
     - Supports multiple selected items (common properties)

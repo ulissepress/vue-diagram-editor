@@ -28,17 +28,17 @@
                 @property-changed = "(changedProperty, newValue) => emit('property-changed', changedProperty, newValue)" />
 
             <!-- Debug -->
-            <div v-show="expanded">
+            <!-- <div v-show="expanded">
                 <hr />
                 <pre style="color: #ddd;">{{ object }}</pre>
-            </div>
+            </div> -->
         </template>
     </div>
 </template>
 
 
 <script setup lang="ts">
-import { onBeforeMount, onUpdated, ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import Icon from "../diagram-editor/components/Icon.vue";
 import { registerPredefinedEditors } from './helpers';
 import ObjectInspectorSection from './ObjectInspectorSection.vue';
@@ -68,9 +68,9 @@ onBeforeMount(() => {
     registerPredefinedEditors();
 });
 
-onUpdated(() => {
-    console.log('ObjectInspector.vue: onUpdated');
-});
+// onUpdated(() => {
+//     console.log('ObjectInspector.vue: onUpdated');
+// });
 
 
 const currentTab = ref(0)

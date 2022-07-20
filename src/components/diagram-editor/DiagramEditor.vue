@@ -2,8 +2,8 @@
     <div class="editor-container">
     
         <!-- Rulers -->
-        <Guides v-show='guidesVisible' class="ruler ruler-horizontal" :showGuides="showGuides" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width' : '100%', height: '30px' }" />
-        <Guides v-show='guidesVisible' class="ruler ruler-vertical"   :showGuides="showGuides" @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="guideUnits" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': '100%', width:  '30px', top: '-30px' }" />
+        <Guides v-show='guidesVisible' class="ruler ruler-horizontal" :showGuides="showGuides" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="50" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width' : '100%', height: '30px' }" />
+        <Guides v-show='guidesVisible' class="ruler ruler-vertical"   :showGuides="showGuides" @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="50" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': '100%', width:  '30px', top: '-30px' }" />
         <div    v-show='guidesVisible' class="rulers-left-top-box"></div>
 
         <!-- Editor Canvas -->
@@ -157,8 +157,7 @@
 </template>
 
 <script setup lang="ts">
-
-import { useKeyModifier } from '@vueuse/core';
+import { onKeyStroke, useKeyModifier } from '@vueuse/core';
 import { computed, nextTick, onMounted, onUpdated, ref, StyleValue } from "vue";
 import Guides from "vue3-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
@@ -179,7 +178,7 @@ import ZoomToolbar from './components/ZoomToolbar.vue';
 import { ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 
 import ObjectInspector from '../inspector/ObjectInspector.vue';
-import { ObjectInspectorModel, ObjectProperty } from '../inspector/types';
+import { ObjectProperty } from '../inspector/types';
 import AddConnectionCommand from './commands/AddConnectionCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import Icon from './components/Icon.vue';
@@ -227,10 +226,13 @@ onUpdated(() => {
     //console.log('DiagramEditor updated')
 })
 
+// Set the handlers to manage keyboard shortcuts
+setupKeyboardHandlers();
+
+
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
 const zoomFactor         = ref(1);
-const guideUnits         = 50; // computed(() => zoomFactor.value < .5 ? 0 : 50);
 
 const viewer             = ref();
 const viewport           = ref()
@@ -253,9 +255,9 @@ const selectedItemActive = computed(() => {
     return isItem(selectedItem.value) ? (!selectedItem.value.locked === true) : true;
 })
 
-const shiftPressed       = useKeyModifier('Shift')
-const historyManager     = ref(new HistoryManager());
-const currentTool        = ref(EditorTool.SELECT);
+const shiftPressed   = useKeyModifier('Shift')
+const historyManager = ref(new HistoryManager());
+const currentTool    = ref(EditorTool.SELECT);
 
 const creatingConnection = computed<boolean>(() => currentTool.value === EditorTool.CONNECTION);
 
@@ -485,11 +487,15 @@ function getItemById(id: string) : Item | undefined {
 }
 
 function undo() {  
+    if(!historyManager.value.canUndo()) return;
+    
     historyManager.value?.undo(); 
     nextTick(() => moveable.value?.updateTarget());
 }
 
 function redo() {  
+    if(!historyManager.value.canRedo()) return;
+
     historyManager.value?.redo(); 
     nextTick(() => moveable.value?.updateTarget());
 }
@@ -549,15 +555,6 @@ function onCanvasClick(e: any): void {
     }
 }
 
-function onGuidesChanged(e: any) {
-    console.log('onGuidesChanged', e);
-
-}
-
-function onKeyDown(e: any) {
-    console.log('onKeyDown', e);
-}
-
 
 function connectionHandleClick(item: Item   , point: ConnectionHandle) {
     console.log('connectionHandleClick', item, point);
@@ -607,12 +604,62 @@ function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
     if(scrollViewerToCenter === true) nextTick(() => viewer.value?.scrollCenter());
 }
 
+function setupKeyboardHandlers() {
 
-function getInspectorModel(e: DiagramElement | null) : ObjectInspectorModel | null {
-    if(e === null) return null;
-    let m = e.inspectorModel;
-    return m ? m : null;
+    function onKey(keys: string | string[], handler: (e: KeyboardEvent) => void) {
+        onKeyStroke(keys, (e) => {
+            if(document.activeElement?.tagName == 'INPUT') return;
+            e.preventDefault();
+            handler(e);
+        }, { eventName: 'keydown' })
+    }
+
+    function isVirtualCtrl(e: KeyboardEvent) {
+        const isMac = navigator.userAgent.toLowerCase().includes('macintosh');
+        return isMac ? e.metaKey : e.ctrlKey;
+    }
+
+    // Delete / backspace to delete selected item
+    onKey(["Backspace", "Delete"], (e: KeyboardEvent) => { 
+        console.log('Pressed delete', e);
+        if(selectedItem.value) deleteItem(); 
+    });
+
+    // CMD+Z to undo, Shift+CMD+Z to redo
+    onKey(["z"], (e: KeyboardEvent) => { 
+        if(isVirtualCtrl(e)) {                       
+            if(e.shiftKey) redo(); else undo();
+        }         
+    });
+
+    // CMD+Z to undo, Shift+CMD+Z to redo
+    onKey(["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"], (e: KeyboardEvent) => {         
+        if(!selectedItem.value) return;
+
+        console.log('Pressed arrow key', e);
+
+        const item = selectedItem.value as Item;        
+
+        let dx = 0, dy = 0;
+        if(e.key == 'ArrowLeft')  dx = -1;
+        if(e.key == 'ArrowRight') dx = 1;
+        if(e.key == 'ArrowUp')    dy = -1;
+        if(e.key == 'ArrowDown')  dy = 1;
+
+        if(e.shiftKey) { dx *= 10; dy *= 10; }
+
+        historyManager.value.execute(new MoveCommand(item as Item, [item.x, item.y], [item.x + dx, item.y + dy]));
+        nextTick(() => moveable.value?.updateRect());
+    });
+
+    // Shortcuts to tools selection
+    onKey(["s"], (e: KeyboardEvent) => selectCurrentTool(EditorTool.SELECT));           // S = Select tool
+    onKey(["c"], (e: KeyboardEvent) => selectCurrentTool(EditorTool.CONNECTION));       // C = Connection tool
+    onKey(["t"], (e: KeyboardEvent) => selectCurrentTool(EditorTool.TEXT));             // T = Text tool
+    onKey(["r"], (e: KeyboardEvent) => selectCurrentTool(EditorTool.RECTANGLE));        // R = Rectanble tool
+    onKey(["i"], (e: KeyboardEvent) => showInspector.value = !showInspector.value);     // I = Show
 }
+
 </script>
 
 
