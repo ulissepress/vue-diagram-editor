@@ -131,8 +131,8 @@ const linePath = computed( () => {
 .raw-connection {
     position: absolute;
     fill: none;
-    stroke-linecap: square; 
-    stroke-linejoin: square;
+    stroke-linecap: round; 
+    stroke-linejoin: round;
     pointer-events: none;
     /* border: 1px dashed red;   */
 }

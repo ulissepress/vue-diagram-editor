@@ -1,5 +1,13 @@
 <template>
-   <img class="image" :src="item.componentOptions.src" :style="{ borderRadius: item.borderRadius + 'px' }"/>
+   <img class  = "image" 
+        :src   = "item.url"
+        :style = "{ 
+            color:        item.textColor, 
+            borderRadius: item.borderRadius + 'px',
+            fontSize:     item.fontSize + 'px',
+            opacity:      item.opacity / 100,   
+            objectFit:    item.fit, 
+        }"/>
 </template>
 
 <style scoped>
@@ -7,16 +15,15 @@
     width: 100%;
     height: 100%;
     max-width: 100%;
-    object-fit: cover;
 }
 </style>
 
 <script setup lang="ts">
 
 import { onMounted, onUpdated } from 'vue';
-import { Item } from '../types';
+import { ImageItem } from '../types';
 
-const { item } = defineProps<{item: Item}>();
+const { item } = defineProps<{item: ImageItem}>();
 
 
 onMounted(()=> console.log('Image mounted'))

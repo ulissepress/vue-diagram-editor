@@ -1,8 +1,10 @@
 <template>
-    <div class="text" :style="{  
+    <div class="text" :style="{ 
+            backgroundColor: item.backgroundColor, 
             color:           item.textColor, 
             borderRadius:    item.borderRadius + 'px',
             fontSize:        item.fontSize + 'px',
+            opacity:         item.opacity / 100,
         }">{{ item.title }}</div>
 </template>
 
@@ -16,8 +18,8 @@ const { item } = defineProps<{item: Item}>();
 <style scoped>
 .text {
     background-color: transparent;
-    width: auto;
-    height: auto;
+    width: 100%;
+    height: 100%;
     /* border: 1px solid grey; */
 
     display: flex;

@@ -58,8 +58,6 @@ export const basicModel: ObjectInspectorModel = {
     ]
 }
 
-
-
 export const shapeModel: ObjectInspectorModel = {
     tabs: [ 
         {
@@ -82,7 +80,56 @@ export const shapeModel: ObjectInspectorModel = {
     ]
 }
 
-export const shapeWithTextModel: ObjectInspectorModel = {
+export const shapeWithoutRadiusModel: ObjectInspectorModel = {
+    tabs: [ 
+        {
+            title: "Style",
+            sections: [        
+                {   // Style
+                    name: "style",
+                    title: "Text and style",
+                    properties: [ id$, title$, fontSize$, backColor$, textColor$, opacity$, locked$]
+                },         
+                {   // Position & size
+                    name: "pos_size",
+                    title: "Position and size",
+                    properties: [x$, y$, w$, h$, rotate$] 
+                }, 
+                
+            ] // sections
+        },
+        otherTab
+    ]
+}
+
+
+export const imageModel: ObjectInspectorModel = {
+    tabs: [ 
+        {
+            title: "Style",
+            sections: [        
+                {   // Style
+                    name: "style",
+                    title: "Source and style",
+                    properties: [ 
+                        { name: "url", label: "URL", type: PropertyType.TEXT,   editorFullsize: true }, 
+                        { name: "fit", label: "Fit", type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: [ "contain", "cover", "fill", "none"] }},
+
+                        opacity$, locked$]
+                },         
+                {   // Position & size
+                    name: "pos_size",
+                    title: "Position and size",
+                    properties: [x$, y$, w$, h$, rotate$, radius$] 
+                }, 
+                
+            ] // sections
+        },
+        otherTab
+    ]
+}
+
+export const textModel: ObjectInspectorModel = {
     tabs: [ 
         {
             title: "Style",
@@ -127,3 +174,29 @@ export const connectionModel: ObjectInspectorModel = {
     ] // tabs
 }
 
+
+export const lineModel: ObjectInspectorModel = {
+    tabs: [ 
+        {
+            title: "Style",
+            sections: [        
+                {   // Style
+                    name: "style",
+                    title: "Style",
+                    properties: [ 
+                        { name: "style", label: "Style", type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: [ ConnectionStyle.SOLID, ConnectionStyle.DASHED, ConnectionStyle.DOTTED] }},
+                        { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},
+                        
+                        { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR }
+                    ]
+                },
+                {   // Position & size
+                    name: "pos_size",
+                    title: "Position and size",
+                    properties: [x$, y$, w$, h$, rotate$] 
+                }, 
+
+            ] // sections
+        } // tab
+    ] // tabs
+}

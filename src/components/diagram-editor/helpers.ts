@@ -1,5 +1,5 @@
-import { basicModel, connectionModel, shapeModel } from './item-properties';
-import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, Item, ItemConnection, Position } from "./types";
+import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position } from "./types";
+import { basicModel, connectionModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
@@ -91,7 +91,7 @@ export function findMaxZ(items: Item[]): number {
 // Shape medata definitions
 const registry: Record<string, Item> = {};
 
-export function registerItemType(item: Item, asName?: string) {
+export function registerItemType<T extends Item>(item: T, asName?: string) {
     registry[item.component || asName || ''] = item;
 }
 
@@ -121,8 +121,8 @@ export function registerDefaultItemTypes() {
         supportsRoundable: false,
         supportsResizable: true,
 
-        backgroundColor: "green",
-        textColor: "black",
+        backgroundColor: "#00ff00",
+        textColor: "#111111",
         fontSize: 14,
         
         locked: false,
@@ -136,23 +136,27 @@ export function registerDefaultItemTypes() {
     registerItemType({
         ...defaults,
         title: "Hello World",
+        backgroundColor: "transparent",
+        textColor: "#333333",
 
         component: type,
 
-        inspectorModel: shapeModel,
+        inspectorModel: textModel,
     });
 
     // ----------------------------------------------------------------------
     type = "Line"
-    registerItemType({
+    registerItemType<LineItem>({
         ...defaults,
 
         component: type,
-        componentOptions: {
-            style: ConnectionStyle.SOLID,
-            thick: 2,
-        },
-        inspectorModel: shapeModel,
+
+        backgroundColor: "#111111",
+        
+        style: ConnectionStyle.SOLID,
+        thick: 2,
+        
+        inspectorModel: lineModel,
     });
 
 
@@ -174,8 +178,9 @@ export function registerDefaultItemTypes() {
 
         w: 90,
         h: 70,
-        backgroundColor: 'lightblue',
-        inspectorModel: shapeModel,
+        backgroundColor: '#324759',
+        textColor: "#FFFFFF",
+        inspectorModel: shapeWithoutRadiusModel,
     })
 
     // ----------------------------------------------------------------------
@@ -186,8 +191,8 @@ export function registerDefaultItemTypes() {
 
         w: 90,
         h: 70,
-        backgroundColor: 'red',
-        inspectorModel: shapeModel,
+        backgroundColor: '#ff0000',
+        inspectorModel: shapeWithoutRadiusModel,
     })
 
     // ----------------------------------------------------------------------
@@ -198,22 +203,24 @@ export function registerDefaultItemTypes() {
 
         w: 70,
         h: 70,
-        backgroundColor: 'pink',
-        inspectorModel: shapeModel,
+        backgroundColor: '#ff0000',
+        textColor: "#333333",
+        inspectorModel: shapeWithoutRadiusModel,
     })
 
 
     // ----------------------------------------------------------------------
     type = "Image"
-    registerItemType({
+    registerItemType<ImageItem>({
         ...defaults,
         w: 300,
         h: 200,
         component: type,
-        componentOptions: {
-            src: 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-        },
         supportsRoundable: true,
+        
+        url: 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
+        fit: "cover",
+        inspectorModel: imageModel
     })    
 } // func
 

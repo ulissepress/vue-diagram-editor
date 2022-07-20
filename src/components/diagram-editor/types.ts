@@ -147,6 +147,18 @@ export function isConnection(e: DiagramElement | undefined | null) : e is ItemCo
 } 
 
 
+export interface LineItem extends Item {
+    thick: number;
+    style: ConnectionStyle;
+}
+
+
+export interface ImageItem extends Item {
+    url: string;
+    fit: "contain" | "cover" | "fill" | "none";
+}
+
+
 export interface WidgetDefinition {
     type:      string;          // The widget type. Example: 'my_shape
     label:     string;          // The widget label. Example: 'My Shape'
