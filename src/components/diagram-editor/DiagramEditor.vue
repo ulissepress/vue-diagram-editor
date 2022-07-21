@@ -122,7 +122,7 @@
             <!-- Editor Toolbar -->
             <ToolsToolbar v-if='editable'  :customWidgets = "customWidgets" :selectedTool  = "currentTool"  @toolSelected  = "selectCurrentTool" />
             <div class='toolbar-separator'></div>
-            <ZoomToolbar :zoomFactor="zoomFactor" @zoomChanged="onZoomChanged" />
+            <ZoomToolbar :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
             <div class='toolbar-separator'></div>
             <div class="toolbar">
                 <button class='toolbar-item' @click="undo"            :disabled="!historyManager.canUndo()" title="Undo"><Icon icon="undo"/></button>
@@ -183,6 +183,7 @@ import { ObjectProperty } from '../inspector/types';
 import AddConnectionCommand from './commands/AddConnectionCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import Icon from './components/Icon.vue';
+import { DefaultZoomManager, IZoomManager } from './ZoomManager';
 
 export type Item = _Item & { hover?: boolean }
 
@@ -234,6 +235,7 @@ setupKeyboardHandlers();
 
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
+const zoomManager   = ref<IZoomManager>(new DefaultZoomManager());
 const zoomFactor    = ref(1);
 
 const viewer        = ref();
@@ -454,7 +456,7 @@ function onRoundEnd(e: any) : void {
 // Scrolling
 // ---------------------------------------------------------------------------------------------------------------------
 function onScroll(e: any) : void {
-    if(e.ctrlKey) e.deltaY < 0 ? zoomIn() : zoomOut();
+    if(e.ctrlKey) zoomFactor.value = e.deltaY < 0 ? zoomManager.value.zoomIn() : zoomManager.value.zoomOut();
 
     if(hGuides.value) { hGuides.value.scroll(e.scrollLeft); hGuides.value.scrollGuides(e.scrollTop);  }
     if(vGuides.value) { vGuides.value.scroll(e.scrollTop);  vGuides.value.scrollGuides(e.scrollLeft); }

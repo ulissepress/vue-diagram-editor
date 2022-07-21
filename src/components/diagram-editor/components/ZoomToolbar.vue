@@ -1,24 +1,24 @@
 <template>
     <div class="toolbar">
         <div class="btn" @click="zoomOut" title="Zoom Out"><Icon icon="zoom_out" /></div>
-        <div class="zoom-info" title="Current Zoom">{{ zoomFactor * 100 }}%</div>         
+        <div class="zoom-info" title="Current Zoom">{{ zoomManager.getZoomFactor() * 100 }}%</div>         
         <div class="btn" @click="zoomIn" title="Zoom In"><Icon icon="zoom_in"/></div>
         <div class="btn" @click="zoomReset" title="Zoom Reset"><Icon icon="center_focus_weak"/></div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { IZoomManager } from '../ZoomManager';
 import Icon from './Icon.vue';
 
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 interface ToolbarProps {
-    zoomFactor: number
+    zoomManager: IZoomManager
 }
 
-const { zoomFactor } = defineProps<ToolbarProps>();
+const { zoomManager } = defineProps<ToolbarProps>();
 
 interface ToolbarEvents {
     (e: 'zoom-changed', newZoomFactor: number, scrollViewerToCenter?: boolean): void    
@@ -27,30 +27,24 @@ interface ToolbarEvents {
 const emit = defineEmits<ToolbarEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
-
-const zooms              = [5, 10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 500];   // must contain the value 100
-const defaultZoomIndex   = zooms.findIndex(v => v === 100);     
-const zoomIndex          = ref(defaultZoomIndex); 
-
 function zoomReset() 
 { 
-    zoomIndex.value = defaultZoomIndex; 
-    emit("zoom-changed", 1, true)
+    const oldZoom = zoomManager.getZoomFactor();
+    const newZoom = zoomManager.zoomReset();
+    if(oldZoom !== newZoom) emit("zoom-changed", newZoom, true)
 }
 
 function zoomIn()    
 { 
-    if(zoomIndex.value < zooms.length - 1) {
-        zoomIndex.value++; 
-        emit("zoom-changed", zooms[zoomIndex.value] / 100, false)
-    }
+    const oldZoom = zoomManager.getZoomFactor();
+    const newZoom = zoomManager.zoomIn();
+    if(oldZoom !== newZoom) emit("zoom-changed", newZoom, false)    
 }
 
 function zoomOut() { 
-    if(zoomIndex.value > 0) {
-        zoomIndex.value--; 
-        emit("zoom-changed", zooms[zoomIndex.value] / 100, false)
-    }
+    const oldZoom = zoomManager.getZoomFactor();
+    const newZoom = zoomManager.zoomOut();
+    if(oldZoom !== newZoom) emit("zoom-changed", newZoom, false)    
 }
 
 </script>
