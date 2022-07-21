@@ -12,7 +12,5 @@
     
 - Change item text directly in the canvas (contenteditable)
 
-- Copy, Cut & Paste Items (CMD+C, CMD+X, CMD+V)
-
 - Object Inspector 
     - Supports multiple selected items (common properties)

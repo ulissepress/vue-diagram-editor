@@ -17,8 +17,8 @@
 <script setup lang="ts">
 import { computed } from '@vue/reactivity';
 import { onMounted, onUpdated } from 'vue';
-import Icon from './Icon.vue';
 import { EditorTool, toolDefinitions } from '../types';
+import Icon from './Icon.vue';
 
 interface Tool {
     type:  EditorTool | "separator";
@@ -77,7 +77,7 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
     height: auto;
     padding: 4px;
 
-    color: #888;
+    color: #676767; 
     display: flex;
     justify-content: center;
     align-items: center; 

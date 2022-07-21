@@ -73,6 +73,9 @@ function zoomOut() {
     width: 32px;
     height: 32px;
     text-align: center;
+    background-color: #fefefe;
+    color: #888;
+
 }
 
 
