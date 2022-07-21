@@ -23,15 +23,15 @@
             <div ref="viewport" class="viewport" >
                 
                 <!-- Render Connections (default component='Connection') -->
-                 <component v-for="(c, i) in connections"
-                    :is         = "c.component"
-                    :key        = "c.id"
-                    :from       = "getItemById(c.from.item)!"
-                    :to         = "getItemById(c.to.item)!"
-                    :connection = "c"
-                    :style      = "{ zIndex: c.z }"
-                    :selected   = "c.id === selectedItem?.id"
-                    @selected   = "selectedItem = c" />
+                <component v-for = "(c, i) in connections"
+                    :is          = "c.component"
+                    :key         = "c.id"
+                    :from        = "getItemById(c.from.item)!"
+                    :to          = "getItemById(c.to.item)!"
+                    :connection  = "c"
+                    :style       = "{ zIndex: c.z }"
+                    :selected    = "c.id === selectedItem?.id"
+                    @selected    = "selectedItem = c" />
                         
                 <!-- Use to render a connection line during a new connection creation -->
                 <RawConnection v-if="creatingConnection && connectionInfo.startItem" 
@@ -40,6 +40,7 @@
                                 :x2    = "mouseCoords.x" 
                                 :y2    = "mouseCoords.y"
                                 :type  = "ConnectionType.LINE"                                
+                                style  = "z-index: -100000;"
                                 selected />
                             
                 <!-- Render Items -->
@@ -53,14 +54,14 @@
                     @click.stop     = "!creatingConnection && editable && selectItem(item)" 
                     @dblclick.stop  = "!creatingConnection && editable && lockItem(item)"
                     
-                    @mousedown  = "!creatingConnection && editable && selectItem(item, $event)" 
-                    @mouseover  = "() => { if(creatingConnection) item.hover = true }"
-                    @mouseleave = "() => { delete item.hover }" > 
+                    @mousedown       = "!creatingConnection && editable && selectItem(item, $event)" 
+                    @mouseover.stop  = "creatingConnection && onMouseOver(item, $event)"
+                    @mouseleave.self = "creatingConnection && onMouseLeave(item, $event)" > 
 
                         <component :is="item.component" :item="item" />
 
                         <!-- Item decorators (delete, locked, size info) -->
-                        <div class="decorator decorator-delete" v-if="!creatingConnection && editable && item.id === selectedItem?.id && selectedItem?.locked !== true" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
+                        <div class="decorator decorator-delete" v-if="!creatingConnection && editable && item.id === selectedItem?.id && (selectedItem as Item)?.locked !== true" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
                         <div class="decorator decorator-locked" v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
                         <div class="decorator decorator-size"   v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
 
@@ -182,13 +183,14 @@ import { ObjectProperty } from '../inspector/types';
 import AddConnectionCommand from './commands/AddConnectionCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import Icon from './components/Icon.vue';
+
 export type Item = _Item & { hover?: boolean }
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
-    elements: DiagramElement[],
-    editable?: boolean,    
+    elements:       DiagramElement[],
+    editable?:      boolean,    
     customWidgets?: boolean,    
 }
 
@@ -202,7 +204,7 @@ export interface DiagramEditorEvents {
 
 // Define props
 const { elements, editable } = withDefaults(defineProps<DiagramEditorProps>(), {
-    editable: true,
+    editable:      true,
     customWidgets: false,
 });
 
@@ -232,21 +234,21 @@ setupKeyboardHandlers();
 
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
-const zoomFactor         = ref(1);
+const zoomFactor    = ref(1);
 
-const viewer             = ref();
-const viewport           = ref()
-const moveable           = ref();
+const viewer        = ref();
+const viewport      = ref<HTMLDivElement>();
+const moveable      = ref();
 
-const hGuides            = ref();
-const vGuides            = ref();
-const guidesVisible      = computed(() => editable && zoomFactor.value >= 0.5);
-const hGuideValues       = ref<number[]>([]);       // Horizontal guides added by the user
-const vGuideValues       = ref<number[]>([]);       // Vertical guides added by the user
-const showGuides         = ref(true);               // Show or hide all the guides
-const showInspector      = ref(true);               // Show or hide all the guides
+const hGuides       = ref();
+const vGuides       = ref();
+const guidesVisible = computed(() => editable && zoomFactor.value >= 0.5);
+const hGuideValues  = ref<number[]>([]);       // Horizontal guides added by the user
+const vGuideValues  = ref<number[]>([]);       // Vertical guides added by the user
+const showGuides    = ref(true);               // Show or hide all the guides
+const showInspector = ref(true);               // Show or hide all the guides
 
-const selectedItem       = ref<DiagramElement | null>(null);
+const selectedItem  = ref<DiagramElement | null>(null);
 
 const selectedItemActive = computed(() => {
     if(!selectedItem.value) return false;
@@ -267,7 +269,7 @@ const connections = computed(() => elements.filter(e => isConnection(e)) as Item
 
 // Temporary variables
 // ------------------------------------------------------------------------------------------------------------------------
-const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0, opacity: 1};
+const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0, opacity: 1 };
 
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 function onMouseMove(e: any) { 
@@ -296,6 +298,17 @@ let connectionInfo : {
     endPoint:   ConnectionHandle.CENTER,
 }
 
+function onMouseOver(item: Item, e: MouseEvent) {
+    if(!creatingConnection.value === true) return;
+
+    item.hover = true;
+}
+
+function onMouseLeave(item: Item,e: MouseEvent) {
+    if(!creatingConnection.value === true) return;
+
+    if('hover' in item) delete item.hover;
+}
 
 function getItemStyle(item: Item) : StyleValue {
     let t = `translate(${item.x}px, ${item.y}px)`;
@@ -605,6 +618,7 @@ function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
 }
 
 function setupKeyboardHandlers() {
+    // https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
 
     function onKey(keys: string | string[], handler: (e: KeyboardEvent) => void) {
         onKeyStroke(keys, (e) => {
@@ -658,7 +672,20 @@ function setupKeyboardHandlers() {
     onKey(["t"], (e: KeyboardEvent) => selectCurrentTool(EditorTool.TEXT));             // T = Text tool
     onKey(["r"], (e: KeyboardEvent) => selectCurrentTool(EditorTool.RECTANGLE));        // R = Rectanble tool
     onKey(["i"], (e: KeyboardEvent) => showInspector.value = !showInspector.value);     // I = Show
+
+
+    onKey(["Escape"], (e: KeyboardEvent) => {
+        if(creatingConnection.value === true) {
+            console.log("ESC pressed: cancelling connection creation");
+            connectionInfo.startItem = null;
+            connectionInfo.endItem   = null;
+            selectCurrentTool(EditorTool.SELECT);
+            nextTick(() => selectCurrentTool(EditorTool.CONNECTION));
+        }
+    }); 
 }
+
+
 
 </script>
 
