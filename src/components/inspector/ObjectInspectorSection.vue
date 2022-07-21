@@ -65,8 +65,4 @@ const expanded = ref(true);
     margin-bottom: 4px;
 }
 
-.tab-selected {
-    background-color: #4af;
-    color: white;
-}
 </style>

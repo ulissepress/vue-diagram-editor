@@ -829,7 +829,7 @@ function pasteItem() {
     width: 16px;
 }
 .toolbar-item-separator {
-    width: 10px;
+    width: 8px;
 }
 
 .toolbar {

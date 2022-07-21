@@ -95,7 +95,7 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
 }
 
 .separator {
-    width: 12px;
+    width: 8px;
     height: 100%;
     user-select: none;
 }

@@ -43,15 +43,18 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
 </script>
 
 <style>
-.property-container input {
+.property-container input,
+.property-container select
+{
     border: 0px;
     background-color: #626262;
     font-size: 11px;
     color: white;
     padding: 2px 4px;
 }
-.property-container input:focus,
-.property-container input:focus-visible
+
+.property-container input:focus,  .property-container input:focus-visible,
+.property-container select:focus, .property-container select:focus-visible
 {
     border: 0px !important;
     outline: 0px !important;    
@@ -68,11 +71,9 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
     overflow: hidden;
     vertical-align: middle;
     line-height: 1;
-    margin-bottom: 2px;
-
+    margin-bottom: 4px;
 
     --label-width: 60px;
-
 }
 
 .property-label {
