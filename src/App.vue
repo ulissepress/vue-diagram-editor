@@ -22,3 +22,7 @@ let elements: DiagramElement[] = reactive([
 ]);
 
 </script>
+
+<style>
+html, body { font-family: 'Open Sans', sans-serif; }
+</style>
