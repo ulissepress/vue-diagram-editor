@@ -160,6 +160,8 @@
                     :object = "selectedItem"
                     @property-changed="onPropertyChange" />                                
         </div> 
+
+        <KeyboardHelp v-if="showKeyboard" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);  z-order: 1000;" />
         
     </div> <!-- editor-container -->    
 </template>
@@ -190,6 +192,7 @@ import { ObjectProperty } from '../inspector/types';
 import AddConnectionCommand from './commands/AddConnectionCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import Icon from './components/Icon.vue';
+import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
 
 export type Item = _Item & { hover?: boolean }
@@ -684,7 +687,8 @@ function setupKeyboardHandlers() {
     // Shortcuts to tools selection
     onKey(["s"], (e: KeyboardEvent) => selectCurrentTool(EditorTool.SELECT));           // S = Select tool
     onKey(["t"], (e: KeyboardEvent) => selectCurrentTool(EditorTool.TEXT));             // T = Text tool
-    onKey(["i"], (e: KeyboardEvent) => showInspector.value = !showInspector.value);     // I = Show
+    onKey(["i"], (e: KeyboardEvent) => showInspector.value = !showInspector.value);     // I = Show/hide inspector
+    onKey(["k"], (e: KeyboardEvent) => showKeyboard.value = !showKeyboard.value);       // K = Show/Hide keyboard help
 
     // R = Rectanble tool, CMD+R = Reload
     onKey(["r"], (e: KeyboardEvent) => isVirtualCtrl(e) ? window.location.reload() : selectCurrentTool(EditorTool.RECTANGLE));        
