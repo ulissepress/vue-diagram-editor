@@ -1,6 +1,10 @@
 <template>
     <div style="width: 100%; height: 95%; padding-top: 16px; margin: 0 auto;">
-        <DiagramEditor :editable="true" customWidgets :elements = "elements" />
+        <DiagramEditor :elements      = "elements"
+                       :customWidgets = "true" 
+                       :editable      = "true"
+                       :viewportSize  = "[300,250]" 
+                     />
     </div>
 </template>
 

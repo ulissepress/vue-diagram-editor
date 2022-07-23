@@ -14,13 +14,17 @@
             :zoom           = "zoomFactor"  
             :zoomOffsetX    = "mouseCoords.x"
             :zoomOffsetY    = "mouseCoords.y"
+
             :style          = "{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair'}" 
             @wheel          = "onScroll" 
             @scroll         = "onScroll"              
             @mousemove      = "onMouseMove"
             @click.stop     = "editable && onCanvasClick($event)">
             
-            <div ref="viewport" class="viewport" >
+            <div ref="viewport" 
+                 :class="{ 'viewport': true, 'viewport-area': viewportSize }" 
+                 :style="{ width:  viewportSize ? viewportSize[0] + 'px' : '100%', 
+                           height: viewportSize ? viewportSize[1] + 'px' : '100%' }">
                 
                 <!-- Render Connections (default component='Connection') -->
                 <component v-for = "(c, i) in connections"
@@ -87,13 +91,13 @@
 
                     :snappable               = "showGuides"
                     :snapGap                 = "true"
+                    :snapThreshold           = "5" 
                     :snapDirections          = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
                     :elementSnapDirections   = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
                     :isDisplayInnerSnapDigit = "true"
-                    :horizontalGuidelines    = "showGuides ? hGuideValues : []"
-                    :verticalGuidelines      = "showGuides ? vGuideValues : []"
+                    :horizontalGuidelines    = "showGuides ? (viewportSize ? [0, viewportSize[1]/2, viewportSize[1], ...hGuideValues] : hGuideValues) : []"
+                    :verticalGuidelines      = "showGuides ? (viewportSize ? [0, viewportSize[0]/2, viewportSize[0], ...vGuideValues] : vGuideValues) : []"
                     :elementGuidelines       = "showGuides ? elementGuidelines() : []"
-                    
                     
                     :clippable         = "isItem(selectedItem) && selectedItem.clipType !== ClipType.NONE"
                     :clipArea          = "false"
@@ -214,8 +218,9 @@ export type Item = _Item & { hover?: boolean }
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
     elements:       DiagramElement[],
-    editable?:      boolean,    
-    customWidgets?: boolean,    
+    editable?:      boolean,
+    customWidgets?: boolean,
+    viewportSize?:  [number, number]
 }
 
 export interface DiagramEditorEvents {
@@ -227,7 +232,7 @@ export interface DiagramEditorEvents {
 }
 
 // Define props
-const { elements, editable } = withDefaults(defineProps<DiagramEditorProps>(), {
+const { elements, editable, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
     editable:      true,
     customWidgets: false,
 });
@@ -830,6 +835,10 @@ function pasteItem() {
     height: 100%;
 }
 
+.viewport-area {
+    background-color: lightyellow;
+    border: 2px dashed #ccc;
+}
 .ruler {    
     position: absolute !important;
     top: 0px;
