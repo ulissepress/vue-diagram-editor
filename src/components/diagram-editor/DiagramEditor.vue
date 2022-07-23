@@ -922,6 +922,7 @@ function pasteItem() {
     text-align: center;
     font-weight: normal;
     font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center; 
