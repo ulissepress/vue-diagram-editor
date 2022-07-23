@@ -1,7 +1,8 @@
 <template>
-    <div class="property-container" :style="{ width: property.editorFullsize ? '99%' : '49%' }">
+    <div v-if="property.name === ''" class="separator"></div>
+    <div v-else class="property-container" :style="{ width: property.editorFullsize ? '98%' : '49%' }">
         <div class="property-label">{{ property.label }}</div>
-        <div class="property-editor">
+        <div class="property-editor" :style="{ justifyContent: property.editorRightAlign === true ? 'flex-end' : 'flex-start' }">
             <component v-if="!property.readonly" :is="editor" 
                        :object="object" 
                        :property="property" 
@@ -51,6 +52,7 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
     font-size: 11px;
     color: white;
     padding: 2px 4px;
+    border-radius: 2px;
 }
 
 .property-container input:focus,  .property-container input:focus-visible,
@@ -64,8 +66,7 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
 
 <style scoped>
 .property-container {
-    display: inline-block;
-    width: 100%;
+    display: inline-block;    
     height: auto;
     user-select: none;
     overflow: hidden;
@@ -90,21 +91,23 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
     /* background-color: lightyellow; */
     color: #aaa;
     vertical-align: middle;
-
 }
 
 .property-editor {
-    display: inline-block;
+    display: inline-flex;
     width: calc(100% - var(--label-width) - 10px);
     color: #aaa;
     font-size: 11px;
     line-height: 1;
     vertical-align: middle;
-    /* background-color: #f2f2c9; */
 }
 
 .readonly-value {
     color: #aaa;
 }
 
+.separator {
+    height: 16px;
+    padding: 0px;
+}
 </style>

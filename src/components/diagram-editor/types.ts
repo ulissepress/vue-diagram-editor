@@ -49,7 +49,25 @@ export interface Item extends DiagramElement {
     supportsResizable: boolean;     // The item can be resized (user can change width / height)
 
     locked: boolean;                // The item is locked (cannot be moved / resized / rotated / ...)
+
+    textHAlign: TextHAlign;
+    textVAlign: TextVAlign;
 }
+
+export enum TextHAlign {
+    LEFT   = "flex-start",
+    CENTER = "center",
+    RIGHT  = "flex-end",
+}
+
+export enum TextVAlign {
+    TOP    = "flex-start",
+    CENTER = "center",
+    BOTTOM = "flex-end",
+}
+
+
+
 
 export interface ConnectionPoint {
     item:   string;                   // The item ID which this connection point is referring to

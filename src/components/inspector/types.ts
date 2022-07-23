@@ -1,12 +1,13 @@
 import Vue from 'vue';
 
 export enum PropertyType {
-    TEXT    = "text",
-    NUMBER  = "number",
-    BOOLEAN = "boolean",
-    SELECT  = "select",
-    COLOR   = "color",
-    RANGE   = "range",
+    TEXT      = "text",
+    NUMBER    = "number",
+    BOOLEAN   = "boolean",
+    SELECT    = "select",
+    COLOR     = "color",
+    RANGE     = "range",
+    ICON_LIST = "iconlist"
 }
 
 export interface ObjectProperty {
@@ -18,9 +19,10 @@ export interface ObjectProperty {
     readonly?: boolean;         // Property is readonly. Default: false
     formatValue?: (property: ObjectProperty, object: any) => string; // Function to format the value. Default: value => value.toString()
 
-    editor?:         Vue.Component;   // Custom editor component. Default: TextEditor    
-    editorOptions?:  any              // Config options to pass to the editor component
-    editorFullsize?: boolean;         // If true the editor will take the full row (not 50%). Default: false
+    editor?:           Vue.Component;   // Custom editor component. Default: TextEditor    
+    editorOptions?:    any              // Config options to pass to the editor component
+    editorFullsize?:   boolean;         // If true the editor will take the full row (not 50%). Default: false
+    editorRightAlign?: boolean;         // Alignement of the editor on the right. Default: false
 }
 
 

@@ -18,7 +18,7 @@ let elements: DiagramElement[] = reactive([
     
     createConnection('a1', 'a2'),
     createConnection('a1', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DOTTED }),
-    createConnection('a2', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DASHED, backgroundColor: "red", thick: 5 }),
+    createConnection('a2', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DASHED, backgroundColor: "#ff0000", thick: 5 }),
 ]);
 
 </script>

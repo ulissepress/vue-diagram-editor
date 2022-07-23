@@ -57,13 +57,14 @@ function onKeyPress(e: any) {
 
 <style scoped>
 .editor-slider {
-    width: calc(100% - 50px);
-
+    width: calc(100% - 60px);
 }
 
 .editor-input {
-    width: 30px;
-    vertical-align: super;
+    width: 40px;
+    height: 12px;
+    text-align: center;
+    margin-top: 3px;
 }
 
 

@@ -1,14 +1,30 @@
-import { ConnectionStyle, ConnectionType } from './types';
+import { ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } from './types';
 import { InspectorTab, PropertyType } from '../inspector/types';
 import { ObjectInspectorModel, ObjectProperty } from './../inspector/types';
+
+export const separator$ : ObjectProperty = { name: "" };
 
 export const id$    : ObjectProperty = { name: "id",     label: "ID",   type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (p, obj) => obj[p.name] + ' (' + obj.component + ')' };
 export const title$ : ObjectProperty = { name: "title",  label: "Text", type: PropertyType.TEXT,  editorFullsize: true };
 
 export const fontSize$ : ObjectProperty = { name: "fontSize", label: "Font Size",  type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 4, max: 120, step: 1 } };
 
+export const textHAlign$ : ObjectProperty = { 
+    name: "textHAlign",  label: "H Align",  type: PropertyType.ICON_LIST, editorOptions: { 
+    items: [ { name: TextHAlign.LEFT,   icon: "format_align_left"   }, 
+             { name: TextHAlign.CENTER, icon: "format_align_center" },
+             { name: TextHAlign.RIGHT,  icon: "format_align_right"  } ] 
+}};
+
+export const textVAlign$ : ObjectProperty = { 
+    name: "textVAlign",  label: "V Align",  type: PropertyType.ICON_LIST, editorRightAlign: true, editorOptions: {
+    items: [ { name: TextVAlign.TOP,    icon: "align_vertical_top"     }, 
+             { name: TextVAlign.CENTER, icon: "align_vertical_center"  },
+             { name: TextVAlign.BOTTOM, icon: "align_vertical_bottom"  } ] 
+}};
+
 export const backColor$ : ObjectProperty = { name: "backgroundColor",  label: "Back Color", type: PropertyType.COLOR };
-export const textColor$ : ObjectProperty = { name: "textColor",        label: "Text Color", type: PropertyType.COLOR };
+export const textColor$ : ObjectProperty = { name: "textColor",        label: "Text Color", type: PropertyType.COLOR, editorRightAlign: true };
 export const locked$    : ObjectProperty = { name: "locked",           label: "Locked",     type: PropertyType.BOOLEAN };
 
 
@@ -29,6 +45,7 @@ const otherTab : InspectorTab =
             name: "comp_info",
             title: "Component Info",
             properties: [
+                id$,
                 { name: "component", label: "Component", type: PropertyType.TEXT, editorFullsize: true, readonly: true }
             ] // props
         } // section
@@ -44,12 +61,12 @@ export const basicModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Style",
-                    properties: [id$, backColor$, opacity$, locked$]
+                    properties: [backColor$, opacity$, locked$]
                 },         
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
-                    properties: [x$, y$, w$, h$, rotate$] 
+                    properties: [x$, y$, w$, h$, separator$, rotate$] 
                 }, 
                 
             ] // sections
@@ -66,12 +83,12 @@ export const shapeModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [ id$, title$, fontSize$, backColor$, textColor$, opacity$, locked$]
+                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
                 },         
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
-                    properties: [x$, y$, w$, h$, rotate$, radius$] 
+                    properties: [x$, y$, w$, h$, separator$, rotate$, radius$] 
                 }, 
                 
             ] // sections
@@ -88,12 +105,12 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [ id$, title$, fontSize$, backColor$, textColor$, opacity$, locked$]
+                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
                 },         
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
-                    properties: [x$, y$, w$, h$, rotate$] 
+                    properties: [x$, y$, w$, h$, separator$, rotate$] 
                 }, 
                 
             ] // sections
@@ -120,7 +137,7 @@ export const imageModel: ObjectInspectorModel = {
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
-                    properties: [x$, y$, w$, h$, rotate$, radius$] 
+                    properties: [x$, y$, w$, h$, separator$, rotate$, radius$] 
                 }, 
                 
             ] // sections
@@ -137,12 +154,12 @@ export const textModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [ id$, title$, fontSize$, backColor$, textColor$, opacity$, locked$ ]
+                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$ ]
                 },         
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
-                    properties: [x$, y$, w$, h$, rotate$, radius$] 
+                    properties: [x$, y$, w$, h$, separator$, rotate$, radius$] 
                 }, 
                 
             ] // sections
@@ -162,11 +179,18 @@ export const connectionModel: ObjectInspectorModel = {
                     name: "style",
                     title: "Style",
                     properties: [ 
-                        { name: "type",  label: "Type",  type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: [ ConnectionType.LINE, ConnectionType.CURVE] }},
-                        { name: "style", label: "Style", type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: [ ConnectionStyle.SOLID, ConnectionStyle.DASHED, ConnectionStyle.DOTTED] }},
-                        { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},
-                        
-                        { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR }
+                        { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorOptions: { 
+                            items: [ { name: ConnectionType.LINE,  icon: "horizontal_rule" }, 
+                                     { name: ConnectionType.CURVE, icon: "conversion_path" } ] 
+                        }},
+                        { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR },
+                        { name: "style",  label: "Style",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                            items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
+                                     { name: ConnectionStyle.DASHED, text: "Dashed" },
+                                     { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
+                        }},
+                        separator$,
+                        { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
                     ]
                 },         
             ] // sections

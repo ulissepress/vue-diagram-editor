@@ -39,6 +39,8 @@ function onChange(e: any) {
 
 <style scoped>
 .editor {
-    width: 100%;
+    max-width: 100%;
+    width: 40px;
+    text-align: center;
 }
 </style>

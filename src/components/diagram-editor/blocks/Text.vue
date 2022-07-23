@@ -1,5 +1,7 @@
 <template>
-    <div class="text" :style="{ 
+    <div class="text" :style="{
+            justifyContent:  item.textHAlign,
+            alignItems:      item.textVAlign, 
             backgroundColor: item.backgroundColor, 
             color:           item.textColor, 
             borderRadius:    item.borderRadius + 'px',

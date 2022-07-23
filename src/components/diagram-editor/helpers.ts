@@ -1,4 +1,4 @@
-import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position } from "./types";
+import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
 import { basicModel, connectionModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
 type DeepPartial<T> = T extends object ? {
@@ -33,6 +33,9 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         backgroundColor: '#bbbbbb',
         textColor: '#000000',
         fontSize: 14,
+         
+        textHAlign: TextHAlign.CENTER,
+        textVAlign: TextVAlign.CENTER,
         
         locked: false,
 
@@ -126,6 +129,9 @@ export function registerDefaultItemTypes() {
         fontSize: 14,
         
         locked: false,
+        
+        textHAlign: TextHAlign.CENTER,
+        textVAlign: TextVAlign.CENTER,
         
         inspectorModel: basicModel  
     };

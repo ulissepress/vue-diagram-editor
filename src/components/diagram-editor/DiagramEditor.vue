@@ -148,8 +148,8 @@
             <div v-if="editable" class="toolbar">
                 <button class='toolbar-item' @click="showRulers    = !showRulers"    title="Show / Hide rulers"               :style="{ backgroundColor: showRulers    ? '#4af': '', color: showRulers    ? 'white': ''  }"><Icon icon="straighten" /></button>
                 <button class='toolbar-item' @click="showGuides    = !showGuides"    title="Show / Hide alignment guidelines" :style="{ backgroundColor: showGuides    ? '#4af': '', color: showGuides    ? 'white': ''  }"><Icon icon="border_style" /></button>
-                <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': ''  }"><Icon icon="brush" /></button>
-                <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"    title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard ? '#4af': '', color: showKeyboard ? 'white': '' }"><Icon icon="keyboard_hide" /></button>
+                <button class='toolbar-item' @click="showInspector = !showInspector" itle="Show / Hide inspector"             :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': ''  }"><Icon icon="brush" /></button>
+                <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard ? '#4af': '', color: showKeyboard ? 'white': '' }"><Icon icon="keyboard_hide" /></button>
             </div>
         </div>
 
@@ -769,7 +769,7 @@ function pasteItem() {
     position: absolute;
     top: 80px;
     right: 20px;
-    width: 240px;
+    width: 300px;
     height: auto;
     max-height: 90%;
     overflow-x: hidden;

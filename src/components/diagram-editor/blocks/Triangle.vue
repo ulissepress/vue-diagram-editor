@@ -16,8 +16,10 @@
             <path :d="`M ${item.w / 2} 0 L ${item.w} ${item.h} L 0 ${item.h} z`" />
         </svg>
         <div class="triangle-text" :style="{ 
-            color:    item.textColor,
-            fontSize: item.fontSize + 'px', 
+            justifyContent: item.textHAlign,
+            alignItems:     item.textVAlign,
+            color:          item.textColor,
+            fontSize:       item.fontSize + 'px', 
         }">{{ item.title }}</div>
     </div>
 </template>

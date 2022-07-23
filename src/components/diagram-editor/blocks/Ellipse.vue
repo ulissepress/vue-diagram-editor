@@ -1,5 +1,7 @@
 <template>
    <div class="shape-ellipse" :style="{ 
+            justifyContent:  item.textHAlign,
+            alignItems:      item.textVAlign,
             backgroundColor: item.backgroundColor, 
             color:           item.textColor, 
             fontSize:        item.fontSize + 'px',

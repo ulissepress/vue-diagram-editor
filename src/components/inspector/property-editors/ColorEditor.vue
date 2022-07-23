@@ -1,5 +1,6 @@
 <template>
-    <input type="color" :value="object[property.name]" @input="onChange" />
+    <input type="color" :value="object[property.name]" @input="onChange" />&nbsp;
+    <input type="text"  :value="object[property.name]" @input="onChange" class="color-text" />
 </template>
 
 <script setup lang="ts">
@@ -59,5 +60,10 @@ input[type="color"]::-webkit-color-swatch {
     height: 14px;
     border: 1px solid #aaa;
     border-radius: 50%;
+}
+
+.color-text {
+    width: 45px;
+    text-align: center;
 }
 </style>

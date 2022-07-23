@@ -36,6 +36,6 @@ function onChange(e: any) {
 
 <style scoped>
 .editor {
-    width: calc(100% - 10px);
+    width: calc(100% - 8px);
 }
 </style>
