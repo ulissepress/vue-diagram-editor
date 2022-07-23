@@ -1,4 +1,4 @@
-import { ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } from './types';
+import { ClipType, ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } from './types';
 import { InspectorTab, PropertyType } from '../inspector/types';
 import { ObjectInspectorModel, ObjectProperty } from './../inspector/types';
 
@@ -18,9 +18,9 @@ export const textHAlign$ : ObjectProperty = {
 
 export const textVAlign$ : ObjectProperty = { 
     name: "textVAlign",  label: "V Align",  type: PropertyType.ICON_LIST, editorRightAlign: true, editorOptions: {
-    items: [ { name: TextVAlign.TOP,    icon: "align_vertical_top"     }, 
-             { name: TextVAlign.CENTER, icon: "align_vertical_center"  },
-             { name: TextVAlign.BOTTOM, icon: "align_vertical_bottom"  } ] 
+    items: [ { name: TextVAlign.TOP,    icon: "vertical_align_top"     }, 
+             { name: TextVAlign.CENTER, icon: "vertical_align_center"  },
+             { name: TextVAlign.BOTTOM, icon: "vertical_align_bottom"  } ] 
 }};
 
 export const backColor$ : ObjectProperty = { name: "backgroundColor",  label: "Back Color", type: PropertyType.COLOR };
@@ -46,7 +46,7 @@ const otherTab : InspectorTab =
             title: "Component Info",
             properties: [
                 id$,
-                { name: "component", label: "Component", type: PropertyType.TEXT, editorFullsize: true, readonly: true }
+                { name: "component", label: "Component", type: PropertyType.TEXT, editorFullsize: true, readonly: true },
             ] // props
         } // section
     ] // sections
@@ -132,7 +132,14 @@ export const imageModel: ObjectInspectorModel = {
                         { name: "url", label: "URL", type: PropertyType.TEXT,   editorFullsize: true }, 
                         { name: "fit", label: "Fit", type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: [ "contain", "cover", "fill", "none"] }},
 
-                        opacity$, locked$]
+                        opacity$, locked$, 
+                        { 
+                            name: "clipType",  label: "Clipping",  type: PropertyType.ICON_LIST, editorRightAlign: true, editorOptions: {
+                            items: [ { name: ClipType.NONE,    icon: "image"     }, 
+                                     { name: ClipType.RECT,    icon: "rectangle" },
+                                     { name: ClipType.ELLIPSE, icon: "circle"    } ] 
+                        }}                    
+                    ]
                 },         
                 {   // Position & size
                     name: "pos_size",

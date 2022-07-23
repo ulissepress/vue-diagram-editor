@@ -1,6 +1,6 @@
 <template>
    <img class  = "image" 
-        :src   = "item.url"
+        :src   = "item.url === '' ? imagePlaceholder : item.url"
         :style = "{ 
             color:        item.textColor, 
             borderRadius: item.borderRadius + 'px',
@@ -21,6 +21,7 @@
 <script setup lang="ts">
 
 import { onMounted, onUpdated } from 'vue';
+import imagePlaceholder from '../image-placeholder.png';
 import { ImageItem } from '../types';
 
 const { item } = defineProps<{item: ImageItem}>();

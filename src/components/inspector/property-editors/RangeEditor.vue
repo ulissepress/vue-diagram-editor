@@ -64,7 +64,7 @@ function onKeyPress(e: any) {
     width: 40px;
     height: 12px;
     text-align: center;
-    margin-top: 3px;
+    margin-top: 4px;
 }
 
 

@@ -95,6 +95,13 @@
                     :elementGuidelines       = "showGuides ? elementGuidelines() : []"
                     
                     
+                    :clippable         = "isItem(selectedItem) && selectedItem.clipType !== ClipType.NONE"
+                    :clipArea          = "false"
+                    :clipRelative      = "false"
+                    :dragWithClip      = "true"
+                    :clipSnapThreshold = "5"
+                    :defaultClipPath   = "isItem(selectedItem) ? selectedItem.clipType : ClipType.NONE"
+
                     :roundable = "selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
                     :draggable = "selectedItemActive"
                     :rotatable = "selectedItemActive"
@@ -114,7 +121,12 @@
 
                     @roundStart  = "onRoundStart"
                     @round       = "onRound"
-                    @roundEnd    = "onRoundEnd" />
+                    @roundEnd    = "onRoundEnd" 
+                    
+                    @clipStart   = "onClipStart"
+                    @clip        = "onClip"
+                    @clipEnd     = "onClipEnd"
+                    />
             </div> <!-- viewport -->
         </VueInfiniteViewer>
 
@@ -185,11 +197,12 @@ import RawConnection from './blocks/RawConnection.vue';
 import AddItemCommand from './commands/AddItemCommand';
 import ToolsToolbar from './components/ToolsToolbar.vue';
 import ZoomToolbar from './components/ZoomToolbar.vue';
-import { ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
+import { ClipType, ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 
 import ObjectInspector from '../inspector/ObjectInspector.vue';
 import { ObjectProperty } from '../inspector/types';
 import AddConnectionCommand from './commands/AddConnectionCommand';
+import ClipCommand from './commands/ClipCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import Icon from './components/Icon.vue';
 import KeyboardHelp from './components/KeyboardHelp.vue';
@@ -285,7 +298,7 @@ const itemToPaste = ref(null as Item | null);
 
 // Temporary variables
 // ------------------------------------------------------------------------------------------------------------------------
-const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0, opacity: 1 };
+const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0, opacity: 1, clipType: ClipType.NONE, clipStyle: '' };
 
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 function onMouseMove(e: any) { 
@@ -335,10 +348,11 @@ function getItemStyle(item: Item) : StyleValue {
         "height":           item.h + 'px',
         "zIndex":           item.z,
         "backgroundColor":  item.component ? "transparent" : item.backgroundColor,
-        "transform":        t        
+        "transform":        t
     }
 
     if(item.supportsRoundable === true) style.borderRadius = Math.max(1, item.borderRadius) + 'px';
+    if(item.clipType !== ClipType.NONE) item.clipType === ClipType.RECT ? style.clip = item.clipStyle : style.clipPath = item.clipStyle;
 
     return style;
 }
@@ -464,6 +478,29 @@ function onRoundEnd(e: any) : void {
 }
 
 
+function onClipStart(e: any) : void {
+    if(!isItem(selectedItem.value)) return;
+    console.log('onClipStart', e);
+    
+    origin.clipType  = e.clipType;
+    origin.clipStyle = e.clipStyle;
+    if(origin.clipStyle === 'rect' || origin.clipStyle === 'ellipse') origin.clipStyle = '';
+}
+
+function onClip(e: any) : void {
+    if(!isItem(selectedItem.value)) return;
+
+    if (e.clipType === ClipType.RECT) e.target.style.clip = e.clipStyle; else e.target.style.clipPath = e.clipStyle;
+    
+    selectedItem.value.clipType  = e.clipType;    
+    selectedItem.value.clipStyle = e.clipStyle;    
+}
+
+function onClipEnd(e: any) : void {
+    console.log('onClipEnd', e);
+
+    if(isItem(selectedItem.value)) historyManager.value.execute(new ClipCommand(selectedItem.value, origin.clipType, origin.clipStyle, selectedItem.value.clipType, selectedItem.value.clipStyle));
+}
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -622,7 +659,7 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
 
 
 function onPropertyChange(p: ObjectProperty, newValue: any) {
-    // console.log('onPropertyChange', p, 'New value:', newValue);
+    console.log('onPropertyChange', p, 'New value:', newValue);
     // TODO: create a history command for this change so the action is undoable
     nextTick(() => moveable.value?.updateRect());
 }

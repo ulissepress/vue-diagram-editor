@@ -15,6 +15,9 @@ export interface Frame extends Rect {
     r: number;              // Rotation angle
     borderRadius: number;   // Border radius
     opacity: number;        // Opacity (0=full transparent, 100=full opaque). Default = 100
+    
+    clipType: ClipType;     // Frame clip type
+    clipStyle: string;      // Frame clip path
 }
 
 
@@ -42,8 +45,10 @@ export interface Item extends DiagramElement {
     w: number;      // Width (in px)
     h: number;      // Height (in px)
     r: number;      // Rotation angle (in degrees)
-
+    
     borderRadius: number;           // border radius (in px)
+    clipType: ClipType;             // The item clip type (rect or ellipse)
+    clipStyle: string;              // Item clipping path
     
     supportsRoundable: boolean;     // The item can be rounded (user can change border radius)
     supportsResizable: boolean;     // The item can be resized (user can change width / height)
@@ -67,7 +72,11 @@ export enum TextVAlign {
 }
 
 
-
+export enum ClipType {
+    NONE    = "none",
+    RECT    = "rect",
+    ELLIPSE = "ellipse"
+}
 
 export interface ConnectionPoint {
     item:   string;                   // The item ID which this connection point is referring to

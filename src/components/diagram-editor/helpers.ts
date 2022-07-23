@@ -1,4 +1,4 @@
-import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
+import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
 import { basicModel, connectionModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
 type DeepPartial<T> = T extends object ? {
@@ -27,8 +27,12 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         borderRadius: 0,
         opacity: 100,
         
+        clipType: ClipType.NONE,
+        clipStyle: '',
+        
         supportsRoundable: true,
         supportsResizable: true,
+        supportsClippable: false,
 
         backgroundColor: '#bbbbbb',
         textColor: '#000000',
@@ -121,8 +125,12 @@ export function registerDefaultItemTypes() {
         borderRadius: 0,
         opacity: 100,
 
+        clipType: ClipType.NONE,
+        clipStyle: '',
+
         supportsRoundable: false,
         supportsResizable: true,
+        
 
         backgroundColor: "#00ff00",
         textColor: "#111111",
@@ -219,12 +227,12 @@ export function registerDefaultItemTypes() {
     type = "Image"
     registerItemType<ImageItem>({
         ...defaults,
-        w: 300,
-        h: 200,
+        w: 220,
+        h: 150,
         component: type,
         supportsRoundable: true,
         
-        url: 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
+        url: '',        // 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
         fit: "cover",
         inspectorModel: imageModel
     })    

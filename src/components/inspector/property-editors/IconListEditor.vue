@@ -6,7 +6,7 @@
                     color:           object[property.name] === item.name ? 'white' : '#aaa',
                     width:           item.text ? 'auto' : '20px'
                   }" 
-                  @click="onChange(item)">
+                  @click="object[property.name] !== item.name && onChange(item)">
                     <div v-if="item.text" class="text">{{ item.text }}</div>
                     <Icon v-else class="item" size="18px" :icon="item.icon" :title="item.name" />
             </div>
