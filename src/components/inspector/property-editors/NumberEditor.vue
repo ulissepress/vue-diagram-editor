@@ -45,7 +45,6 @@ function onKeyPress(e: any) {
 <style scoped>
 .editor {
     max-width: 100%;
-    width: 40px;
-    text-align: center;
+    width: 40px;    
 }
 </style>

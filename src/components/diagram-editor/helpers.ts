@@ -42,11 +42,12 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         textVAlign: TextVAlign.CENTER,
         
         border: {
-            width: 1,
+            width: 0,
             style: ConnectionStyle.SOLID,
             color: '#333333',
         },
-
+        
+        shadow: false,
         locked: false,
 
         inspectorModel: shapeModel,
@@ -148,10 +149,12 @@ export function registerDefaultItemTypes() {
         textVAlign: TextVAlign.CENTER,
 
         border: {
-            width: 1,
+            width: 0,
             style: ConnectionStyle.SOLID,
             color: '#333333',
         },
+
+        shadow: false,
         
         inspectorModel: basicModel  
     };

@@ -8,6 +8,7 @@
             borderRadius:    item.borderRadius + 'px',
             fontSize:        item.fontSize + 'px',
             opacity:         item.opacity / 100,
+            textShadow:       item.shadow ? '3px 3px 5px #ccc' : 'none',
         }">{{ item.title }}</div>
 </template>
 

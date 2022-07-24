@@ -7,7 +7,8 @@
             borderRadius: item.borderRadius + 'px',
             fontSize:     item.fontSize + 'px',
             opacity:      item.opacity / 100,   
-            objectFit:    item.fit, 
+            objectFit:    item.fit,
+            boxShadow:       item.shadow ? '3px 3px 5px #aaa' : 'none', 
         }"/>
 </template>
 

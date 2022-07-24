@@ -64,7 +64,6 @@ function onKeyPress(e: any) {
 .editor-input {
     width: 40px;
     height: 12px;
-    text-align: center;
     margin-top: 4px;
 }
 

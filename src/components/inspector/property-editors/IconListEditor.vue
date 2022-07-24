@@ -3,7 +3,7 @@
         <template v-for="item in property.editorOptions.items" :key="item.name">
             <div class="item" :style="{
                     backgroundColor: getObjectValue(object, property.name) === item.name ? '#4af'  : '#777',
-                    color:           getObjectValue(object, property.name) === item.name ? 'white' : '#aaa',
+                    color:           getObjectValue(object, property.name) === item.name ? 'white' : '#ddd',
                     width:           item.text ? 'auto' : '20px'
                   }" 
                   @click="getObjectValue(object, property.name) !== item.name && onChange(item)">

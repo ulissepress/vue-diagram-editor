@@ -12,6 +12,8 @@
             stroke-linecap    = "round" 
             stroke-linejoin   = "round"
 
+            :style="{ 'filter': item.shadow ? 'drop-shadow(2px 2px 5px #aaa)' : '' }"
+
             :fill             = "item.backgroundColor"             
             :width            = "item.w" 
             :height           = "item.h" >

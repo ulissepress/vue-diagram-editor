@@ -50,7 +50,7 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
     border: 0px;
     background-color: transparent;
     font-size: 12px;
-    color: #eeeeee;
+    color: #ddd;
     border: 1px solid transparent !important;
     padding: 2px 4px;
     border-radius: 2px;

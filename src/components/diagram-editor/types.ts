@@ -32,6 +32,7 @@ export interface DiagramElement {
     opacity:          number;   // Opacity (0=full transparent, 100=full opaque). Default = 100
 
     fontSize:        number;    // The element text font size
+    shadow:          boolean;   // Show/hide element shadow  
     
     component:         string;  // The Vue component used to render this element
     componentOptions?: any;     // The Vue component options / config

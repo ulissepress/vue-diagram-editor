@@ -25,6 +25,7 @@ export const textVAlign$ : ObjectProperty = {
 
 export const backColor$ : ObjectProperty = { name: "backgroundColor",  label: "Back Color", type: PropertyType.COLOR };
 export const textColor$ : ObjectProperty = { name: "textColor",        label: "Text Color", type: PropertyType.COLOR, editorRightAlign: true };
+export const shadow$    : ObjectProperty = { name: "shadow",           label: "Shadow",     type: PropertyType.BOOLEAN };
 export const locked$    : ObjectProperty = { name: "locked",           label: "Locked",     type: PropertyType.BOOLEAN };
 
 
@@ -42,12 +43,13 @@ export const borderSection$ = {   // Border
     title: "Border",
     properties: [
         { name: "border.width",  label: "Width", type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 0, max: 50, step: 1 } },
-        { name: "border.color",  label: "Color", type: PropertyType.COLOR,     editorFullsize: true },
         { name: "border.style",  label: "Style", type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
             items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
                      { name: ConnectionStyle.DASHED, text: "Dashed" },
                      { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
         }},
+        { name: "border.color",  label: "Color", type: PropertyType.COLOR,     editorFullsize: true },
+        radius$,
     ] 
 }
 
@@ -76,7 +78,7 @@ export const basicModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Style",
-                    properties: [backColor$, opacity$, locked$]
+                    properties: [backColor$, opacity$, locked$, shadow$]
                 },     
                 borderSection$,  
                 {   // Position & size
@@ -99,13 +101,13 @@ export const shapeModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
+                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$, shadow$]
                 },         
                 borderSection$,  
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
-                    properties: [x$, y$, w$, h$, separator$, rotate$, radius$] 
+                    properties: [x$, y$, w$, h$, separator$, rotate$] 
                 }, 
                 
             ] // sections
@@ -122,7 +124,7 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
+                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$, shadow$]
                 },         
                 borderSection$,  
                 {   // Position & size
@@ -150,9 +152,9 @@ export const imageModel: ObjectInspectorModel = {
                         { name: "url", label: "URL", type: PropertyType.TEXT,   editorFullsize: true }, 
                         { name: "fit", label: "Fit", type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: [ "contain", "cover", "fill", "none"] }},
 
-                        opacity$, locked$, 
+                        opacity$, locked$, shadow$,
                         { 
-                            name: "clipType",  label: "Clipping",  type: PropertyType.ICON_LIST, editorRightAlign: true, editorOptions: {
+                            name: "clipType",  label: "Crop",  type: PropertyType.ICON_LIST, editorRightAlign: true, editorOptions: {
                             items: [ { name: ClipType.NONE,    icon: "image"     }, 
                                      { name: ClipType.RECT,    icon: "rectangle" },
                                      { name: ClipType.ELLIPSE, icon: "circle"    } ] 
@@ -163,7 +165,7 @@ export const imageModel: ObjectInspectorModel = {
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
-                    properties: [x$, y$, w$, h$, separator$, rotate$, radius$] 
+                    properties: [x$, y$, w$, h$, separator$, rotate$] 
                 }, 
                 
             ] // sections
@@ -180,13 +182,13 @@ export const textModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$ ]
+                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$, shadow$ ]
                 },         
                 borderSection$,  
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
-                    properties: [x$, y$, w$, h$, separator$, rotate$, radius$] 
+                    properties: [x$, y$, w$, h$, separator$, rotate$] 
                 }, 
                 
             ] // sections

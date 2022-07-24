@@ -7,6 +7,7 @@
             color:           item.textColor, 
             fontSize:        item.fontSize + 'px',
             opacity:         item.opacity / 100,
+            boxShadow:       item.shadow ? '3px 3px 5px #aaa' : 'none',
         }">{{ item.title }}</div>
 </template>
 
