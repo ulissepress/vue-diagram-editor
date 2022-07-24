@@ -1,11 +1,12 @@
 <template>
-    <Icon v-if="object[property.name] === true" class="checker" @click="toggle" icon="check_box" color="#4af" />
+    <Icon v-if="getObjectValue(object, property.name) === true" class="checker" @click="toggle" icon="check_box" color="#4af" />
     <Icon v-else icon="check_box_outline_blank" class="checker" @click="toggle" color="#ddd" />
 </template>
 
 <script setup lang="ts">
 import Icon from '../../diagram-editor/components/Icon.vue';
 import { ObjectProperty } from "../types";
+import { getObjectValue, setObjectValue } from "./utils";
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
@@ -28,7 +29,7 @@ const emit = defineEmits<NumberEditorEvents>();
 function toggle(e: any) {
     let v = object[property.name] === true;
 
-    object[property.name] = !v;
+    setObjectValue(object, property.name, !v);    
     emit('property-changed', property, v)
 }
 

@@ -3,16 +3,18 @@
             opacity: item.opacity / 100,
         }">
         <svg xmlns="http://www.w3.org/2000/svg"
-            class           = "star"
-            stroke          = "transparent" 
-            stroke-width    = "0" 
-            stroke-linecap  = "round" 
-            stroke-linejoin = "round"
-            viewBox         = "0 0 16 16" 
+            class             = "star"
+            viewBox           = "0 0 16 16" 
+            
+            :stroke           = "item.border.color" 
+            :stroke-width     = "item.border.width / 10" 
+            :stroke-dasharray = "dashArray"            
+            stroke-linecap    = "round" 
+            stroke-linejoin   = "round"
 
-            :fill           = "item.backgroundColor"             
-            :width          = "item.w" 
-            :height         = "item.h" >
+            :fill             = "item.backgroundColor"             
+            :width            = "item.w" 
+            :height           = "item.h" >
             <path d="M16 6.216l-6.095-.02L7.98.38 6.095 6.196 0 6.215h.02l4.912 3.57-1.904 5.834h.02l4.972-3.59 4.932 3.59-1.904-5.815L16 6.215 z" />
         </svg>
         <div class="star-text" :style="{ 
@@ -25,9 +27,16 @@
 </template>
 
 <script setup lang="ts">
-import { Item } from '../types';
+import { computed } from 'vue';
+import { ConnectionStyle, Item } from '../types';
 
 const { item } = defineProps<{item: Item}>();
+const dashArray = computed(() => {
+    if(item.border.style == ConnectionStyle.DASHED) return `${10 + item.border.width}`;
+    if(item.border.style == ConnectionStyle.DOTTED) return `${2},${3 + item.border.width*2}`;;
+
+    return '0';  // ConnectionStyle.SOLID
+});
 
 </script>
 
@@ -43,6 +52,8 @@ const { item } = defineProps<{item: Item}>();
     left: 0px;
     width: 100%;
     height: 100%;
+
+    overflow: visible;
 }
 
 .star-text {

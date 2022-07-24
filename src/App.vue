@@ -2,8 +2,7 @@
     <div style="width: 100%; height: 95%; padding-top: 16px; margin: 0 auto;">
         <DiagramEditor :elements      = "elements"
                        :customWidgets = "true" 
-                       :editable      = "true"
-                       :viewportSize  = "[300,250]" 
+                       :editable      = "true"                       
                      />
     </div>
 </template>

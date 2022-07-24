@@ -2,11 +2,11 @@
     <div class="editor">
         <template v-for="item in property.editorOptions.items" :key="item.name">
             <div class="item" :style="{
-                    backgroundColor: object[property.name] === item.name ? '#4af'  : '#777',
-                    color:           object[property.name] === item.name ? 'white' : '#aaa',
+                    backgroundColor: getObjectValue(object, property.name) === item.name ? '#4af'  : '#777',
+                    color:           getObjectValue(object, property.name) === item.name ? 'white' : '#aaa',
                     width:           item.text ? 'auto' : '20px'
                   }" 
-                  @click="object[property.name] !== item.name && onChange(item)">
+                  @click="getObjectValue(object, property.name) !== item.name && onChange(item)">
                     <div v-if="item.text" class="text">{{ item.text }}</div>
                     <Icon v-else class="item" size="18px" :icon="item.icon" :title="item.name" />
             </div>
@@ -17,6 +17,7 @@
 <script setup lang="ts">
 import Icon from "../../diagram-editor/components/Icon.vue";
 import { ObjectProperty } from "../types";
+import { getObjectValue, setObjectValue } from "./utils";
 
 
 // The component props and events
@@ -38,7 +39,7 @@ const emit = defineEmits<IconListEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 function onChange(item: { name: string, icon: string}) {
-    object[property.name] = item.name;
+    setObjectValue(object, property.name, item.name);    
     emit('property-changed', property, item.name)
 }
 </script>

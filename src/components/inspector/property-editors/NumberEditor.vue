@@ -1,12 +1,12 @@
 <template>
     <input class="editor" type="number" 
-           :value="object[property.name]"
+           :value="getObjectValue(object, property.name)"
            @change="onChange" />
 </template>
 
 <script setup lang="ts">
 import { ObjectProperty } from "../types";
-
+import { getObjectValue, setObjectValue } from "./utils";
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ function onChange(e: any) {
     let v = parseInt(e.target.value);
     if(isNaN(v)) v = 0;
 
-    object[property.name] = v;
+    setObjectValue(object, property.name, v);    
     emit('property-changed', property, v)
 }
 

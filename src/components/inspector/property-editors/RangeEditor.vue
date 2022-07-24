@@ -1,7 +1,7 @@
 <template>
     <input class  = "editor-slider" 
            type   = "range"  
-           :value = "object[property.name]" 
+           :value = "getObjectValue(object, property.name)" 
            :min   = "property.editorOptions?.min || 0"
            :max   = "property.editorOptions?.max || 100" 
            @input = "onChange" />
@@ -9,7 +9,7 @@
     <input class        = "editor-input"  
            type         = "text" 
            maxlength    = "6"
-           :value       = "object[property.name]"
+           :value       = "getObjectValue(object, property.name)"
            @keypress    = "onKeyPress"
            @keyup.enter = "onChange"
            @change      = "onChange" />
@@ -23,6 +23,7 @@ export default { inheritAttrs: false }
 <script setup lang="ts">
 import { ObjectProperty } from "../types";
 
+import { getObjectValue, setObjectValue } from "./utils";
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +47,7 @@ function onChange(e: any) {
     let v = parseInt(e.target.value);
     if(isNaN(v)) v = 0;
 
-    object[property.name] = v;
+    setObjectValue(object, property.name, v);
     emit('property-changed', property, v)
 }
 

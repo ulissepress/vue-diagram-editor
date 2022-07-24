@@ -4,6 +4,7 @@
             alignItems:      item.textVAlign, 
             backgroundColor: item.backgroundColor, 
             color:           item.textColor, 
+            border:          item.border.width + 'px ' + item.border.style + ' ' + item.border.color,
             borderRadius:    item.borderRadius + 'px',
             fontSize:        item.fontSize + 'px',
             opacity:         item.opacity / 100,

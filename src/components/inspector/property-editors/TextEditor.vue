@@ -1,10 +1,11 @@
 <template>
-    <input class="editor" type="text" :value="object[property.name]" @input="onChange" />
+    <input class="editor" type="text" :value="getObjectValue(object, property.name)" @input="onChange" />
 </template>
 
 <script setup lang="ts">
 import { onUpdated } from "vue";
 import { ObjectProperty } from "../types";
+import { getObjectValue, setObjectValue } from "./utils";
 
 
 // The component props and events
@@ -29,7 +30,7 @@ onUpdated(() => {
 });
 
 function onChange(e: any) {
-    object[property.name] = e.target.value;
+    setObjectValue(object, property.name, e.target.value);
     emit('property-changed', property, e.target.value)
 }
 </script>

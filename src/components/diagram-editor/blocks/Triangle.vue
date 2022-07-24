@@ -4,8 +4,11 @@
         }">
         <svg xmlns="http://www.w3.org/2000/svg"
             class="triangle"
-            stroke          = "transparent" 
-            stroke-width    = "0" 
+
+            :stroke           = "item.border.color" 
+            :stroke-width     = "item.border.width" 
+            :stroke-dasharray = "dashArray"
+            
             stroke-linecap  = "round" 
             stroke-linejoin = "round"
 
@@ -25,9 +28,17 @@
 </template>
 
 <script setup lang="ts">
-import { Item } from '../types';
+import { computed } from 'vue';
+import { ConnectionStyle, Item } from '../types';
 
 const { item } = defineProps<{item: Item}>();
+
+const dashArray = computed(() => {
+    if(item.border.style == ConnectionStyle.DASHED) return `${10 + item.border.width}`;
+    if(item.border.style == ConnectionStyle.DOTTED) return `${2},${3 + item.border.width*2}`;;
+
+    return '0';  // ConnectionStyle.SOLID
+});
 
 </script>
 
@@ -43,6 +54,8 @@ const { item } = defineProps<{item: Item}>();
     left: 0px;
     width: 100%;
     height: 100%;
+
+    overflow: visible;
 }
 
 .triangle-text {

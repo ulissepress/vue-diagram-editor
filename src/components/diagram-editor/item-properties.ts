@@ -7,7 +7,7 @@ export const separator$ : ObjectProperty = { name: "" };
 export const id$    : ObjectProperty = { name: "id",     label: "ID",   type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (p, obj) => obj[p.name] + ' (' + obj.component + ')' };
 export const title$ : ObjectProperty = { name: "title",  label: "Text", type: PropertyType.TEXT,  editorFullsize: true };
 
-export const fontSize$ : ObjectProperty = { name: "fontSize", label: "Font Size",  type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 4, max: 120, step: 1 } };
+export const fontSize$ : ObjectProperty = { name: "fontSize",     label: "Font Size",  type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 4, max: 120, step: 1 } };
 
 export const textHAlign$ : ObjectProperty = { 
     name: "textHAlign",  label: "H Align",  type: PropertyType.ICON_LIST, editorOptions: { 
@@ -37,6 +37,21 @@ export const rotate$  : ObjectProperty = { name: "r",             label: "Rotati
 export const radius$  : ObjectProperty = { name: "borderRadius",  label: "Radius",    type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 0,    max: 100, step: 1 }};
 export const opacity$ : ObjectProperty = { name: "opacity",       label: "Opacity %", type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 0,    max: 100, step: 1 }};
 
+export const borderSection$ = {   // Border
+    name: "border",
+    title: "Border",
+    properties: [
+        { name: "border.width",  label: "Width", type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 0, max: 50, step: 1 } },
+        { name: "border.color",  label: "Color", type: PropertyType.COLOR,     editorFullsize: true },
+        { name: "border.style",  label: "Style", type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+            items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
+                     { name: ConnectionStyle.DASHED, text: "Dashed" },
+                     { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
+        }},
+    ] 
+}
+
+
 const otherTab : InspectorTab =
 {
     title: "Other",
@@ -62,7 +77,8 @@ export const basicModel: ObjectInspectorModel = {
                     name: "style",
                     title: "Style",
                     properties: [backColor$, opacity$, locked$]
-                },         
+                },     
+                borderSection$,  
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -85,6 +101,7 @@ export const shapeModel: ObjectInspectorModel = {
                     title: "Text and style",
                     properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
                 },         
+                borderSection$,  
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -107,6 +124,7 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
                     title: "Text and style",
                     properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
                 },         
+                borderSection$,  
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -141,6 +159,7 @@ export const imageModel: ObjectInspectorModel = {
                         }}                    
                     ]
                 },         
+                borderSection$,  
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -163,6 +182,7 @@ export const textModel: ObjectInspectorModel = {
                     title: "Text and style",
                     properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$ ]
                 },         
+                borderSection$,  
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -215,9 +235,12 @@ export const lineModel: ObjectInspectorModel = {
                     name: "style",
                     title: "Style",
                     properties: [ 
-                        { name: "style", label: "Style", type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: [ ConnectionStyle.SOLID, ConnectionStyle.DASHED, ConnectionStyle.DOTTED] }},
-                        { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},
-                        
+                        { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
+                        { name: "style",  label: "Style", type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                            items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
+                                     { name: ConnectionStyle.DASHED, text: "Dashed" },
+                                     { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
+                        }},
                         { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR }
                     ]
                 },

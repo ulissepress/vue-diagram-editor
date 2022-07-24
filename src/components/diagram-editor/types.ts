@@ -57,6 +57,8 @@ export interface Item extends DiagramElement {
 
     textHAlign: TextHAlign;
     textVAlign: TextVAlign;
+
+    border: ItemBorder;
 }
 
 export enum TextHAlign {
@@ -76,6 +78,11 @@ export enum ClipType {
     NONE    = "none",
     RECT    = "rect",
     ELLIPSE = "ellipse"
+}
+export interface ItemBorder {
+    width: number;
+    style: ConnectionStyle
+    color: string;
 }
 
 export interface ConnectionPoint {
@@ -197,3 +204,6 @@ export interface WidgetDefinition {
 
     canBeResized?: boolean;     // Is the widget resizable? Default: true
 }
+
+
+

@@ -134,6 +134,9 @@ const linePath = computed( () => {
     stroke-linecap: round; 
     stroke-linejoin: round;
     pointer-events: none;
+
+    overflow: visible;
+
     /* border: 1px dashed red;   */
     /* background-color: lightyellow; */
 }

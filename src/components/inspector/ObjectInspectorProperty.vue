@@ -49,7 +49,7 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
 {
     border: 0px;
     background-color: #626262;
-    font-size: 11px;
+    font-size: 12px;
     color: white;
     padding: 2px 4px;
     border-radius: 2px;
@@ -82,7 +82,7 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
     user-select: none;
 
     text-align: right;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1;
     padding: 4px;
     width:     var(--label-width);
@@ -97,7 +97,7 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
     display: inline-flex;
     width: calc(100% - var(--label-width) - 10px);
     color: #aaa;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1;
     vertical-align: middle;
 }

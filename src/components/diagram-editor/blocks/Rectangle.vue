@@ -5,6 +5,7 @@
             backgroundColor: item.backgroundColor, 
             color:           item.textColor, 
             borderRadius:    item.borderRadius + 'px',
+            border:          item.border.width + 'px ' + item.border.style + ' ' + item.border.color,
             fontSize:        item.fontSize + 'px',
             opacity:         item.opacity / 100,
         }">{{ item.title }}</div>

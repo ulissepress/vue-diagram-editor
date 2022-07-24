@@ -41,6 +41,12 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         textHAlign: TextHAlign.CENTER,
         textVAlign: TextVAlign.CENTER,
         
+        border: {
+            width: 1,
+            style: ConnectionStyle.SOLID,
+            color: '#333333',
+        },
+
         locked: false,
 
         inspectorModel: shapeModel,
@@ -140,6 +146,12 @@ export function registerDefaultItemTypes() {
         
         textHAlign: TextHAlign.CENTER,
         textVAlign: TextVAlign.CENTER,
+
+        border: {
+            width: 1,
+            style: ConnectionStyle.SOLID,
+            color: '#333333',
+        },
         
         inspectorModel: basicModel  
     };
