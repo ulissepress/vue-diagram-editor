@@ -35,7 +35,7 @@
                     :connection  = "c"
                     :style       = "{ zIndex: c.z }"
                     :selected    = "c.id === selectedItem?.id"
-                    @selected    = "selectedItem = c" />
+                    @selected    = "selectItem(c)" />
                         
                 <!-- Use to render a connection line during a new connection creation -->
                 <RawConnection v-if="creatingConnection && connectionInfo.startItem" 
@@ -646,14 +646,14 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
     ci.endItem  = item;
     ci.endPoint = point;
 
-    const newConnection = createConnection(
+    const newConnection = deepCloneItem(createConnection(
         ci.startItem.id, 
         ci.endItem.id, 
         {
             from: { handle: ci.startPoint },
             to:   { handle: ci.endPoint   }
         }
-    );
+    ));
     
     ci.startItem = null;
     ci.endItem   = null;

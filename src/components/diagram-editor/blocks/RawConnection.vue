@@ -10,7 +10,7 @@
         <path :d="linePath" class="realpath" />
 
         <!-- Ticker (invisible) connection for catching user clicks -->
-        <path :d="linePath" class="ghostpath" :stroke-opacity='selected ? 0.2 : 0' @click.stop="emit('selected')" />
+        <path :d="linePath" class="ghostpath" :stroke-width="selected ? 10+props.thick : 10"  :stroke-opacity='selected ? 0.2 : 0' @click.stop="emit('selected')" />
     </svg>
 </template>
 
@@ -66,11 +66,8 @@ const boundingBox = computed<Rect>(() => {
     const y2 = Math.max(props.y1, props.y2);
 
     // Width and height cannot be 0...at least we need the space for the connecion thick
-    let w = Math.max(Math.abs(x2 - x), props.thick);
-    let h = Math.max(Math.abs(y2 - y), props.thick);
-
-    // If we are drawing a selected connection, the minimum space is 5px
-    if(props.selected) { w = Math.max(w, 5); h = Math.max(h, 5); }
+    let w = Math.max(Math.abs(x2 - x), 1);
+    let h = Math.max(Math.abs(y2 - y), 1);
     
     return { x, y, w, h };
 });
@@ -148,7 +145,6 @@ const linePath = computed( () => {
     pointer-events: all;
     cursor: pointer; 
     stroke: #4af;
-    stroke-width: 10;
 }
 
 </style>
