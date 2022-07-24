@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="title">Keyboard Shortcuts</div>
-        <div class="key" v-for="k in shortcuts" :style="{ 'margin-bottom': k[0] === '' ? '20px' : '4px' }">
+        <div class="key" v-for="k in shortcuts" :style="{ 'margin-bottom': k[0] === '' ? '16px' : '2px' }">
             <div class="key-shortcut">{{ k[0] }}</div>
             <div class="key-help">{{ k[1] }}</div>
         </div>
@@ -56,7 +56,7 @@ if(!isMac) for(let k of shortcuts) k[0] = k[0].replace('CMD', 'CTRL')
     text-transform: uppercase;
     font-size: 20px;
     font-weight: bold;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     color: #4af;
 }
 
