@@ -59,10 +59,14 @@ function onChange(item: { name: string, icon: string}) {
     height: 20px;
     padding: 1px;
 
+    border: 1px solid transparent;
     border-radius: 2px;
     cursor: pointer;
 }
 
+.item:hover {
+    border: 1px solid #4af;
+}
 .text {
     width: auto;
     height: 18px;
@@ -71,7 +75,6 @@ function onChange(item: { name: string, icon: string}) {
     vertical-align: middle;
     line-height: 1.5;
     padding: 1px 4px;
-
 }
 
 </style>

@@ -682,7 +682,10 @@ function setupKeyboardHandlers() {
 
     function onKey(keys: string | string[], handler: (e: KeyboardEvent) => void) {
         onKeyStroke(keys, (e) => {
-            if(document.activeElement?.tagName == 'INPUT') return;
+            if(document.activeElement) {
+                if(['INPUT', 'SELECT'].includes(document.activeElement.tagName)) return;
+            }
+            
             e.preventDefault();
             handler(e);
         }, { eventName: 'keydown' })

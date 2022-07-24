@@ -44,7 +44,7 @@ const emit = defineEmits<RangeEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 function onChange(e: any) {
-    let v = parseInt(e.target.value);
+    let v = parseFloat(e.target.value);
     if(isNaN(v)) v = 0;
 
     setObjectValue(object, property.name, v);
@@ -52,7 +52,7 @@ function onChange(e: any) {
 }
 
 function onKeyPress(e: any) {
-    if(!e.key.match(/[0-9\-]/)) e.preventDefault();        
+    if(!e.key.match(/[0-9\-\.]/)) e.preventDefault();        
 }
 </script>
 

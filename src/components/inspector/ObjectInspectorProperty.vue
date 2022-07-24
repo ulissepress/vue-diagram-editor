@@ -48,9 +48,10 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
 .property-container select
 {
     border: 0px;
-    background-color: #626262;
+    background-color: transparent;
     font-size: 12px;
-    color: white;
+    color: #eeeeee;
+    border: 1px solid transparent !important;
     padding: 2px 4px;
     border-radius: 2px;
 }
@@ -58,8 +59,16 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
 .property-container input:focus,  .property-container input:focus-visible,
 .property-container select:focus, .property-container select:focus-visible
 {
-    border: 0px !important;
+    background-color: #626262;
+    color: #f5f5f5;
+    border: 1px solid #4af !important;
     outline: 0px !important;    
+}
+
+.property-container input:hover,
+.property-container select:hover
+{
+    border: 1px solid #4af !important;
 }
 
 </style>
