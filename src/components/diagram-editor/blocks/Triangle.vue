@@ -20,7 +20,7 @@
             :height         = "item.h" >
             <path :d="`M ${item.w / 2} 0 L ${item.w} ${item.h} L 0 ${item.h} z`" />
         </svg>
-        <div class="triangle-text" :style="{ 
+        <div class="triangle-text diagram-item-inline-edit" :style="{ 
             justifyContent: item.textHAlign,
             alignItems:     item.textVAlign,
             color:          item.textColor,

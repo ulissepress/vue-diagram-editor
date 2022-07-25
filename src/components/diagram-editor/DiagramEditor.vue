@@ -30,8 +30,8 @@
                 <component v-for = "(c, i) in connections"
                     :is          = "c.component"
                     :key         = "c.id"
-                    :from        = "getItemById(c.from.item)!"
-                    :to          = "getItemById(c.to.item)!"
+                    :from        = "getItemById(items, c.from.item)!"
+                    :to          = "getItemById(items, c.to.item)!"
                     :connection  = "c"
                     :style       = "{ zIndex: c.z }"
                     :selected    = "c.id === selectedItem?.id"
@@ -56,7 +56,7 @@
                     :style         = "getItemStyle(item)"
                    
                     @click.stop     = "!creatingConnection && editable && selectItem(item)" 
-                    @dblclick.stop  = "!creatingConnection && editable && lockItem(item)"
+                    @dblclick.stop  = "!creatingConnection && editable && inlineEdit(item)"
                     
                     @mousedown       = "!creatingConnection && editable && selectItem(item, $event)" 
                     @mouseover.stop  = "creatingConnection && onMouseOver(item, $event)"
@@ -184,7 +184,7 @@
 
 <script setup lang="ts">
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
-import { computed, nextTick, onMounted, onUpdated, ref, StyleValue } from "vue";
+import { computed, nextTick, onMounted, onUpdated, ref } from "vue";
 import Guides from "vue3-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
@@ -195,7 +195,7 @@ import MoveCommand from './commands/MoveCommand';
 import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
-import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBlueprint, getUniqueId, registerDefaultItemTypes } from './helpers';
+import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBlueprint, getItemById, getItemStyle, getUniqueId, registerDefaultItemTypes } from './helpers';
 
 import RawConnection from './blocks/RawConnection.vue';
 import AddItemCommand from './commands/AddItemCommand';
@@ -278,7 +278,7 @@ const hGuideValues  = ref<number[]>([]);       // Horizontal guides added by the
 const vGuideValues  = ref<number[]>([]);       // Vertical guides added by the user
 const showGuides    = ref(true);               // Show or hide all the guides
 const showInspector = ref(true);               // Show or hide all the guides
-const showKeyboard  = ref(false);               // Show or hide all the guides
+const showKeyboard  = ref(false);              // Show or hide all the guides
 
 const selectedItem  = ref<DiagramElement | null>(null);
 
@@ -298,34 +298,35 @@ const creatingConnection = computed<boolean>(() => currentTool.value === EditorT
 const items       = computed(() => elements.filter(e => isItem(e)) as Item[]);
 const connections = computed(() => elements.filter(e => isConnection(e)) as ItemConnection[]);
 
+const itemToPaste   = ref(null as Item | null);
+const inlineEditing = ref(false);
 
-const itemToPaste = ref(null as Item | null);
 
 // Temporary variables
 // ------------------------------------------------------------------------------------------------------------------------
 const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0, opacity: 1, clipType: ClipType.NONE, clipStyle: '' };
 
+
+// Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
+
 function onMouseMove(e: any) { 
-     if(!viewport.value) return;
-    
+     if(!viewport.value) return;   
     //console.log('onMouseMove', e.srcElement, e.offsetX, e.offsetY, e);
 
-    const rect = viewport.value.getBoundingClientRect();
-
     // Mouse position
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    mouseCoords.value.x = Math.floor(x / zoomFactor.value);
-    mouseCoords.value.y = Math.floor(y / zoomFactor.value);
+    const rect = viewport.value.getBoundingClientRect();
+    mouseCoords.value.x = Math.floor((e.clientX - rect.left) / zoomFactor.value);
+    mouseCoords.value.y = Math.floor((e.clientY - rect.top)  / zoomFactor.value);
 }
+
 
 let connectionInfo : { 
     startItem:  Item | null, 
     endItem:    Item | null,
     startPoint: ConnectionHandle,
     endPoint:   ConnectionHandle,
-}= {
+} = {
     startItem:  null, 
     endItem:    null,
     startPoint: ConnectionHandle.CENTER,
@@ -334,35 +335,15 @@ let connectionInfo : {
 
 function onMouseOver(item: Item, e: MouseEvent) {
     if(!creatingConnection.value === true) return;
-
     item.hover = true;
 }
 
-function onMouseLeave(item: Item,e: MouseEvent) {
+function onMouseLeave(item: Item, e: MouseEvent) {
     if(!creatingConnection.value === true) return;
-
     if('hover' in item) delete item.hover;
 }
 
-function getItemStyle(item: Item) : StyleValue {
-    let t = `translate(${item.x}px, ${item.y}px)`;
-    if(item.r !== 0) t += ` rotate(${item.r}deg)`
-
-    const style: StyleValue = {
-        "width":            item.w + 'px',
-        "height":           item.h + 'px',
-        "zIndex":           item.z,
-        "backgroundColor":  item.component ? "transparent" : item.backgroundColor,
-        "transform":        t
-    }
-
-    if(item.supportsRoundable === true) style.borderRadius = Math.max(1, item.borderRadius) + 'px';
-    if(item.clipType !== ClipType.NONE) item.clipType === ClipType.RECT ? style.clip = item.clipStyle : style.clipPath = item.clipStyle;
-
-    return style;
-}
-
-function selectItem(item: Item, e?: MouseEvent)  : void {
+function selectItem(item: Item | ItemConnection, e?: MouseEvent)  : void {
     console.log('selectItem', item, e);
 
     // Item already selected
@@ -376,6 +357,16 @@ function selectItem(item: Item, e?: MouseEvent)  : void {
 }
 
 function selectNone() : void {
+    const target = getTargetElement(selectedItem.value as Item);
+    if(target)  {
+        const elementToEdit = target.querySelector('.diagram-item-inline-edit') as HTMLElement;
+        if(elementToEdit) {
+            elementToEdit.removeAttribute('contenteditable');            
+            selectedItem.value!.title = elementToEdit.innerHTML;
+            inlineEditing.value = false;
+        }                
+    }
+    
     selectedItem.value = null;
 }
 
@@ -386,6 +377,12 @@ function selectNone() : void {
 function onDragStart(e: any) : void {
     if(!isItem(selectedItem.value)) return;
     
+    const target = getTargetElement(selectedItem.value);
+    if(target && target.contentEditable === "true") {
+        e.stop();
+        return;
+    }
+
     origin.x = selectedItem.value.x;
     origin.y = selectedItem.value.y;    
 }
@@ -437,9 +434,7 @@ function onResize(e: any) : void {
 }
 
 function onResizeEnd(e: any) : void {
-    if(!isItem(selectedItem.value)) return;
-    
-    historyManager.value.execute(new ResizeCommand(selectedItem.value, { ...origin }, { ...selectedItem.value }));
+    if(isItem(selectedItem.value)) historyManager.value.execute(new ResizeCommand(selectedItem.value, { ...origin }, { ...selectedItem.value }));
 }
 
 
@@ -473,7 +468,6 @@ function onRoundStart(e: any) : void {
 function onRound(e: any) : void {
     if(!isItem(selectedItem.value)) return;
 
-    //console.log('onRound', e);
     selectedItem.value.borderRadius = parseInt(e.borderRadius) || 0;
     e.target.style.borderRadius = e.borderRadius;
 }
@@ -483,6 +477,9 @@ function onRoundEnd(e: any) : void {
 }
 
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Clip item
+// ---------------------------------------------------------------------------------------------------------------------
 function onClipStart(e: any) : void {
     if(!isItem(selectedItem.value)) return;
     console.log('onClipStart', e);
@@ -509,7 +506,7 @@ function onClipEnd(e: any) : void {
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Scrolling
+// Synch viewer / guieds scrolling
 // ---------------------------------------------------------------------------------------------------------------------
 function onScroll(e: any) : void {
     if(e.ctrlKey) zoomFactor.value = e.deltaY < 0 ? zoomManager.value.zoomIn() : zoomManager.value.zoomOut();
@@ -519,15 +516,17 @@ function onScroll(e: any) : void {
 }
  
 
-
+/** Send the selected item to the bottom of the z-index */
 function sendToBack() : void {
     if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, findMinZ(items.value as Item[]) - 1));    
 }
 
+/** Send the selected item to the top of the z-index */
 function bringToFront() : void {
     if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, findMaxZ(items.value as Item[]) + 1));    
 }
 
+/** Delete current selected item / connection */
 function deleteItem() {
     if(isItem(selectedItem.value)) {
         historyManager.value.execute(new DeleteCommand(elements, selectedItem.value));
@@ -542,6 +541,7 @@ function deleteItem() {
     }
 }
 
+/** Lock current selected item */
 function lockItem(item: Item) {
     historyManager.value.execute(item.locked === true ? new UnlockCommand(item) : new LockCommand(item));
 }
@@ -553,10 +553,7 @@ function elementGuidelines() {
     return Array.prototype.slice.call(viewport.value!.querySelectorAll(".item"), 0).filter(n => !n.classList.contains('target'))
 }
 
-function getItemById(id: string) : Item | undefined {
-    return (items.value as Item[]).find(n => n.id == id);
-}
-
+/** Undo last action done (is possible) */
 function undo() {  
     if(!historyManager.value.canUndo()) return;
     
@@ -565,6 +562,7 @@ function undo() {
     nextTick(() => moveable.value?.updateTarget());
 }
 
+/** Redo last undoed action (is possible) */
 function redo() {  
     if(!historyManager.value.canRedo()) return;
 
@@ -572,7 +570,7 @@ function redo() {
     nextTick(() => moveable.value?.updateTarget());
 }
 
-
+/** Select the current tool to use (selection, connection, text, image, ...) */
 function selectCurrentTool(tool: EditorTool) : void {
     console.log('selectCurrentTool', tool);
     
@@ -588,16 +586,16 @@ function selectCurrentTool(tool: EditorTool) : void {
 
         return;
     }
-
 }
 
+/** Handle the clik in the overall canvas */
 function onCanvasClick(e: any): void {
-    console.log('onCanvasClick', e);
+    // console.log('onCanvasClick', e);
 
     // Was just clicking the scrollbar for scrolling?
     if(e.target?.classList?.contains('infinite-viewer-scroll-thumb')) return;
 
-    
+    // Current tool is 'select' => clicking the canvas unselect all
     if(currentTool.value === EditorTool.SELECT) {
         console.log('Unselecting all');
         selectNone();
@@ -611,23 +609,22 @@ function onCanvasClick(e: any): void {
         return;
     }
     
-    const toolDef  = getToolDefinition(currentTool.value);
-    const itemType = toolDef.itemType;
-    if(itemType) {
-        const newItem = deepCloneItem({
-            ...getItemBlueprint(itemType),
-            id: getUniqueId(),
-            x: mouseCoords.value.x,
-            y: mouseCoords.value.y
-        })
-        
-        console.log('creating new item', toolDef, itemType, newItem)
-        historyManager.value.execute(new AddItemCommand(elements, newItem));
-        emit('add-item', newItem);
-    }
+
+    // Clicking the canvas with other tools => create a new item of related type
+    const toolDef  = getToolDefinition(currentTool.value);    
+    const newItem  = deepCloneItem({
+        ...getItemBlueprint(toolDef.itemType!),
+        id: getUniqueId(),
+        x: mouseCoords.value.x,
+        y: mouseCoords.value.y
+    })
+    
+    console.log('creating new item', toolDef, toolDef.itemType, newItem)
+    historyManager.value.execute(new AddItemCommand(elements, newItem));
+    emit('add-item', newItem);
 }
 
-
+/** Handle a click on the connection handles */
 function connectionHandleClick(item: Item   , point: ConnectionHandle) {
     console.log('connectionHandleClick', item, point);
     
@@ -649,10 +646,7 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
     const newConnection = deepCloneItem(createConnection(
         ci.startItem.id, 
         ci.endItem.id, 
-        {
-            from: { handle: ci.startPoint },
-            to:   { handle: ci.endPoint   }
-        }
+        { from: { handle: ci.startPoint }, to: { handle: ci.endPoint } }
     ));
     
     ci.startItem = null;
@@ -665,11 +659,13 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
 
 function onPropertyChange(p: ObjectProperty, newValue: any) {
     console.log('onPropertyChange', p, 'New value:', newValue);
-    // TODO: create a history command for this change so the action is undoable
+    // TODO: create a history command for this change so the action is undoable (for that we need the 'oldValue' as well)
+    // historyManager.value.execute(new PropertyChangeCommand(selectedItem.value, oldValue, newValue));
+
     nextTick(() => moveable.value?.updateRect());
 }
 
-
+/** Handle zoom changes from the zoom toolbar */
 function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
     console.log('onZoomChanged', newZoomFactor, scrollViewerToCenter);
     zoomFactor.value = newZoomFactor;
@@ -677,13 +673,15 @@ function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
     if(scrollViewerToCenter === true) nextTick(() => viewer.value?.scrollCenter());
 }
 
+/** Setup all the keyboard shortcuts */
 function setupKeyboardHandlers() {
     // https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
 
     function onKey(keys: string | string[], handler: (e: KeyboardEvent) => void) {
         onKeyStroke(keys, (e) => {
             if(document.activeElement) {
-                if(['INPUT', 'SELECT'].includes(document.activeElement.tagName)) return;
+                // console.log('active element', document.activeElement, e);
+                if(['INPUT', 'SELECT'].includes(document.activeElement.tagName) || inlineEditing.value === true) return;
             }
             
             e.preventDefault();
@@ -769,6 +767,8 @@ function copyItem() {
     console.log('Copying item', selectedItem.value);
 
     itemToPaste.value = selectedItem.value;
+
+    // TODO:  notify the user visually that the item has been copied
 }
 
 function cutItem() {
@@ -794,11 +794,36 @@ function pasteItem() {
     nextTick(() => selectItem(newItem));
 
     emit('add-item', newItem);
+}
+// ---------------------------------------------------------------------------------------------------------------------
 
+function getTargetElement(item: Item) : HTMLDivElement | undefined{
+    if(!item) return undefined;
+    const el = viewport.value?.querySelector(`[data-item-id='${item.id}']`);
+    if(el === undefined || el === null) return undefined;
+
+    return el as HTMLDivElement;
+}
+
+function inlineEdit(item: Item) {
+    const target = getTargetElement(item);
+    if(!target) return;
+
+    // Find the child element with the 'diagram-item-inline-edit' CSS class (if any)
+    const elementToEdit = target.querySelector('.diagram-item-inline-edit') as HTMLElement;
+    if(elementToEdit) {
+        elementToEdit.contentEditable = 'true';
+        elementToEdit.focus(); 
+        inlineEditing.value = true;       
+    }
 }
 
 </script>
 
+
+<style>
+.diagram-item-inline-edit { /* marker class */}
+</style>
 
 <style scoped>
 .editor-container {

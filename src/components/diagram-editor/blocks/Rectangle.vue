@@ -9,7 +9,8 @@
             fontSize:        item.fontSize + 'px',
             opacity:         item.opacity / 100,
             boxShadow:       item.shadow ? '3px 3px 5px #aaa' : 'none',
-        }">{{ item.title }}</div>
+        }" ><div><div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }"/></div> 
+        </div>
 </template>
 
 <script setup lang="ts">
@@ -30,4 +31,13 @@ const { item } = defineProps<{item: Item}>();
     overflow: hidden;
     padding: 8px;
 }
+.shape div.diagram-item-inline-edit {
+    display: flex;     
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+    padding: 0px;
+}
+
 </style>

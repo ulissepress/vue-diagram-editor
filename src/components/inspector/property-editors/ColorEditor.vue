@@ -43,6 +43,8 @@ input[type="color"] {
     padding-top: 2px;
     position: relative;
 }
+
+
 input[type="color"]::-webkit-color-swatch-wrapper {
     position: absolute;
 	padding: 0;
@@ -59,12 +61,13 @@ input[type="color"]::-webkit-color-swatch {
     left: 0px;
     width: 14px;
     height: 14px;
-    border: 1px solid #aaa;
+    border: 1px solid #aaaaaa88; 
     border-radius: 50%;
+    outline: 0px;
 }
 
 .color-text {
-    width: 45px;
+    width: 50px;
     text-align: center;
 }
 </style>

@@ -1,15 +1,16 @@
 <template>
     <div class="text" :style="{
             justifyContent:  item.textHAlign,
-            alignItems:      item.textVAlign, 
+            alignItems:      item.textVAlign,
             backgroundColor: item.backgroundColor, 
             color:           item.textColor, 
-            border:          item.border.width + 'px ' + item.border.style + ' ' + item.border.color,
             borderRadius:    item.borderRadius + 'px',
+            border:          item.border.width + 'px ' + item.border.style + ' ' + item.border.color,
             fontSize:        item.fontSize + 'px',
             opacity:         item.opacity / 100,
-            textShadow:       item.shadow ? '3px 3px 5px #ccc' : 'none',
-        }">{{ item.title }}</div>
+            boxShadow:       item.shadow ? '3px 3px 5px #aaa' : 'none',
+        }" ><div><div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }"/></div> 
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -21,14 +22,22 @@ const { item } = defineProps<{item: Item}>();
 
 <style scoped>
 .text {
-    background-color: transparent;
+    box-sizing: border-box;
+    display: flex;     
+    justify-content: center;
+    align-items: center;
     width: 100%;
     height: 100%;
-    /* border: 1px solid grey; */
-
-    display: flex;
-    justify-content: center;
-    align-items: center; 
     overflow: hidden;
+    padding: 8px;
 }
+.text div.diagram-item-inline-edit {
+    display: flex;     
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+    padding: 0px;
+}
+
 </style>

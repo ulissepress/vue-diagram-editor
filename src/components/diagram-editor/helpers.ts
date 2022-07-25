@@ -1,6 +1,8 @@
 import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
 import { basicModel, connectionModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
+import { StyleValue } from "vue";
+
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
 } : T;
@@ -8,6 +10,26 @@ type DeepPartial<T> = T extends object ? {
 export function getUniqueId(prefix: string = 'id_') : string {
     const base = 36;
     return prefix + Date.now().toString(base) + '_' + randomInt(1, 10000).toString(base);
+}
+
+export function getItemStyle(item: Item) : StyleValue {
+    let t = `translate(${item.x}px, ${item.y}px)`;
+    if(item.r !== 0) t += ` rotate(${item.r}deg)`
+
+    const style: StyleValue = {
+        "width":            item.w + 'px',
+        "height":           item.h + 'px',
+        "zIndex":           item.z,
+        "backgroundColor":  item.component ? "transparent" : item.backgroundColor,
+        "transform":        t
+    }
+
+    if(item.clipType !== ClipType.NONE) item.clipType === ClipType.RECT ? style.clip = item.clipStyle : style.clipPath = item.clipStyle;
+    return style;
+}
+
+export function getItemById(items: Item[], id: string) : Item | undefined {
+    return items.find(n => n.id == id);
 }
 
 // TODO: to be removed (used only for demo/startup purposes)
@@ -110,6 +132,7 @@ export function registerItemType<T extends Item>(item: T, asName?: string) {
 }
 
 export function getItemBlueprint(type: string): Item {
+    if(!registry[type]) throw new Error("No item type registered with name: " + type);
     return registry[type];
 }
 

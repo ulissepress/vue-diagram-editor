@@ -208,17 +208,17 @@ export const connectionModel: ObjectInspectorModel = {
                     name: "style",
                     title: "Style",
                     properties: [ 
-                        { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorOptions: { 
+                        { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionType.LINE,  icon: "horizontal_rule" }, 
                                      { name: ConnectionType.CURVE, icon: "conversion_path" } ] 
                         }},
-                        { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR },
                         { name: "style",  label: "Style",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
-                                     { name: ConnectionStyle.DASHED, text: "Dashed" },
-                                     { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
+                            { name: ConnectionStyle.DASHED, text: "Dashed" },
+                            { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
                         }},
                         separator$,
+                        { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR },
                         { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
                     ]
                 },         
