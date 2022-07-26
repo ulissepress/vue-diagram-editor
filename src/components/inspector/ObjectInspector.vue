@@ -1,9 +1,9 @@
 <template>
     <div class="object-inspector">
-        <div class="inspector-title" @click="expanded = !expanded">
+        <div class="inspector-title inspector-title-drag-handle">
             <div>Inspector</div>
-            <div style="flex-grow: 1"></div>
-            <div>
+            <div style="flex-grow: 1; pointer-events: none; "></div>
+            <div @click="expanded = !expanded" style="cursor: pointer;">
                 <Icon v-show="expanded"  size='16px' icon="keyboard_arrow_down" color="white" /> 
                 <Icon v-show="!expanded" size='16px' icon="keyboard_arrow_right" color="white" /> 
             </div>
@@ -53,6 +53,7 @@ export interface ObjectInspectorProps {
 }
 
 export interface ObjectInspectorEvents {
+    (e: 'drag', event: any): void
     (e: 'property-changed', property: ObjectProperty, newValue: any): void
 }
 
@@ -77,6 +78,11 @@ const currentTab = ref(0)
 const expanded   = ref(true);
 </script>
 
+<style>
+.inspector-title-drag-handle {
+    cursor: move;
+}
+</style>
 
 <style  scoped>
 .object-inspector {
@@ -91,28 +97,28 @@ const expanded   = ref(true);
 }
 
 .object-inspector::-webkit-scrollbar {
-  width: 12px;               /* width of the entire scrollbar */
+    width: 12px;               /* width of the entire scrollbar */
 }
-
 .object-inspector::-webkit-scrollbar-track {
-  background: orange;        /* color of the tracking area */
+    background: orange;        /* color of the tracking area */
 }
-
 .object-inspector::-webkit-scrollbar-thumb {
-  background-color: blue;    /* color of the scroll thumb */
-  border-radius: 20px;       /* roundness of the scroll thumb */
-  border: 3px solid orange;  /* creates padding around scroll thumb */
+    background-color: blue;        /* color of the scroll thumb */
+    border-radius: 20px;             /* roundness of the scroll thumb */
+    border: 3px solid orange;      /* creates padding around scroll thumb */
 }
 
 .inspector-title {
-    display: flex;   
-    color: white;
-    padding: 8px;
+    display: flex;
+    color: #ddd;
+    padding: 8px 8px 2px 8px;
     text-align: center;
     font-size: 11px;
     line-height: 1;
-    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
+
 .tab-container {
     letter-spacing: 2px;
     display: flex;

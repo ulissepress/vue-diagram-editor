@@ -19,11 +19,11 @@ const shortcuts = [
     ['SHIFT+CMD+Z', 'Redo'],
     ['', ''],
     ['S', 'Selection tool'],
-    ['R', 'Rectangle tool'],
     ['C', 'Connection tool'],
     ['T', 'Text tool'],
-    ['K', 'Show / Hide keyboard shortcuts'],
+    ['R', 'Rectangle tool'],
     ['I', 'Show / Hide inspector'],
+    ['K', 'Show / Hide keyboard shortcuts'],
     ['', ''],
     ['Backspace / Delete', 'Delete selected item / connection'],
     ['Arrows',             'Move selected item by 1 pixel'],
@@ -32,6 +32,7 @@ const shortcuts = [
     ['SHIFT',              'While resizing keep the aspect ratio. In rotation will rotate by 45 deg'],
     ['ESC',                'Cancel operation during connection creation'],
     ['CTRL+Mouse wheel',   'Zoom in / out'],
+    ['Double Click',       'Edit item text'],
 ];
 
 // Replace 'CMD' with 'CTRL' is user is using not a Mac
@@ -72,6 +73,7 @@ if(!isMac) for(let k of shortcuts) k[0] = k[0].replace('CMD', 'CTRL')
 .key-shortcut {
     min-width: 200px;
     font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
     color: #ccc;
 }
 

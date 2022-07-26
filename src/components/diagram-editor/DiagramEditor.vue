@@ -170,12 +170,22 @@
         </div>
 
         <!-- Object Inspector -->
-        <div v-if='editable && showInspector' class="object-inspector-container">
-                <ObjectInspector                    
-                    :schema = "selectedItem ? selectedItem.inspectorModel : null"
-                    :object = "selectedItem"
-                    @property-changed="onPropertyChange" />                                
-        </div> 
+        <div v-if='editable && showInspector' class="object-inspector-container" :style="{ transform: `translate(${inspectorCoords.x}px, ${inspectorCoords.y}px)`}">
+            <ObjectInspector :schema = "selectedItem ? selectedItem.inspectorModel : null"
+                             :object = "selectedItem"
+                             @property-changed="onPropertyChange" />                                
+        </div>
+        <Moveable v-if='editable && showInspector'
+            ref           = "moveableInspector"
+            :target       = "['.object-inspector-container']"
+            :throttleDrag = "1"
+            :draggable    = "true"
+            :origin       = "false"  
+            :hideDefaultLines = "true"
+            @dragStart    = "onDragStartInspector" 
+            @drag         = "onDragInspector" />        
+
+        <!-- Manage drag of inspector -->
 
         <KeyboardHelp v-if="showKeyboard" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);  z-order: 1000;" />
         
@@ -211,7 +221,6 @@ import DeleteCommand from './commands/DeleteCommand';
 import Icon from './components/Icon.vue';
 import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
-
 export type Item = _Item & { hover?: boolean }
 
 // The component props and events
@@ -269,6 +278,8 @@ const zoomFactor    = ref(1);
 const viewer        = ref();
 const viewport      = ref<HTMLDivElement>();
 const moveable      = ref();
+const moveableInspector = ref();
+
 
 const hGuides       = ref();
 const vGuides       = ref();
@@ -310,6 +321,8 @@ const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0, opa
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 
+const inspectorCoords = ref<Position>({ x: 0, y: 0 });
+
 function onMouseMove(e: any) { 
      if(!viewport.value) return;   
     //console.log('onMouseMove', e.srcElement, e.offsetX, e.offsetY, e);
@@ -344,15 +357,17 @@ function onMouseLeave(item: Item, e: MouseEvent) {
 }
 
 function selectItem(item: Item | ItemConnection, e?: MouseEvent)  : void {
-    console.log('selectItem', item, e);
+    // Item already selected?
+    if (item.id === selectedItem.value?.id) return;
 
-    // Item already selected
-    if (item === selectedItem.value) return;
+    console.log('selectItem', item, e);
 
     selectNone();
     nextTick(() => {
         selectedItem.value = item;
         if (e) nextTick(() => { moveable.value?.dragStart(e); });        
+
+        if(moveableInspector.value) moveableInspector.value.updateRect();
     });
 }
 
@@ -368,6 +383,8 @@ function selectNone() : void {
     }
     
     selectedItem.value = null;
+    nextTick(() => { if(moveableInspector.value) moveableInspector.value.updateRect(); });
+
 }
 
 
@@ -818,6 +835,22 @@ function inlineEdit(item: Item) {
     }
 }
 
+function onDragStartInspector(e: any) : void {
+    console.log('onDragStartInspector', e);
+    
+    if(!e.inputEvent.target.className.includes('inspector-title-drag-handle')) {
+        e.stop();
+        return;
+    }
+}
+
+function onDragInspector(e: any) : void {
+    inspectorCoords.value.x = Math.floor(e.beforeTranslate[0]);
+    inspectorCoords.value.y = Math.floor(e.beforeTranslate[1]);
+    e.target.style.transform = e.transform;  
+}
+
+
 </script>
 
 
@@ -1052,5 +1085,11 @@ function inlineEdit(item: Item) {
 .item .connection-handle-top    { top:    var(--handle-offset); left: calc(50% - var(--handle-size)); }
 .item .connection-handle-bottom { bottom: var(--handle-offset); left: calc(50% - var(--handle-size)); }
 .item .connection-handle-center { top: calc(50% - var(--handle-size)); left: calc(50% - var(--handle-size)); }
+
+
+.object-inspector-moveable {
+    border: 0px;
+    outline: 0px;
+}
 </style>
 

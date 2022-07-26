@@ -10,7 +10,5 @@
 - Items toolbar (select, connection, text, rectangle, image, ...)
     - Add Custom Widget
     
-- Change item text directly in the canvas (contenteditable)
-
 - Object Inspector 
     - Supports multiple selected items (common properties)

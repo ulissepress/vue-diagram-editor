@@ -7,9 +7,20 @@ type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
 } : T;
 
-export function getUniqueId(prefix: string = 'id_') : string {
+
+/**
+ * Return an unique ID (use current time + random number)
+ */
+ export function getUniqueId(prefix: string = 'id_') : string {
     const base = 36;
-    return prefix + Date.now().toString(base) + '_' + randomInt(1, 10000).toString(base);
+    return prefix + Date.now().toString(base) + '_' + randomInt(1, 100000).toString(base);
+}
+
+/**
+ * Return a random number between min and max (included)
+ */
+export function randomInt(min: number, max: number) : number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export function getItemStyle(item: Item) : StyleValue {
@@ -32,7 +43,6 @@ export function getItemById(items: Item[], id: string) : Item | undefined {
     return items.find(n => n.id == id);
 }
 
-// TODO: to be removed (used only for demo/startup purposes)
 export function createItem(item?: DeepPartial<Item>) : Item {
     return {
         id: getUniqueId(),
@@ -276,12 +286,6 @@ export function registerDefaultItemTypes() {
     })    
 } // func
 
-/**
- * Return a random number between min and max
- */
-export function randomInt(min: number, max: number) : number {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 export function getHandlePosition(item: Item, cp: ConnectionHandle): Position {
     // If item is rotated always use the center handle
