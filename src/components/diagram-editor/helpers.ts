@@ -1,5 +1,5 @@
-import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
 import { basicModel, connectionModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
+import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
 
 import { StyleValue } from "vue";
 
@@ -280,8 +280,22 @@ export function registerDefaultItemTypes() {
         component: type,
         supportsRoundable: true,
         
-        url: '',        // 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
+        url: 'https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1228&q=80',        // 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
         fit: "cover",
+
+        flip: "none",        
+
+        filtersEnabled: false,
+        filters: {
+            brightness: 100,
+            contrast:   100,
+            saturate:   100,
+            grayscale:  0,
+            hue:        0,
+            invert:     0,
+            sepia:      0,
+            blur:       0,
+        },
         inspectorModel: imageModel
     })    
 } // func

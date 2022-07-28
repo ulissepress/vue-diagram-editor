@@ -679,7 +679,7 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
 
 
 function onPropertyChange(p: ObjectProperty, newValue: any) {
-    console.log('onPropertyChange', p, 'New value:', newValue);
+    //console.log('onPropertyChange', p, 'New value:', newValue);
     // TODO: create a history command for this change so the action is undoable (for that we need the 'oldValue' as well)
     // historyManager.value.execute(new PropertyChangeCommand(selectedItem.value, oldValue, newValue));
 

@@ -192,6 +192,20 @@ export interface LineItem extends Item {
 export interface ImageItem extends Item {
     url: string;
     fit: "contain" | "cover" | "fill" | "none";
+
+    flip: "none" | "horizontal" | "vertical" | "both";
+
+    filtersEnabled: boolean;
+    filters?: {
+        blur:       number;     // 0px-10px,    default = 0,    step 1
+        grayscale:  number;     // 0% to 100%,  default = 0%,   step 1
+        brightness: number;     // 0% to 200%,  default = 100%, step 1
+        contrast:   number;     // 0% to 200%,  default = 100%, step 1
+        hue:        number;     // 0 to 360,    default = 0,    step 1
+        invert:     number;     // 0% to 100%,  default = 0%,   step 1
+        saturate:   number;     // 0% to 200%,  default = 0%,   step 1
+        sepia:      number;     // 0% to 100%,  default = 0%,   step 1
+    }
 }
 
 

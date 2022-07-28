@@ -59,10 +59,12 @@ const expanded = ref(true);
     background-color: #515151;
     color: #dbdbdb;
     text-align: left;
-    font-size: 11px;    
     padding: 4px;
     cursor: pointer;
     margin-bottom: 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 </style>

@@ -53,6 +53,20 @@ export const borderSection$ = {   // Border
     ] 
 }
 
+export const borderWithoutRadiusSection$ = {   // Border
+    name: "border",
+    title: "Border",
+    properties: [
+        { name: "border.width",  label: "Width", type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 0, max: 50, step: 1 } },
+        { name: "border.style",  label: "Style", type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+            items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
+                     { name: ConnectionStyle.DASHED, text: "Dashed" },
+                     { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
+        }},
+        { name: "border.color",  label: "Color", type: PropertyType.COLOR,     editorFullsize: true },
+    ] 
+}
+
 
 const otherTab : InspectorTab =
 {
@@ -80,7 +94,7 @@ export const basicModel: ObjectInspectorModel = {
                     title: "Style",
                     properties: [backColor$, opacity$, locked$, shadow$]
                 },     
-                borderSection$,  
+                borderWithoutRadiusSection$,  
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -126,7 +140,7 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
                     title: "Text and style",
                     properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$, shadow$]
                 },         
-                borderSection$,  
+                borderWithoutRadiusSection$,  
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -158,10 +172,32 @@ export const imageModel: ObjectInspectorModel = {
                                      { name: ClipType.POLYGON, icon: "timeline"  },
                                      { name: ClipType.ELLIPSE, icon: "circle"    } ] 
                         }},
+                        { 
+                            name: "flip",  label: "Flip",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: {
+                            items: [ { name: "none",       text: "None"       }, 
+                                     { name: "horizontal", text: "Horizontal" },
+                                     { name: "vertical",   text: "Vertical"   },
+                                     { name: "both",       text: "Both"       } ] 
+                        }},
                         opacity$, locked$, shadow$,
                     ]
                 },         
                 borderSection$,  
+                {   // Filters
+                    name: "image_filters",
+                    title: "Filters",
+                    properties: [
+                        { name: "filtersEnabled",     label: "Enabled",    type: PropertyType.BOOLEAN, editorFullsize: true },
+                        { name: "filters.blur",       label: "Blur",       type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 10,   step: 1 }},
+                        { name: "filters.grayscale",  label: "Grayscale",  type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 100,  step: 1 }},
+                        { name: "filters.brightness", label: "Brightness", type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 200,  step: 1 }},
+                        { name: "filters.contrast",   label: "Contrast",   type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 200,  step: 1 }},
+                        { name: "filters.invert",     label: "Invert",     type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 100,  step: 1 }},
+                        { name: "filters.saturate",   label: "Saturate",   type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 200,  step: 1 }},
+                        { name: "filters.sepia",      label: "Sepia",      type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 100,  step: 1 }},
+                        { name: "filters.hue",        label: "Hue",        type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 359,  step: 1 }},
+                    ]
+                }, 
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
