@@ -2,15 +2,16 @@
     <div class="editor-container">
     
         <!-- Rulers -->
-        <Guides v-show='guidesVisible' class="ruler ruler-horizontal" :showGuides="showGuides" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :units="50" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width' : '100%', height: '30px' }" />
-        <Guides v-show='guidesVisible' class="ruler ruler-vertical"   :showGuides="showGuides" @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :units="50" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': '100%', width:  '30px', top: '-30px' }" />
+        <Guides v-show='guidesVisible' class="ruler ruler-horizontal" :showGuides="showGuides" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width' : '100%', height: '30px' }" />
+        <Guides v-show='guidesVisible' class="ruler ruler-vertical"   :showGuides="showGuides" @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': '100%', width:  '30px', top: '-30px' }" />
         <div    v-show='guidesVisible' class="rulers-left-top-box"></div>
 
         <!-- Editor Canvas -->
         <VueInfiniteViewer 
             ref             = "viewer" 
             class           = "viewer" 
-            :useWheelScroll = "true" 
+            :useMouseDrag   = "false"
+            :useWheelScroll = "true"
             :zoom           = "zoomFactor"  
             :zoomOffsetX    = "mouseCoords.x"
             :zoomOffsetY    = "mouseCoords.y"
@@ -284,7 +285,7 @@ const moveableInspector = ref();
 const hGuides       = ref();
 const vGuides       = ref();
 const showRulers    = ref(true);
-const guidesVisible = computed(() => showRulers.value && editable && zoomFactor.value >= 0.5);
+const guidesVisible = computed(() => showRulers.value && editable);
 const hGuideValues  = ref<number[]>([]);       // Horizontal guides added by the user
 const vGuideValues  = ref<number[]>([]);       // Vertical guides added by the user
 const showGuides    = ref(true);               // Show or hide all the guides
@@ -393,6 +394,9 @@ function selectNone() : void {
 // ---------------------------------------------------------------------------------------------------------------------
 function onDragStart(e: any) : void {
     if(!isItem(selectedItem.value)) return;
+
+    console.log('onDragStart', e);
+    
     
     const target = getTargetElement(selectedItem.value);
     if(target && target.contentEditable === "true") {
@@ -503,7 +507,7 @@ function onClipStart(e: any) : void {
     
     origin.clipType  = e.clipType;
     origin.clipStyle = e.clipStyle;
-    if(origin.clipStyle === 'rect' || origin.clipStyle === 'ellipse') origin.clipStyle = '';
+    if(origin.clipStyle === ClipType.RECT || origin.clipStyle === ClipType.POLYGON || origin.clipStyle === ClipType.ELLIPSE) origin.clipStyle = '';
 }
 
 function onClip(e: any) : void {

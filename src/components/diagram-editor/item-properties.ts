@@ -1,6 +1,6 @@
-import { ClipType, ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } from './types';
 import { InspectorTab, PropertyType } from '../inspector/types';
 import { ObjectInspectorModel, ObjectProperty } from './../inspector/types';
+import { ClipType, ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } from './types';
 
 export const separator$ : ObjectProperty = { name: "" };
 
@@ -151,14 +151,14 @@ export const imageModel: ObjectInspectorModel = {
                     properties: [ 
                         { name: "url", label: "URL", type: PropertyType.TEXT,   editorFullsize: true }, 
                         { name: "fit", label: "Fit", type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: [ "contain", "cover", "fill", "none"] }},
-
-                        opacity$, locked$, shadow$,
                         { 
-                            name: "clipType",  label: "Crop",  type: PropertyType.ICON_LIST, editorRightAlign: true, editorOptions: {
+                            name: "clipType",  label: "Crop",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: {
                             items: [ { name: ClipType.NONE,    icon: "image"     }, 
                                      { name: ClipType.RECT,    icon: "rectangle" },
+                                     { name: ClipType.POLYGON, icon: "timeline"  },
                                      { name: ClipType.ELLIPSE, icon: "circle"    } ] 
-                        }}                    
+                        }},
+                        opacity$, locked$, shadow$,
                     ]
                 },         
                 borderSection$,  

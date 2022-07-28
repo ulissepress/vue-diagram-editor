@@ -78,6 +78,7 @@ export enum TextVAlign {
 export enum ClipType {
     NONE    = "none",
     RECT    = "rect",
+    POLYGON = "polygon",
     ELLIPSE = "ellipse"
 }
 export interface ItemBorder {
