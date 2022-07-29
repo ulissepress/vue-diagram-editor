@@ -31,6 +31,7 @@ const shortcuts = [
     ['', ''],
     ['SHIFT',              'While resizing keep the aspect ratio. In rotation will rotate by 45 deg'],
     ['ESC',                'Cancel operation during connection creation'],
+    ['SHIFT+Mouse drag',   'Pan canvas area'],
     ['CTRL+Mouse wheel',   'Zoom in / out'],
     ['Double Click',       'Edit item text'],
 ];
@@ -48,8 +49,11 @@ if(!isMac) for(let k of shortcuts) k[0] = k[0].replace('CMD', 'CTRL')
     color: #333;
     width: 700px;
     height: auto;
+    max-height: 80%;
     padding: 16px 24px;
     box-shadow: 3px 3px 5px #bbb;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .title {

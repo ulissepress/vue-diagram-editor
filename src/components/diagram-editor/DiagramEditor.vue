@@ -10,7 +10,7 @@
         <VueInfiniteViewer 
             ref             = "viewer" 
             class           = "viewer" 
-            :useMouseDrag   = "false"
+            :useMouseDrag   = "shiftPressed"
             :useWheelScroll = "true"
             :zoom           = "zoomFactor"  
             :zoomOffsetX    = "mouseCoords.x"
@@ -20,7 +20,7 @@
             @wheel          = "onScroll" 
             @scroll         = "onScroll"              
             @mousemove      = "onMouseMove"
-            @click.stop     = "editable && onCanvasClick($event)">
+            @click.stop     = "editable && !shiftPressed && onCanvasClick($event)">
             
             <div ref="viewport" 
                  :class="{ 'viewport': true, 'viewport-area': viewportSize }" 
@@ -78,62 +78,65 @@
                         <div class="connection-handle connection-handle-center" v-if="editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.CENTER)"></div>
                 </div> <!-- item -->
                 
-                <!-- Manage drag / resize / rotate / rounding of selected item -->
-                <Moveable 
-                    ref     = "moveable"
-                    :target = "isItem(selectedItem) ? [`[data-item-id='${selectedItem.id}']`] : []"
-                    :zoom   = "1 / zoomFactor"
-                    :origin = "false"  
-                    
-                    :throttleDrag   = "1"
-                    :throttleResize = "1"
-                    :throttleRotate = "shiftPressed ? 45 : 1"
-                    :keepRatio      = "shiftPressed"
+            <!-- Manage drag / resize / rotate / rounding of selected item -->
+            <Moveable 
+                ref     = "moveable"
+                :target = "isItem(selectedItem) ? [`[data-item-id='${selectedItem.id}']`] : []"
+                :zoom   = "1 / zoomFactor"
+                :origin = "false"  
 
-                    :snappable               = "showGuides"
-                    :snapGap                 = "true"
-                    :snapThreshold           = "5" 
-                    :snapDirections          = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
-                    :elementSnapDirections   = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
-                    :isDisplayInnerSnapDigit = "true"
-                    :horizontalGuidelines    = "showGuides ? (viewportSize ? [0, viewportSize[1]/2, viewportSize[1], ...hGuideValues] : hGuideValues) : []"
-                    :verticalGuidelines      = "showGuides ? (viewportSize ? [0, viewportSize[0]/2, viewportSize[0], ...vGuideValues] : vGuideValues) : []"
-                    :elementGuidelines       = "showGuides ? elementGuidelines() : []"
-                    
-                    :clippable         = "isItem(selectedItem) && selectedItem.clipType !== ClipType.NONE"
-                    :clipArea          = "false"
-                    :clipRelative      = "false"
-                    :dragWithClip      = "true"
-                    :clipSnapThreshold = "5"
-                    :defaultClipPath   = "isItem(selectedItem) ? selectedItem.clipType : ClipType.NONE"
+                :stopPropagation = "true"
+                
+                :throttleDrag   = "1"
+                :throttleResize = "1"
+                :throttleRotate = "shiftPressed ? 45 : 1"
+                :keepRatio      = "shiftPressed"
 
-                    :roundable = "selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
-                    :draggable = "selectedItemActive"
-                    :rotatable = "selectedItemActive"
-                    :resizable = "selectedItemActive && (selectedItem as Item)?.supportsResizable === true"
+                :snappable               = "showGuides"
+                :snapGap                 = "true"
+                :snapThreshold           = "5" 
+                :snapDirections          = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
+                :elementSnapDirections   = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
+                :isDisplayInnerSnapDigit = "true"
+                :horizontalGuidelines    = "showGuides ? (viewportSize ? [0, viewportSize[1]/2, viewportSize[1], ...hGuideValues] : hGuideValues) : []"
+                :verticalGuidelines      = "showGuides ? (viewportSize ? [0, viewportSize[0]/2, viewportSize[0], ...vGuideValues] : vGuideValues) : []"
+                :elementGuidelines       = "showGuides ? elementGuidelines() : []"
+                
+                :clippable         = "isItem(selectedItem) && selectedItem.clipType !== ClipType.NONE"
+                :clipArea          = "false"
+                :clipRelative      = "false"
+                :dragWithClip      = "true"
+                :clipSnapThreshold = "5"
+                :defaultClipPath   = "isItem(selectedItem) ? selectedItem.clipType : ClipType.NONE"
 
-                    @dragStart   = "onDragStart"
-                    @drag        = "onDrag"
-                    @dragEnd     = "onDragEnd"
+                :roundable = "selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
+                :draggable = "selectedItemActive"
+                :rotatable = "selectedItemActive"
+                :resizable = "selectedItemActive && (selectedItem as Item)?.supportsResizable === true"
 
-                    @resizeStart = "onResizeStart"
-                    @resize      = "onResize"
-                    @resizeEnd   = "onResizeEnd"
-                    
-                    @rotateStart = "onRotateStart"
-                    @rotate      = "onRotate"
-                    @rotateEnd   = "onRotateEnd"
+                @dragStart   = "onDragStart"
+                @drag        = "onDrag"
+                @dragEnd     = "onDragEnd"
 
-                    @roundStart  = "onRoundStart"
-                    @round       = "onRound"
-                    @roundEnd    = "onRoundEnd" 
-                    
-                    @clipStart   = "onClipStart"
-                    @clip        = "onClip"
-                    @clipEnd     = "onClipEnd"
-                    />
+                @resizeStart = "onResizeStart"
+                @resize      = "onResize"
+                @resizeEnd   = "onResizeEnd"
+                
+                @rotateStart = "onRotateStart"
+                @rotate      = "onRotate"
+                @rotateEnd   = "onRotateEnd"
+
+                @roundStart  = "onRoundStart"
+                @round       = "onRound"
+                @roundEnd    = "onRoundEnd" 
+                
+                @clipStart   = "onClipStart"
+                @clip        = "onClip"
+                @clipEnd     = "onClipEnd" />                
             </div> <!-- viewport -->
         </VueInfiniteViewer>
+        
+        
 
         <div class="toolbars-container" :style="{ top: showRulers && editable ? '40px' : '10px', left: showRulers && editable ? '40px' : '10px' }">
             <!-- Editor Toolbar -->
