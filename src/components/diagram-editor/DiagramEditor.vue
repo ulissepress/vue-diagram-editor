@@ -172,7 +172,7 @@
 
         <!-- Object Inspector -->
         <div v-if='editable && showInspector' class="object-inspector-container" :style="{ transform: `translate(${inspectorCoords.x}px, ${inspectorCoords.y}px)`}">
-            <ObjectInspector :schema = "selectedItem ? selectedItem.inspectorModel : null"
+            <ObjectInspector :schema = "selectedItem ? getItemBlueprint(selectedItem.component)[1] : null"
                              :object = "selectedItem"
                              @property-changed="onPropertyChange" />                                
         </div>
@@ -394,15 +394,14 @@ function selectNone() : void {
 // ---------------------------------------------------------------------------------------------------------------------
 function onDragStart(e: any) : void {
     if(!isItem(selectedItem.value)) return;
-
-    console.log('onDragStart', e);
-    
     
     const target = getTargetElement(selectedItem.value);
     if(target && target.contentEditable === "true") {
         e.stop();
         return;
     }
+
+    console.log('onDragStart', e);
 
     origin.x = selectedItem.value.x;
     origin.y = selectedItem.value.y;    
@@ -634,7 +633,7 @@ function onCanvasClick(e: any): void {
     // Clicking the canvas with other tools => create a new item of related type
     const toolDef  = getToolDefinition(currentTool.value);    
     const newItem  = deepCloneItem({
-        ...getItemBlueprint(toolDef.itemType!),
+        ...getItemBlueprint(toolDef.itemType!)[0],
         id: getUniqueId(),
         x: mouseCoords.value.x,
         y: mouseCoords.value.y
@@ -839,13 +838,13 @@ function inlineEdit(item: Item) {
     }
 }
 
-function onDragStartInspector(e: any) : void {
-    console.log('onDragStartInspector', e);
-    
+function onDragStartInspector(e: any) : void {    
     if(!e.inputEvent.target.className.includes('inspector-title-drag-handle')) {
         e.stop();
         return;
     }
+
+    console.log('onDragStartInspector', e);         
 }
 
 function onDragInspector(e: any) : void {

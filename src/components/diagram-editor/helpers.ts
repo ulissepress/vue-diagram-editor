@@ -1,7 +1,8 @@
-import { basicModel, connectionModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
+import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
 
 import { StyleValue } from "vue";
+import { ObjectInspectorModel } from '../inspector/types';
 
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
@@ -35,7 +36,14 @@ export function getItemStyle(item: Item) : StyleValue {
         "transform":        t
     }
 
-    if(item.clipType !== ClipType.NONE) item.clipType === ClipType.RECT ? style.clip = item.clipStyle : style.clipPath = item.clipStyle;
+    if(item.clipType !== ClipType.NONE) {
+        item.clipType === ClipType.RECT ? style.clip = item.clipStyle : style.clipPath = item.clipStyle;
+    } else { 
+        item.clipStyle = '';
+        style.clip     = "none"; 
+        style.clipPath = "none"; 
+    }
+    
     return style;
 }
 
@@ -82,8 +90,6 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         shadow: false,
         locked: false,
 
-        inspectorModel: shapeModel,
-
         ...item
     } as Item
 }
@@ -110,10 +116,7 @@ export function createConnection(fromID: string, toID: string, c?: DeepPartial<I
         style: c?.style || ConnectionStyle.SOLID,
         thick: c?.thick || 1,
 
-        backgroundColor: c?.backgroundColor || "#333",
-
-        inspectorModel: connectionModel,
-        
+        backgroundColor: c?.backgroundColor || "#333",        
     } as ItemConnection
 }
 
@@ -135,13 +138,13 @@ export function findMaxZ(items: Item[]): number {
 
 
 // Shape medata definitions
-const registry: Record<string, Item> = {};
+const registry: Record<string, [Item, ObjectInspectorModel]> = {};
 
-export function registerItemType<T extends Item>(item: T, asName?: string) {
-    registry[item.component || asName || ''] = item;
+export function registerItemType<T extends Item>(item: T, model: ObjectInspectorModel) {
+    registry[item.component] = [item, model];
 }
 
-export function getItemBlueprint(type: string): Item {
+export function getItemBlueprint(type: string): [Item, ObjectInspectorModel] {
     if(!registry[type]) throw new Error("No item type registered with name: " + type);
     return registry[type];
 }
@@ -188,13 +191,20 @@ export function registerDefaultItemTypes() {
         },
 
         shadow: false,
-        
-        inspectorModel: basicModel  
     };
 
 
+    
     // ----------------------------------------------------------------------
-    let type = "Text"
+    let type = "Connection"
+    registerItemType({
+        ...defaults,
+        component: type,
+    }, connectionModel);
+    
+
+    // ----------------------------------------------------------------------
+    type = "Text"
     registerItemType({
         ...defaults,
         title: "Hello World",
@@ -202,9 +212,7 @@ export function registerDefaultItemTypes() {
         textColor: "#333333",
 
         component: type,
-
-        inspectorModel: textModel,
-    });
+    }, textModel);
 
     // ----------------------------------------------------------------------
     type = "Line"
@@ -217,9 +225,7 @@ export function registerDefaultItemTypes() {
         
         style: ConnectionStyle.SOLID,
         thick: 2,
-        
-        inspectorModel: lineModel,
-    });
+    }, lineModel);
 
 
     // ----------------------------------------------------------------------
@@ -229,8 +235,7 @@ export function registerDefaultItemTypes() {
         
         component: type,
         supportsRoundable: true,
-        inspectorModel: shapeModel,
-    })
+    }, shapeModel)
 
     // ----------------------------------------------------------------------
     type = "Ellipse"
@@ -242,8 +247,7 @@ export function registerDefaultItemTypes() {
         h: 70,
         backgroundColor: '#324759',
         textColor: "#FFFFFF",
-        inspectorModel: shapeWithoutRadiusModel,
-    })
+    }, shapeWithoutRadiusModel)
 
     // ----------------------------------------------------------------------
     type = "Triangle"
@@ -254,8 +258,7 @@ export function registerDefaultItemTypes() {
         w: 90,
         h: 70,
         backgroundColor: '#ff0000',
-        inspectorModel: shapeWithoutRadiusModel,
-    })
+    }, shapeWithoutRadiusModel)
 
     // ----------------------------------------------------------------------
     type = "Star"
@@ -267,9 +270,7 @@ export function registerDefaultItemTypes() {
         h: 70,
         backgroundColor: '#ff0000',
         textColor: "#333333",
-        inspectorModel: shapeWithoutRadiusModel,
-    })
-
+    }, shapeWithoutRadiusModel);
 
     // ----------------------------------------------------------------------
     type = "Image"
@@ -280,7 +281,7 @@ export function registerDefaultItemTypes() {
         component: type,
         supportsRoundable: true,
         
-        url: 'https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1228&q=80',        // 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
+        url: '', // 'https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1228&q=80',        // 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
         fit: "cover",
 
         flip: "none",        
@@ -296,8 +297,24 @@ export function registerDefaultItemTypes() {
             sepia:      0,
             blur:       0,
         },
-        inspectorModel: imageModel
-    })    
+    }, imageModel)    
+
+
+    // ----------------------------------------------------------------------
+    type = "Icon"
+    registerItemType({
+        ...defaults,
+        
+        component: type,
+        title: 'portrait',          // icon name
+        supportsRoundable: true,
+
+        backgroundColor: 'transparent',
+        textColor: "#333333",
+        fontSize: 60,
+        w: 60,
+        h: 60,        
+    }, iconModel)
 } // func
 
 

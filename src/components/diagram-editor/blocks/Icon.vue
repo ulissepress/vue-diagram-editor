@@ -1,16 +1,11 @@
 <template>
-    <div class="text" :style="{
-            justifyContent:  item.textHAlign,
-            alignItems:      item.textVAlign,
-            backgroundColor: item.backgroundColor, 
-            color:           item.textColor, 
+    <span class="material-symbols-outlined" :style="{
+            color:           item.textColor,            
+            fontSize:        item.h + 'px',
             borderRadius:    item.borderRadius + 'px',
-            border:          item.border.width + 'px ' + item.border.style + ' ' + item.border.color,
-            fontSize:        item.fontSize + 'px',
             opacity:         item.opacity / 100,
             textShadow:      item.shadow ? '3px 3px 5px #aaa' : 'none',
-        }" ><div><div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }"/></div> 
-    </div>
+            }" >{{ item.title }}</span>
 </template>
 
 <script setup lang="ts">
@@ -21,7 +16,7 @@ const { item } = defineProps<{item: Item}>();
 </script>
 
 <style scoped>
-.text {
+.shape {
     box-sizing: border-box;
     display: flex;     
     justify-content: center;
@@ -31,7 +26,7 @@ const { item } = defineProps<{item: Item}>();
     overflow: hidden;
     padding: 8px;
 }
-.text div.diagram-item-inline-edit {
+.shape div.diagram-item-inline-edit {
     display: flex;     
     flex-direction: column;
     justify-content: flex-start;

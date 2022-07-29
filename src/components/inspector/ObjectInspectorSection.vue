@@ -15,7 +15,7 @@
 
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onUpdated, ref } from "vue";
 import Icon from "../diagram-editor/components/Icon.vue";
 import ObjectInspectorProperty from "./ObjectInspectorProperty.vue";
 import { InspectorSection, ObjectProperty } from "./types";
@@ -37,6 +37,10 @@ const { object, section } = defineProps<ObjectInspectorSectionProps>();
 // Define events
 const emit = defineEmits<ObjectInspectorSectionvents>();
 // ------------------------------------------------------------------------------------------------------------------------
+
+onUpdated(() => {
+    console.log('ObjectInspectorSection: onUpdated');
+});
 
 const expanded = ref(true);
 

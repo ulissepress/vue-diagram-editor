@@ -17,11 +17,11 @@
                     :key      = "tab.title" 
                     :tab      = "tab" 
                     :object   = "object" 
-                    :selected = "index === currentTab"
+                    :selected = "currentTab > (schema.tabs.length - 1) ? index === 0 : index === currentTab"
                     @click    = "currentTab = index" />
             </div>
             
-            <ObjectInspectorSection v-if="schema !== null" v-show="expanded" v-for="(section, index) in schema.tabs[currentTab].sections" 
+            <ObjectInspectorSection v-if="schema !== null" v-show="expanded" v-for="(section, index) in schema.tabs[currentTab > schema.tabs.length - 1 ? 0 : currentTab].sections" 
                 :key      = "section.name" 
                 :section  = "section" 
                 :object   = "object"
@@ -38,7 +38,7 @@
 
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, onUpdated, ref } from 'vue';
 import Icon from "../diagram-editor/components/Icon.vue";
 import { registerPredefinedEditors } from './helpers';
 import ObjectInspectorSection from './ObjectInspectorSection.vue';
@@ -69,13 +69,27 @@ onBeforeMount(() => {
     registerPredefinedEditors();
 });
 
-// onUpdated(() => {
-//     console.log('ObjectInspector.vue: onUpdated');
-// });
+onUpdated(() => {
+    console.log('ObjectInspector.vue: onUpdated');
+});
 
 
-const currentTab = ref(0)
 const expanded   = ref(true);
+const currentTab = ref(0)
+// const selectedTab = computed(() => {   
+//     if(!schema) return 0;
+    
+//     console.log('ObjectInspector.vue: selectedTab', currentTab.value, schema.tabs.length);
+//     return currentTab.value > schema.tabs.length - 1 ? 0 : currentTab.value;
+// })
+
+function getTabSections() {
+    console.log('ObjectInspector.vue: getTabSections', schema, currentTab.value);
+    
+    if(!schema) return [];
+    if(currentTab.value > schema.tabs.length - 1) currentTab.value = 0;
+    return schema.tabs[currentTab.value].sections;
+}
 </script>
 
 <style>

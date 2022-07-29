@@ -3,19 +3,21 @@
     <div v-else class="property-container" :style="{ width: property.editorFullsize ? '98%' : '49%' }">
         <div class="property-label">{{ property.label }}</div>
         <div class="property-editor" :style="{ justifyContent: property.editorRightAlign === true ? 'flex-end' : 'flex-start' }">
-            <component v-if="!property.readonly" :is="editor" 
-                       :object="object" 
-                       :property="property" 
-                       v-bind="property.editorOptions"
-                       @property-changed="(p: any, v: any) => emit('property-changed', p, v)"  />
-            <div v-else class="readonly-value">{{ property.formatValue ? property.formatValue(property, object) : object[property.name] }}</div>
+            <component v-if = "!property.readonly" 
+                       :is               = "editor" 
+                       :object           = "object" 
+                       :property         = "property" 
+                       v-bind            = "property.editorOptions"
+                       @property-changed = "(p: any, v: any) => emit('property-changed', p, v)"  />
+            <div v-else class="readonly-value" v-html="readonlyValue" />
         </div>
     </div>
 </template>
 
 
 <script setup lang="ts">
-import { computed } from "@vue/reactivity";
+import { computed, onUpdated } from "vue";
+import { getObjectValue } from "../inspector/property-editors/utils";
 import { getEditorForProperty } from "./helpers";
 
 //@ts-ignore
@@ -39,7 +41,25 @@ const { object, property } = defineProps<ObjectInspectorPropertyProps>();
 const emit = defineEmits<ObjectInspectorPropertyEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
+
+onUpdated(() => {
+    console.log('ObjectInspectorProperty: onUpdated');
+});
+
 const editor = computed(() => getEditorForProperty(property.type || PropertyType.TEXT))
+
+
+const readonlyValue = computed(() => {
+   const f = property.formatValue;
+   console.log('formatting readonly value 0', f, property);
+
+   if(!f) return getObjectValue(object, property.name);
+
+   console.log('formatting readonly value obj', object)
+   console.log('formatting readonly value prop', property)
+   console.log('formatting readonly value value', getObjectValue(object, property.name))
+   return f(object, property, getObjectValue(object, property.name));
+})
 
 </script>
 
@@ -99,7 +119,7 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
     max-width: var(--label-width);
     /* background-color: lightyellow; */
     color: #aaa;
-    vertical-align: middle;
+    vertical-align: top;
 }
 
 .property-editor {
@@ -116,7 +136,7 @@ const editor = computed(() => getEditorForProperty(property.type || PropertyType
 }
 
 .separator {
-    height: 16px;
+    height: 12px;
     padding: 0px;
 }
 </style>

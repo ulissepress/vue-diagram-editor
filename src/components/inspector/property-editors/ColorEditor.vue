@@ -27,8 +27,11 @@ const emit = defineEmits<TextEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 function onChange(e: any) {
-    setObjectValue(object, property.name, e.target.value);
-    emit('property-changed', property, e.target.value)
+    let v = e.target.value;
+    if(v === '') v = "transparent";
+
+    setObjectValue(object, property.name, v);
+    emit('property-changed', property, v)
 }
 </script>
 

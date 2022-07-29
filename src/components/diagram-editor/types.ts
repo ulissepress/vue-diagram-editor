@@ -1,4 +1,3 @@
-import { ObjectInspectorModel } from './../inspector/types';
 
 export interface Position {
     x: number;              // X Coordinate
@@ -36,8 +35,6 @@ export interface DiagramElement {
     
     component:         string;  // The Vue component used to render this element
     componentOptions?: any;     // The Vue component options / config
-
-    inspectorModel: ObjectInspectorModel | null // Return the list of properties to display in the inspector
 }
 
 export interface Item extends DiagramElement {
@@ -139,6 +136,7 @@ export enum EditorTool {
     ELLIPSE    = 'ellipse',
     STAR       = 'star',
     WIDGET     = 'widget',
+    ICON       = 'icon',
     CONNECTION = 'connection'
 }
 
@@ -163,6 +161,7 @@ export const toolDefinitions: ToolDefinition[] = [
     { type: EditorTool.ELLIPSE,    title: 'Ellipse',    icon: 'circle',          itemType: "Ellipse"   },
     { type: EditorTool.TRIANGLE,   title: 'Triangle',   icon: 'change_history',  itemType: "Triangle"  },
     { type: EditorTool.STAR,       title: 'Star',       icon: 'grade',           itemType: "Star"      },
+    { type: EditorTool.ICON,       title: 'Icon',       icon: 'portrait',        itemType: "Icon"      },
     { type: 'separator' },
     { type: EditorTool.WIDGET,     title: 'Widgets',    icon: 'view_in_ar' },
 ];

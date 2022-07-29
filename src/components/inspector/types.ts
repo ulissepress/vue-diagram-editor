@@ -17,7 +17,7 @@ export interface ObjectProperty {
     type?:   PropertyType;   // Property type. Default: PropertyType.TEXT
 
     readonly?: boolean;         // Property is readonly. Default: false
-    formatValue?: (property: ObjectProperty, object: any) => string; // Function to format the value. Default: value => value.toString()
+    formatValue?: (object: any, property: ObjectProperty, value: any) => string; // Function to format the value. Default: value => value.toString()
 
     editor?:           Vue.Component;   // Custom editor component. Default: TextEditor    
     editorOptions?:    any              // Config options to pass to the editor component

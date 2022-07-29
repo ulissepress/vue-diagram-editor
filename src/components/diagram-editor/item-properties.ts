@@ -4,7 +4,7 @@ import { ClipType, ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } fro
 
 export const separator$ : ObjectProperty = { name: "" };
 
-export const id$    : ObjectProperty = { name: "id",     label: "ID",   type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (p, obj) => obj[p.name] + ' (' + obj.component + ')' };
+export const id$    : ObjectProperty = { name: "id",     label: "ID",   type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (obj, prop, value) => value + ' (' + obj.component + ')' };
 export const title$ : ObjectProperty = { name: "title",  label: "Text", type: PropertyType.TEXT,  editorFullsize: true };
 
 export const fontSize$ : ObjectProperty = { name: "fontSize",     label: "Font Size",  type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 4, max: 120, step: 1 } };
@@ -78,6 +78,8 @@ const otherTab : InspectorTab =
             properties: [
                 id$,
                 { name: "component", label: "Component", type: PropertyType.TEXT, editorFullsize: true, readonly: true },
+                separator$,                
+                { name: "id",     label: "DEBUG",   type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (obj, prop, value) => '<pre>' + JSON.stringify(obj, null, 2)  + '</pre>' }
             ] // props
         } // section
     ] // sections
@@ -163,15 +165,21 @@ export const imageModel: ObjectInspectorModel = {
                     name: "style",
                     title: "Source and style",
                     properties: [ 
-                        { name: "url", label: "URL", type: PropertyType.TEXT,   editorFullsize: true }, 
-                        { name: "fit", label: "Fit", type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: [ "contain", "cover", "fill", "none"] }},
+                        { name: "url", label: "URL", type: PropertyType.TEXT, editorFullsize: true },
+                        separator$,
                         { 
                             name: "clipType",  label: "Crop",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: {
                             items: [ { name: ClipType.NONE,    icon: "image"     }, 
                                      { name: ClipType.RECT,    icon: "rectangle" },
                                      { name: ClipType.POLYGON, icon: "timeline"  },
                                      { name: ClipType.ELLIPSE, icon: "circle"    } ] 
-                        }},
+                        }},                        
+                        { name: "fit", label: "Fit", type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                          items: [ { name: "none",    text: "None"    }, 
+                                   { name: "contain", text: "Contain" },
+                                   { name: "cover",   text: "Cover"   },
+                                   { name: "fill",    text: "Fill"    } ]              
+                        }},                      
                         { 
                             name: "flip",  label: "Flip",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: {
                             items: [ { name: "none",       text: "None"       }, 
@@ -280,6 +288,33 @@ export const lineModel: ObjectInspectorModel = {
                                      { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
                         }},
                         { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR }
+                    ]
+                },
+                {   // Position & size
+                    name: "pos_size",
+                    title: "Position and size",
+                    properties: [x$, y$, w$, h$, rotate$] 
+                }, 
+
+            ] // sections
+        } // tab
+    ] // tabs
+}
+
+export const iconModel: ObjectInspectorModel = {
+    tabs: [ 
+        {
+            title: "Style",
+            sections: [        
+                {   // Style
+                    name: "style",
+                    title: "Icon and Style",
+                    properties: [ 
+                        { name: "title", label: "Icon", type: PropertyType.TEXT,  editorFullsize: true },
+                        { name: "_1",    label: "",     type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (obj: any, prop: ObjectProperty, value: any) => `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: #4af;'>See available icons</a>` },
+                        separator$,
+                        { name: "textColor", label: "Color", type: PropertyType.COLOR, editorRightAlign: true },
+                        opacity$, locked$, shadow$,                         
                     ]
                 },
                 {   // Position & size

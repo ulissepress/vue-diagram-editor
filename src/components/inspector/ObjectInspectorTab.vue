@@ -6,6 +6,7 @@
 
 
 <script setup lang="ts">
+import { onUpdated } from "vue";
 import { InspectorTab } from "./types";
 
 // The component props and events
@@ -18,6 +19,11 @@ export interface ObjectInspectorTabProps {
 
 // Define props
 const { object, tab } = defineProps<ObjectInspectorTabProps>();
+
+
+onUpdated(() => {
+    console.log('ObjectInspectorTab: onUpdated');
+});
 
 </script>
 
