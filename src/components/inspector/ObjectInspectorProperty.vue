@@ -7,7 +7,6 @@
                        :is               = "editor" 
                        :object           = "object" 
                        :property         = "property" 
-                       v-bind            = "property.editorOptions"
                        @property-changed = "(p: any, v: any) => emit('property-changed', p, v)"  />
             <div v-else class="readonly-value" v-html="readonlyValue" />
         </div>
