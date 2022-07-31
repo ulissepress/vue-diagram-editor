@@ -69,7 +69,7 @@ const readonlyValue = computed(() => {
 {
     border: 0px;
     background-color: transparent;
-    font-size: 12px;
+    font-size: 11px;
     color: #ddd;
     border: 1px solid transparent !important;
     padding: 2px 4px;
@@ -111,22 +111,22 @@ const readonlyValue = computed(() => {
     user-select: none;
 
     text-align: right;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1;
     padding: 4px;
-    width:     var(--label-width);
-    min-width: var(--label-width);
-    max-width: var(--label-width);
-    /* background-color: lightyellow; */
     color: #aaa;
     vertical-align: top;
+
+    width:     var(--label-width);
+    min-width: var(--label-width);
+    max-width: var(--label-width);    
 }
 
 .property-editor {
     display: inline-flex;
     width: calc(100% - var(--label-width) - 10px);
     color: #aaa;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1;
     vertical-align: middle;
 }
@@ -136,7 +136,7 @@ const readonlyValue = computed(() => {
 }
 
 .separator {
-    height: 12px;
+    height: 8px;
     padding: 0px;
 }
 </style>

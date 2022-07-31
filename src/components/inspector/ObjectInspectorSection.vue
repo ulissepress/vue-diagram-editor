@@ -51,19 +51,19 @@ const expanded = ref(true);
 .section-container {
     width: 100%;
     height: auto;
-    margin-bottom: 12px;
+    margin-bottom: 4px;
     user-select: none;
 }
 
 .section-title {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     user-select: none;
     background-color: #515151;
     color: #dbdbdb;
     text-align: left;
-    padding: 4px;
+    padding: 2px;
     cursor: pointer;
     margin-bottom: 4px;
     font-size: 10px;

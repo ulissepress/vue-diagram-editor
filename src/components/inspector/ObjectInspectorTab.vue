@@ -35,7 +35,7 @@ onUpdated(() => {
     color: #aaa;    
     
     text-align: center;
-    font-size: 12px;
+    font-size: 11px;
     padding: 4px;
     text-transform: uppercase;
     cursor: pointer;
