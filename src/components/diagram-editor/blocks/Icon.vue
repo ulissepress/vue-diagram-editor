@@ -4,12 +4,13 @@
             fontSize:        item.h + 'px',
             borderRadius:    item.borderRadius + 'px',
             opacity:         item.opacity / 100,
-            textShadow:      item.shadow.enabled ? `${item.shadow.offsetX}px ${item.shadow.offsetY}px ${item.shadow.blur}px ${item.shadow.color}` : 'none',
+            textShadow:      cssShadow(item),
             }" >{{ item.title }}</span>
 </template>
 
 <script setup lang="ts">
 import { Item } from '../types';
+import { cssShadow } from './utils';
 
 const { item } = defineProps<{item: Item}>();
 

@@ -29,7 +29,7 @@ const viewBox = computed(() => {
 const dashArray = computed(() => {
     let w = 10 + item.thick;
     if(item.style == ConnectionStyle.DASHED) return `${10 + item.thick}`;
-    if(item.style == ConnectionStyle.DOTTED) return `${2},${3 + item.thick*2}`;;
+    if(item.style == ConnectionStyle.DOTTED) return `${2},${3 + item.thick*2}`;
 
     return '0';  // ConnectionStyle.SOLID
 });

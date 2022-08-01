@@ -98,21 +98,21 @@
                 :snapDirections          = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
                 :elementSnapDirections   = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
                 :isDisplayInnerSnapDigit = "true"
-                :horizontalGuidelines    = "showGuides ? (viewportSize ? [0, viewportSize[1]/2, viewportSize[1], ...hGuideValues] : hGuideValues) : []"
-                :verticalGuidelines      = "showGuides ? (viewportSize ? [0, viewportSize[0]/2, viewportSize[0], ...vGuideValues] : vGuideValues) : []"
-                :elementGuidelines       = "showGuides ? elementGuidelines() : []"
+                :horizontalGuidelines    = "horizontalGuidelines"
+                :verticalGuidelines      = "verticalGuidelines"
+                :elementGuidelines       = "showGuides ? elementGuidelines : []"
                 
                 :clippable         = "isItem(selectedItem) && selectedItem.clipType !== ClipType.NONE"
+                :defaultClipPath   = "isItem(selectedItem) ? selectedItem.clipType : ClipType.NONE"
                 :clipArea          = "false"
                 :clipRelative      = "false"
                 :dragWithClip      = "true"
                 :clipSnapThreshold = "5"
-                :defaultClipPath   = "isItem(selectedItem) ? selectedItem.clipType : ClipType.NONE"
 
-                :roundable = "selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
                 :draggable = "selectedItemActive"
                 :rotatable = "selectedItemActive"
                 :resizable = "selectedItemActive && (selectedItem as Item)?.supportsResizable === true"
+                :roundable = "selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
 
                 @dragStart   = "onDragStart"
                 @drag        = "onDrag"
@@ -158,7 +158,7 @@
                 
                 <div class='toolbar-item-separator'></div>               
                 <button class='toolbar-item' @click="sendToBack" :disabled="!selectedItemActive" title="Send to back">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" :style="{transform: 'scale(1.5)', opacity: selectedItemActive ? 1 : 0.3}"><path d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"  /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" :style="{ transform: 'scale(1.5)', opacity: selectedItemActive ? 1 : 0.3}"><path d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"  /></svg>
                 </button>
                 <button class='toolbar-item' @click="bringToFront" :disabled="!selectedItemActive" title="Bring to front">
                     <svg xmlns="http://www.w3.org/2000/svg" :style="{transform: 'scale(1.5)', opacity: selectedItemActive ? 1 : 0.3}" viewBox="0 0 24 24"><g><path fill="none" d="M0 0H24V24H0z"/><path d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"/> </g></svg>
@@ -168,7 +168,7 @@
             <div v-if="editable" class="toolbar">
                 <button class='toolbar-item' @click="showRulers    = !showRulers"    title="Show / Hide rulers"               :style="{ backgroundColor: showRulers    ? '#4af': '', color: showRulers    ? 'white': ''  }"><Icon icon="straighten" /></button>
                 <button class='toolbar-item' @click="showGuides    = !showGuides"    title="Show / Hide alignment guidelines" :style="{ backgroundColor: showGuides    ? '#4af': '', color: showGuides    ? 'white': ''  }"><Icon icon="border_style" /></button>
-                <button class='toolbar-item' @click="showInspector = !showInspector" itle="Show / Hide inspector"             :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': ''  }"><Icon icon="brush" /></button>
+                <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': ''  }"><Icon icon="brush" /></button>
                 <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard ? '#4af': '', color: showKeyboard ? 'white': '' }"><Icon icon="keyboard_hide" /></button>
             </div>
         </div>
@@ -179,17 +179,17 @@
                              :object = "selectedItem"
                              @property-changed="onPropertyChange" />                                
         </div>
-        <Moveable v-if='editable && showInspector'
-            ref           = "moveableInspector"
-            :target       = "['.object-inspector-container']"
-            :throttleDrag = "1"
-            :draggable    = "true"
-            :origin       = "false"  
-            :hideDefaultLines = "true"
-            @dragStart    = "onDragStartInspector" 
-            @drag         = "onDragInspector" />        
-
         <!-- Manage drag of inspector -->
+        <Moveable v-if='editable && showInspector'
+            ref               = "moveableInspector"
+            :target           = "['.object-inspector-container']"
+            :throttleDrag     = "1"
+            :draggable        = "true"
+            :origin           = "false"  
+            :hideDefaultLines = "true"
+            @dragStart        = "onDragStartInspector" 
+            @drag             = "onDragInspector" />        
+
 
         <KeyboardHelp v-if="showKeyboard" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);  z-order: 1000;" />
         
@@ -315,6 +315,11 @@ const connections = computed(() => elements.filter(e => isConnection(e)) as Item
 
 const itemToPaste   = ref(null as Item | null);
 const inlineEditing = ref(false);
+
+
+const horizontalGuidelines = computed(() => showGuides.value ? (viewportSize ? [0, viewportSize[1]/2, viewportSize[1], ...hGuideValues.value] : hGuideValues.value) : []);
+const verticalGuidelines   = computed(() => showGuides.value ? (viewportSize ? [0, viewportSize[0]/2, viewportSize[0], ...vGuideValues.value] : vGuideValues.value) : []);
+const elementGuidelines    = computed(() => viewport.value   ? Array.prototype.slice.call(viewport.value!.querySelectorAll(".item"), 0).filter(n => !n.classList.contains('target')) : []);
 
 
 // Temporary variables
@@ -569,12 +574,6 @@ function lockItem(item: Item) {
     historyManager.value.execute(item.locked === true ? new UnlockCommand(item) : new LockCommand(item));
 }
 
-
-function elementGuidelines() {   
-    if(!viewport.value) return [];
-
-    return Array.prototype.slice.call(viewport.value!.querySelectorAll(".item"), 0).filter(n => !n.classList.contains('target'))
-}
 
 /** Undo last action done (is possible) */
 function undo() {  

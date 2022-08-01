@@ -12,7 +12,7 @@
             stroke-linecap  = "round" 
             stroke-linejoin = "round"
             
-            :style="{ 'filter': item.shadow.enabled ? `drop-shadow(${item.shadow.offsetX}px ${item.shadow.offsetY}px ${item.shadow.blur}px ${item.shadow.color})` : '' }"
+            :style="{ 'filter': cssDropShadow(item) }"
 
             :fill           = "item.backgroundColor" 
             :viewBox        = "`0 0 ${item.w} ${item.h}`" 
@@ -32,6 +32,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { ConnectionStyle, Item } from '../types';
+import { cssDropShadow } from './utils';
 
 const { item } = defineProps<{item: Item}>();
 
