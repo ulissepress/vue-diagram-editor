@@ -8,7 +8,7 @@
             fontSize:     item.fontSize + 'px',
             opacity:      item.opacity / 100,   
             objectFit:    item.fit,
-            boxShadow:    item.shadow ? '3px 3px 5px #aaa' : 'none', 
+            boxShadow:       item.shadow.enabled ? `${item.shadow.offsetX}px ${item.shadow.offsetY}px ${item.shadow.blur}px ${item.shadow.color}` : 'none',
             filter:       cssFilter,
             transform:    cssTransform,
         }"/>

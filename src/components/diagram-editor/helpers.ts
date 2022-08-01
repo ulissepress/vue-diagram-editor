@@ -1,8 +1,8 @@
-import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
+import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
-import { StyleValue } from "vue";
 import { ObjectInspectorModel } from '../inspector/types';
+import { StyleValue } from "vue";
 
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
@@ -87,7 +87,14 @@ export function createItem(item?: DeepPartial<Item>) : Item {
             color: '#333333',
         },
         
-        shadow: false,
+        shadow: {
+            enabled: false,
+            offsetX: 3,
+            offsetY: 3,
+            blur: 5,
+            color: '#aaaaaa',
+        },
+        
         locked: false,
 
         ...item
@@ -190,7 +197,13 @@ export function registerDefaultItemTypes() {
             color: '#333333',
         },
 
-        shadow: false,
+        shadow: {
+            enabled: false,
+            offsetX: 3,
+            offsetY: 3,
+            blur: 5,
+            color: '#aaaaaa',
+        }
     };
 
 

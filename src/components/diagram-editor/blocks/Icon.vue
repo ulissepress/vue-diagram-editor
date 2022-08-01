@@ -4,7 +4,7 @@
             fontSize:        item.h + 'px',
             borderRadius:    item.borderRadius + 'px',
             opacity:         item.opacity / 100,
-            textShadow:      item.shadow ? '3px 3px 5px #aaa' : 'none',
+            textShadow:      item.shadow.enabled ? `${item.shadow.offsetX}px ${item.shadow.offsetY}px ${item.shadow.blur}px ${item.shadow.color}` : 'none',
             }" >{{ item.title }}</span>
 </template>
 

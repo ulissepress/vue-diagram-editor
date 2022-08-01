@@ -11,9 +11,7 @@
         :stroke           = "item.backgroundColor" 
         :stroke-width     = "item.thick || 1" 
         :stroke-dasharray = "dashArray">        
-        
-        :style="{ 'filter': item.shadow ? 'drop-shadow(2px 2px 5px #aaa)' : '' }"
-        
+                
         <line x1="0" :y1="item.h / 2" :x2="item.w" :y2="item.h / 2" />
    </svg>
 </template>

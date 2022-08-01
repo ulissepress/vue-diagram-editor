@@ -114,7 +114,7 @@ const readonlyValue = computed(() => {
     line-height: 1;
     padding: 4px;
     color: #aaa;
-    vertical-align: top;
+    vertical-align: middle;
 
     width:     var(--label-width);
     min-width: var(--label-width);

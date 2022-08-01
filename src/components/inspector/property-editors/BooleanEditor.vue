@@ -27,8 +27,8 @@ const emit = defineEmits<NumberEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 function toggle(e: any) {
-    let v = object[property.name] === true;
-
+    let v = getObjectValue(object, property.name) === true;
+    
     setObjectValue(object, property.name, !v);    
     emit('property-changed', property, v)
 }

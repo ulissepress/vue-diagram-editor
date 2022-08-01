@@ -1,6 +1,6 @@
+import { ClipType, ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } from './types';
 import { InspectorTab, PropertyType } from '../inspector/types';
 import { ObjectInspectorModel, ObjectProperty } from './../inspector/types';
-import { ClipType, ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } from './types';
 
 export const separator$ : ObjectProperty = { name: "" };
 
@@ -25,7 +25,6 @@ export const textVAlign$ : ObjectProperty = {
 
 export const backColor$ : ObjectProperty = { name: "backgroundColor",  label: "Back Color", type: PropertyType.COLOR };
 export const textColor$ : ObjectProperty = { name: "textColor",        label: "Text Color", type: PropertyType.COLOR, editorRightAlign: true };
-export const shadow$    : ObjectProperty = { name: "shadow",           label: "Shadow",     type: PropertyType.BOOLEAN };
 export const locked$    : ObjectProperty = { name: "locked",           label: "Locked",     type: PropertyType.BOOLEAN };
 
 
@@ -50,6 +49,19 @@ export const borderSection$ = {   // Border
         }},
         { name: "border.color",  label: "Color", type: PropertyType.COLOR,     editorFullsize: true },
         radius$,
+    ] 
+}
+
+
+export const shadowSection$ = {   // Shadow
+    name: "shadow",
+    title: "Shadow",
+    properties: [
+        { name: "shadow.enabled",  label: "Enabled", type: PropertyType.BOOLEAN, editorFullsize: true },
+        { name: "shadow.offsetX",  label: "X",       type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: -50, max: 50, step: 1 } },
+        { name: "shadow.offsetY",  label: "Y",       type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: -50, max: 50, step: 1 } },
+        { name: "shadow.blur",     label: "Blur",    type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0,   max: 20, step: 1 } },
+        { name: "shadow.color",    label: "Color",   type: PropertyType.COLOR,   editorFullsize: true },
     ] 
 }
 
@@ -94,9 +106,10 @@ export const basicModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Style",
-                    properties: [backColor$, opacity$, locked$, shadow$]
+                    properties: [backColor$, opacity$, locked$]
                 },     
                 borderWithoutRadiusSection$,  
+                shadowSection$,
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -117,9 +130,10 @@ export const shapeModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$, shadow$]
+                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
                 },         
-                borderSection$,  
+                borderSection$,
+                shadowSection$,
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -140,9 +154,10 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$, shadow$]
+                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
                 },         
                 borderWithoutRadiusSection$,  
+                shadowSection$,
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -187,10 +202,11 @@ export const imageModel: ObjectInspectorModel = {
                                      { name: "vertical",   text: "Vertical"   },
                                      { name: "both",       text: "Both"       } ] 
                         }},
-                        opacity$, locked$, shadow$,
+                        opacity$, locked$,
                     ]
                 },         
                 borderSection$,  
+                shadowSection$,
                 {   // Filters
                     name: "image_filters",
                     title: "Filters",
@@ -226,9 +242,10 @@ export const textModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$, shadow$ ]
+                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$ ]
                 },         
                 borderSection$,  
+                shadowSection$,
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",
@@ -314,9 +331,10 @@ export const iconModel: ObjectInspectorModel = {
                         { name: "_1",    label: "",     type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (obj: any, prop: ObjectProperty, value: any) => `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: #4af;'>See available icons</a>` },
                         separator$,
                         { name: "textColor", label: "Color", type: PropertyType.COLOR, editorRightAlign: true },
-                        opacity$, locked$, shadow$,                         
+                        opacity$, locked$,
                     ]
                 },
+                shadowSection$,
                 {   // Position & size
                     name: "pos_size",
                     title: "Position and size",

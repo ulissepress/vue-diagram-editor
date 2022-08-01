@@ -12,7 +12,7 @@
             stroke-linecap  = "round" 
             stroke-linejoin = "round"
             
-            :style="{ 'filter': item.shadow ? 'drop-shadow(2px 2px 5px #aaa)' : '' }"
+            :style="{ 'filter': item.shadow.enabled ? `drop-shadow(${item.shadow.offsetX}px ${item.shadow.offsetY}px ${item.shadow.blur}px ${item.shadow.color})` : '' }"
 
             :fill           = "item.backgroundColor" 
             :viewBox        = "`0 0 ${item.w} ${item.h}`" 
