@@ -1,4 +1,4 @@
-import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
+import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
 import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
 import { ObjectInspectorModel } from '../inspector/types';
@@ -315,7 +315,7 @@ export function registerDefaultItemTypes() {
 
     // ----------------------------------------------------------------------
     type = "Icon"
-    registerItemType({
+    registerItemType<IconItem>({
         ...defaults,
         
         component: type,
@@ -325,6 +325,7 @@ export function registerDefaultItemTypes() {
         backgroundColor: 'transparent',
         textColor: "#333333",
         fontSize: 60,
+        filled: false,
         w: 60,
         h: 60,        
     }, iconModel)

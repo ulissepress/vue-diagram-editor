@@ -216,6 +216,9 @@ export interface ImageItem extends Item {
     }
 }
 
+export interface IconItem extends Item {
+    filled: boolean;
+}
 
 export interface WidgetDefinition {
     type:      string;          // The widget type. Example: 'my_shape

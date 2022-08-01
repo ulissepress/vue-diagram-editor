@@ -1,5 +1,6 @@
 <template>
-    <span class="material-symbols-outlined" :style="{ 'font-size': size + ' !important', 'color': color }">{{ icon }}</span>
+    <span :class="{'material-icons': icon.endsWith(':filled'), 'material-icons-outlined': !icon.endsWith(':filled')}" 
+          :style="{ 'font-size': size + ' !important', 'color': color }">{{ icon.split(':')[0] }}</span>
 </template>
 
 <script setup lang="ts">
@@ -14,4 +15,10 @@ const { icon, size, color } =  withDefaults(defineProps<{ icon: string, size?: s
     size: '24px',
     color: '',
 });
+
+
+
+
+
+
 </script>

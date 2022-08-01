@@ -1,4 +1,4 @@
-import { ClipType, ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } from './types';
+import { ClipType, ConnectionMarker, ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } from './types';
 import { InspectorTab, PropertyType } from '../inspector/types';
 import { ObjectInspectorModel, ObjectProperty } from './../inspector/types';
 
@@ -271,13 +271,27 @@ export const connectionModel: ObjectInspectorModel = {
                     properties: [ 
                         { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionType.LINE,  icon: "horizontal_rule" }, 
-                                     { name: ConnectionType.CURVE, icon: "conversion_path" } ] 
+                                     { name: ConnectionType.CURVE, icon: "moving" } ] 
                         }},
                         { name: "style",  label: "Style",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
-                            { name: ConnectionStyle.DASHED, text: "Dashed" },
-                            { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
+                                     { name: ConnectionStyle.DASHED, text: "Dashed" },
+                                     { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
                         }},
+                        separator$,
+                        { name: "from.marker",  label: "Start",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                            items: [ { name: ConnectionMarker.NONE,   icon: "horizontal_rule"   }, 
+                                     { name: ConnectionMarker.SQUARE, icon: "square:filled" },
+                                     { name: ConnectionMarker.CIRCLE, icon: "circle:filled" },
+                                     { name: ConnectionMarker.ARROW,  icon: "east"  } ] 
+                        }},
+                        { name: "to.marker",  label: "End",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                            items: [ { name: ConnectionMarker.NONE,   icon: "horizontal_rule"   }, 
+                                     { name: ConnectionMarker.SQUARE, icon: "square:filled" },
+                                     { name: ConnectionMarker.CIRCLE, icon: "circle:filled" },
+                                     { name: ConnectionMarker.ARROW,  icon: "east"  } ] 
+                        }},
+
                         separator$,
                         { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR },
                         { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
@@ -330,7 +344,8 @@ export const iconModel: ObjectInspectorModel = {
                         { name: "title", label: "Icon", type: PropertyType.TEXT,  editorFullsize: true },
                         { name: "_1",    label: "",     type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (obj: any, prop: ObjectProperty, value: any) => `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: #4af;'>See available icons</a>` },
                         separator$,
-                        { name: "textColor", label: "Color", type: PropertyType.COLOR, editorRightAlign: true },
+                        { name: "textColor", label: "Color",  type: PropertyType.COLOR, editorRightAlign: true },
+                        { name: "filled",    label: "Filled", type: PropertyType.BOOLEAN },
                         opacity$, locked$,
                     ]
                 },

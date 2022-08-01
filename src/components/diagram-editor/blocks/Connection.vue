@@ -6,8 +6,12 @@
                    :lineStyle = "connection.style" 
                    :thick     = "connection.thick" 
                    :color     = "connection.backgroundColor" 
-                   :selected  = "selected" 
-                   @selected  = "emit('selected')" />
+
+                   :startMarker = "connection.from.marker"
+                   :endMarker   = "connection.to.marker"
+                   
+                   :selected    = "selected" 
+                   @selected    = "emit('selected')" />
 </template>
 
 <script setup lang="ts">

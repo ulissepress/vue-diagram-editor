@@ -1,5 +1,5 @@
 <template>
-    <span class="material-symbols-outlined" :style="{
+    <span :class="{'material-icons': item.filled, 'material-icons-outlined': !item.filled}" :style="{
             color:           item.textColor,            
             fontSize:        item.h + 'px',
             borderRadius:    item.borderRadius + 'px',
@@ -9,10 +9,10 @@
 </template>
 
 <script setup lang="ts">
-import { Item } from '../types';
+import { IconItem } from '../types';
 import { cssShadow } from './utils';
 
-const { item } = defineProps<{item: Item}>();
+const { item } = defineProps<{item: IconItem}>();
 
 </script>
 
