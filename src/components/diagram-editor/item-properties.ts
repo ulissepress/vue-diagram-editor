@@ -318,6 +318,20 @@ export const lineModel: ObjectInspectorModel = {
                                      { name: ConnectionStyle.DASHED, text: "Dashed" },
                                      { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
                         }},
+                        separator$,
+                        { name: "startMarker",  label: "Start",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                            items: [ { name: ConnectionMarker.NONE,   icon: "horizontal_rule"   }, 
+                                     { name: ConnectionMarker.SQUARE, icon: "square:filled" },
+                                     { name: ConnectionMarker.CIRCLE, icon: "circle:filled" },
+                                     { name: ConnectionMarker.ARROW,  icon: "east"  } ] 
+                        }},
+                        { name: "endMarker",  label: "End",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                            items: [ { name: ConnectionMarker.NONE,   icon: "horizontal_rule"   }, 
+                                     { name: ConnectionMarker.SQUARE, icon: "square:filled" },
+                                     { name: ConnectionMarker.CIRCLE, icon: "circle:filled" },
+                                     { name: ConnectionMarker.ARROW,  icon: "east"  } ] 
+                        }},                        
+                        separator$,
                         { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR }
                     ]
                 },

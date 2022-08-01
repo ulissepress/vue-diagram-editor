@@ -237,6 +237,8 @@ export function registerDefaultItemTypes() {
         backgroundColor: "#111111",
         
         style: ConnectionStyle.SOLID,
+        startMarker: ConnectionMarker.NONE,
+        endMarker: ConnectionMarker.NONE,
         thick: 2,
     }, lineModel);
 

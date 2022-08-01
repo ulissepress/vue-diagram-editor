@@ -160,7 +160,7 @@ export interface ToolDefinition {
 export const toolDefinitions: ToolDefinition[] = [
     { type: EditorTool.SELECT,     title: 'Select',     icon: 'ads_click' },    
     { type: 'separator' },    
-    { type: EditorTool.CONNECTION, title: 'Connection', icon: 'share',           itemType: "Connection"},
+    { type: EditorTool.CONNECTION, title: 'Connection', icon: 'share',          itemType: "Connection"},
     { type: 'separator' },    
     { type: EditorTool.TEXT,       title: 'Text',       icon: 'text_fields',     itemType: "Text"      },
     { type: EditorTool.IMAGE,      title: 'Image',      icon: 'image',           itemType: "Image"     },
@@ -194,6 +194,8 @@ export function isConnection(e: DiagramElement | undefined | null) : e is ItemCo
 export interface LineItem extends Item {
     thick: number;
     style: ConnectionStyle;
+    startMarker: ConnectionMarker,
+    endMarker: ConnectionMarker,
 }
 
 

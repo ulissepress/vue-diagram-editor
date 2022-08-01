@@ -3,7 +3,7 @@
         fill              = "none" 
         stroke-linecap    = "square"
         stroke-linejoin   = "round"
-        style             = "pointer-events: none;"    
+        style             = "pointer-events: none; overflow: visible;"
 
         :viewBox          = "viewBox" 
         :width            = "item.w" 
@@ -11,16 +11,36 @@
         :stroke           = "item.backgroundColor" 
         :stroke-width     = "item.thick || 1" 
         :stroke-dasharray = "dashArray">        
-                
-        <line x1="0" :y1="item.h / 2" :x2="item.w" :y2="item.h / 2" />
+        
+        <marker v-if="item.startMarker !== ConnectionMarker.NONE" :id="item.id + '_marker_start'" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse" markerUnits="strokeWidth">
+            <circle v-if="item.startMarker === ConnectionMarker.CIRCLE" cx="5" cy="5" r="5"               :fill="item.backgroundColor" stroke="none" />
+            <path   v-if="item.startMarker === ConnectionMarker.SQUARE" d="M 0 0 L 10 0 L 10 10 L 0 10 z" :fill="item.backgroundColor" stroke="none" />
+            <path   v-if="item.startMarker === ConnectionMarker.ARROW"  d="M 0 0 L 10 5 L 0 10 z"         :fill="item.backgroundColor" stroke="none" />
+        </marker>        
+        
+        <marker v-if="item.endMarker != ConnectionMarker.NONE" :id="item.id + '_marker_end'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse" markerUnits="strokeWidth">
+            <circle v-if="item.endMarker === ConnectionMarker.CIRCLE" cx="5" cy="5" r="5"               :fill="item.backgroundColor" stroke="none" />
+            <path   v-if="item.endMarker === ConnectionMarker.SQUARE" d="M 0 0 L 10 0 L 10 10 L 0 10 z" :fill="item.backgroundColor" stroke="none" />
+            <path   v-if="item.endMarker === ConnectionMarker.ARROW"  d="M 0 0 L 10 5 L 0 10 z"         :fill="item.backgroundColor" stroke="none" />
+        </marker>
+
+        <path :d="`M 0 ${item.h / 2} L ${item.w} ${item.h / 2}`" :marker-start="`url(#${item.id}_marker_start)`"  :marker-end="`url(#${item.id}_marker_end)`" />
    </svg>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { ConnectionStyle, LineItem } from '../types';
+import { computed, onMounted, onUpdated } from 'vue';
+import { ConnectionMarker, ConnectionStyle, LineItem } from '../types';
 
 const { item } = defineProps<{item: LineItem}>();
+
+onMounted(() => {
+   console.log('Line mounted', item)   
+});
+
+onUpdated(() => {
+   console.log('Line updated', item)   
+});
 
 const viewBox = computed(() => {    
     return `0 0 ${item.w} ${item.h}`;

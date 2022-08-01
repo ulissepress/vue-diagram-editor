@@ -20,14 +20,14 @@
         <!-- Real connection -->
         <path :d            = "linePath[0]" 
               class         = "realpath" 
-              :marker-start = "linePath[1] ? `url(#${cid}_marker_end`   : `url(#${cid}_marker_start`"  
-              :marker-end   = "linePath[1] ? `url(#${cid}_marker_start` : `url(#${cid}_marker_end`  " />
+              :marker-start = "linePath[1] ? `url(#${cid}_marker_end)`   : `url(#${cid}_marker_start)`"  
+              :marker-end   = "linePath[1] ? `url(#${cid}_marker_start)` : `url(#${cid}_marker_end)`" />
 
         <!-- Ticker (invisible) connection for catching user clicks -->
         <path :d              = "linePath[0]"
               class           = "ghostpath"     
-              :marker-start   = "linePath[1] ? `url(#${cid}_marker_end`   : `url(#${cid}_marker_start`"  
-              :marker-end     = "linePath[1] ? `url(#${cid}_marker_start` : `url(#${cid}_marker_end`  "                       
+              :marker-start   = "linePath[1] ? `url(#${cid}_marker_end)`   : `url(#${cid}_marker_start)`"  
+              :marker-end     = "linePath[1] ? `url(#${cid}_marker_start)` : `url(#${cid}_marker_end)`"                       
               :stroke-width   = "selected ? 10 + props.thick : 10" 
               :stroke-opacity = "selected ? 0.2 : 0"
               @click.stop     = "emit('selected')" />
