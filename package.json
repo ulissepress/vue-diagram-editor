@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ckpack/vue-color": "^1.2.0",
     "@vueuse/core": "^8.6.0",
     "vue": "^3.2.25",
     "vue3-guides": "^0.1.1",

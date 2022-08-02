@@ -90,8 +90,16 @@ export interface ItemShadow {
     offsetX: number;
     offsetY: number;
     blur:    number;
-    color:   string;    
+    color:   string;
 }
+
+export interface ItemBackround {
+    type:      "color" | "gradient-linear" | "gradient-radial";
+    starColor: string;        // The start color of the gradient
+    endColor:  string;        // The start color of the gradient
+    direction: number;        // The grandient direction (in degrees: 0-359)
+}
+
 
 export interface ConnectionPoint {
     item:   string;                   // The item ID which this connection point is referring to

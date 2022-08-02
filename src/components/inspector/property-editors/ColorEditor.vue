@@ -1,10 +1,11 @@
 <template>
-    <input type="color" :value="getObjectValue(object, property.name)" @input="onChange" />&nbsp;
-    <input type="text"  :value="getObjectValue(object, property.name)" @input="onChange" class="color-text" />
+    <ColorPicker :color="getObjectValue(object, property.name)" @color-changed="onChange" :show-color-value="false"/>    
 </template>
 
 <script setup lang="ts">
 import { ObjectProperty } from "../types";
+
+import ColorPicker from './ColorPicker.vue';
 
 import { getObjectValue, setObjectValue } from "./utils";
 
@@ -26,12 +27,10 @@ const { object, property } = defineProps<TextEditorProps>();
 const emit = defineEmits<TextEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
-function onChange(e: any) {
-    let v = e.target.value;
-    if(v === '') v = "transparent";
+function onChange(newColor: string) {
 
-    setObjectValue(object, property.name, v);
-    emit('property-changed', property, v)
+    setObjectValue(object, property.name, newColor);
+    emit('property-changed', property, newColor)
 }
 </script>
 
