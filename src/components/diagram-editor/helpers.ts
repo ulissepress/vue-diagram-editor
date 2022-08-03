@@ -92,7 +92,7 @@ export function createItem(item?: DeepPartial<Item>) : Item {
             offsetX: 3,
             offsetY: 3,
             blur: 5,
-            color: '#aaaaaa',
+            color: '#555555',
         },
         
         locked: false,
@@ -202,7 +202,7 @@ export function registerDefaultItemTypes() {
             offsetX: 3,
             offsetY: 3,
             blur: 5,
-            color: '#aaaaaa',
+            color: '#555555',
         }
     };
 

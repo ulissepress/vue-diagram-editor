@@ -1,15 +1,16 @@
 <template>
     <div style="width: 100%; height: 95%; padding-top: 16px; margin: 0 auto;">
-        <!-- <ColorPicker :color="myColor" /> -->
-        <DiagramEditor :elements      = "elements"
-                       :customWidgets = "true" 
-                       :editable      = "true"                       
-                     />
+        <DiagramEditor :elements = "elements"
+                       :editable = "true" 
+                       :settings = "{
+                            backgroundColor: '#FFF8D2',
+                            customWidgets: true
+                       }" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive } from 'vue';
 import DiagramEditor from './components/diagram-editor/DiagramEditor.vue';
 import { createConnection, createItem } from './components/diagram-editor/helpers';
 import { ConnectionStyle, ConnectionType, DiagramElement } from './components/diagram-editor/types';
@@ -23,8 +24,6 @@ let elements: DiagramElement[] = reactive([
     createConnection('a1', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DOTTED }),
     createConnection('a2', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DASHED, backgroundColor: "#ff0000", thick: 5 }),
 ]);
-
-const myColor = ref('#97535354');
 
 </script>
 

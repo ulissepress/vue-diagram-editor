@@ -6,16 +6,17 @@
             {{ section.title }}
         </div>
         <ObjectInspectorProperty v-if="expanded" v-for="property in section.properties" 
-            :key      = "property.name" 
-            :property = "property"
-            :object   = "object" 
+            :key          = "property.name" 
+            :property     = "property"
+            :object       = "object" 
+            :singleColumn = "singleColumn"
             @property-changed = "(propertyChanged, newValue) => emit('property-changed', propertyChanged, newValue)" />
     </div>
 </template>
 
 
 <script setup lang="ts">
-import { onUpdated, ref } from "vue";
+import { ref } from "vue";
 import Icon from "../diagram-editor/components/Icon.vue";
 import ObjectInspectorProperty from "./ObjectInspectorProperty.vue";
 import { InspectorSection, ObjectProperty } from "./types";
@@ -25,6 +26,7 @@ import { InspectorSection, ObjectProperty } from "./types";
 export interface ObjectInspectorSectionProps {
     object?: any;
     section: InspectorSection;
+    singleColumn: boolean;
 }
 
 export interface ObjectInspectorSectionvents {
@@ -37,10 +39,6 @@ const { object, section } = defineProps<ObjectInspectorSectionProps>();
 // Define events
 const emit = defineEmits<ObjectInspectorSectionvents>();
 // ------------------------------------------------------------------------------------------------------------------------
-
-onUpdated(() => {
-    console.log('ObjectInspectorSection: onUpdated');
-});
 
 const expanded = ref(true);
 

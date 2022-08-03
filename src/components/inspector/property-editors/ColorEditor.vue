@@ -1,5 +1,5 @@
 <template>
-    <ColorPicker :color="getObjectValue(object, property.name)" @color-changed="onChange" :show-color-value="false"/>    
+    &nbsp;<ColorPicker :color="getObjectValue(object, property.name)" @color-changed="onChange" :show-color-value="false" />    
 </template>
 
 <script setup lang="ts">

@@ -1,9 +1,11 @@
 <template>
     <div class="color-picker">
-        <div class="color-preview" @click="open = true" :style="{ width: (previewSize || 16) + 'px', height: (previewSize || 16) + 'px', backgroundColor: currentColor }"></div> 
+        <div class="color-preview" @click="openPicker" :style="{ width: (previewSize || 16) + 'px', height: (previewSize || 16) + 'px', backgroundColor: currentColor }"></div> 
         <div v-if="showColorValue" class="color-value">{{ currentColor }}</div>
     </div>
-    <Sketch style="position: absolute;" ref="picker" v-if="open" :modelValue="currentColor" @update:modelValue="currentColor=$event.hex8; $emit('color-changed', $event.hex8)" />
+    <Teleport to="body">
+        <Sketch ref="picker" v-if="open"  :style="getPickerStyle()" :modelValue="currentColor" @update:modelValue="currentColor=$event.hex8; $emit('color-changed', $event.hex8)" />
+    </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -31,10 +33,40 @@ const { color } = defineProps<ColorPickerProps>();
 const emit = defineEmits<ColorPickerEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
-const open = ref(false);
-const currentColor = ref(color);
+const open           = ref(false);
+const currentColor   = ref(color);
+const pickerPosition = ref({ x: 0, y: 0 })
+
+// Close the picker when clicking oujtside of it
 const picker = ref(null)
 onClickOutside(picker, () => open.value = false)
+
+
+function openPicker(e: MouseEvent) {
+    // Save the mouse position, so the picker can be opened 'close' to the mouse click coordinates    
+    pickerPosition.value = { x: e.clientX, y: e.clientY }   
+    
+    // Open the picker
+    open.value = true;
+}
+
+function getPickerStyle() {
+    let top  = (pickerPosition.value.y + 20);
+    let left = (pickerPosition.value.x - 20);
+    
+    if(top  > document.body.clientHeight - 350) top  = document.body.clientHeight - 350;
+    if(left > document.body.clientWidth  - 250) left = document.body.clientWidth  - 250;
+
+    top  = Math.max(0, top);
+    left = Math.max(0, left);
+    
+    return {
+        position: 'absolute',
+        top: top + 'px',
+        left: left + 'px',
+        zOrder: 10000
+    }
+}
 
 </script>
 

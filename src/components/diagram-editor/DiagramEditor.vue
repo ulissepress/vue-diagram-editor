@@ -9,14 +9,15 @@
         <!-- Editor Canvas -->
         <VueInfiniteViewer 
             ref             = "viewer" 
-            class           = "viewer" 
+            class           = "viewer"
+            :style          = "{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair' }"
+            
             :useMouseDrag   = "shiftPressed"
             :useWheelScroll = "true"
             :zoom           = "zoomFactor"  
             :zoomOffsetX    = "mouseCoords.x"
             :zoomOffsetY    = "mouseCoords.y"
 
-            :style          = "{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair'}" 
             @wheel          = "onScroll" 
             @scroll         = "onScroll"              
             @mousemove      = "onMouseMove"
@@ -140,7 +141,7 @@
 
         <div class="toolbars-container" :style="{ top: showRulers && editable ? '40px' : '10px', left: showRulers && editable ? '40px' : '10px' }">
             <!-- Editor Toolbar -->
-            <ToolsToolbar v-if='editable'  :customWidgets = "customWidgets" :selectedTool  = "currentTool"  @toolSelected  = "selectCurrentTool" />
+            <ToolsToolbar v-if='editable'  :customWidgets = "customWidgets === true" :selectedTool  = "currentTool"  @toolSelected  = "selectCurrentTool" />
             <div class='toolbar-separator'></div>
             <ZoomToolbar :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
             <div class='toolbar-separator'></div>
@@ -166,17 +167,17 @@
             </div>   
             <div class='toolbar-separator'></div>
             <div v-if="editable" class="toolbar">
-                <button class='toolbar-item' @click="showRulers    = !showRulers"    title="Show / Hide rulers"               :style="{ backgroundColor: showRulers    ? '#4af': '', color: showRulers    ? 'white': ''  }"><Icon icon="straighten" /></button>
-                <button class='toolbar-item' @click="showGuides    = !showGuides"    title="Show / Hide alignment guidelines" :style="{ backgroundColor: showGuides    ? '#4af': '', color: showGuides    ? 'white': ''  }"><Icon icon="border_style" /></button>
-                <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': ''  }"><Icon icon="brush" /></button>
-                <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard ? '#4af': '', color: showKeyboard ? 'white': '' }"><Icon icon="keyboard_hide" /></button>
+                <button class='toolbar-item' @click="showRulers    = !showRulers"    title="Show / Hide rulers"               :style="{ backgroundColor: showRulers    ? '#4af': '', color: showRulers    ? 'white': '' }"><Icon icon="straighten" /></button>
+                <button class='toolbar-item' @click="showGuides    = !showGuides"    title="Show / Hide alignment guidelines" :style="{ backgroundColor: showGuides    ? '#4af': '', color: showGuides    ? 'white': '' }"><Icon icon="border_style" /></button>
+                <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': '' }"><Icon icon="brush" /></button>
+                <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard  ? '#4af': '', color: showKeyboard  ? 'white': '' }"><Icon icon="keyboard_hide" /></button>
             </div>
         </div>
 
         <!-- Object Inspector -->
         <div v-if='editable && showInspector' class="object-inspector-container" :style="{ transform: `translate(${inspectorCoords.x}px, ${inspectorCoords.y}px)`}">
-            <ObjectInspector :schema = "selectedItem ? getItemBlueprint(selectedItem.component)[1] : null"
-                             :object = "selectedItem"
+            <ObjectInspector :schema = "getObjectToInspect()[1]"
+                             :object = "getObjectToInspect()[0]"                                
                              @property-changed="onPropertyChange" />                                
         </div>
         <!-- Manage drag of inspector -->
@@ -218,7 +219,7 @@ import ZoomToolbar from './components/ZoomToolbar.vue';
 import { ClipType, ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 
 import ObjectInspector from '../inspector/ObjectInspector.vue';
-import { ObjectProperty } from '../inspector/types';
+import { ObjectInspectorModel, ObjectProperty } from '../inspector/types';
 import AddConnectionCommand from './commands/AddConnectionCommand';
 import ClipCommand from './commands/ClipCommand';
 import DeleteCommand from './commands/DeleteCommand';
@@ -230,10 +231,11 @@ export type Item = _Item & { hover?: boolean }
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
-    elements:       DiagramElement[],
-    editable?:      boolean,
-    customWidgets?: boolean,
-    viewportSize?:  [number, number]
+    elements:               DiagramElement[],
+    editable?:              boolean,
+    viewportSize?:          [number, number];
+    customWidgets?:         boolean,
+    customWidgetsCatalog?:  any[];     // TODO:  to be defined as widget metadata
 }
 
 export interface DiagramEditorEvents {
@@ -246,9 +248,10 @@ export interface DiagramEditorEvents {
 
 // Define props
 const { elements, editable, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
-    editable:      true,
-    customWidgets: false,
+    editable: true,
+    customWidgets: false
 });
+
 
 // Define events
 const emit = defineEmits<DiagramEditorEvents>();
@@ -855,6 +858,12 @@ function onDragInspector(e: any) : void {
     e.target.style.transform = e.transform;  
 }
 
+
+function getObjectToInspect() : [any, ObjectInspectorModel | null] {
+    if(selectedItem.value) return [selectedItem.value,  getItemBlueprint(selectedItem.value.component)[1]]
+
+    return [ null, null]
+}
 
 </script>
 

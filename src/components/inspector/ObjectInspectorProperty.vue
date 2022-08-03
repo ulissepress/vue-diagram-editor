@@ -1,8 +1,8 @@
 <template>
     <div v-if="property.name === ''" class="separator"></div>
-    <div v-else class="property-container" :style="{ width: property.editorFullsize ? '98%' : '49%' }">
-        <div class="property-label">{{ property.label }}</div>
-        <div class="property-editor" :style="{ justifyContent: property.editorRightAlign === true ? 'flex-end' : 'flex-start' }">
+    <div v-else class="property-container" :style="{ width: property.editorFullsize || singleColumn ? '98%' : '49%' }">
+        <div class="property-label"  :style="{ width: singleColumn ? '100px' : '60px' }">{{ property.label }}</div>
+        <div class="property-editor" :style="{ width: singleColumn ? 'calc(100% - 100px - 10px)' : 'calc(100% - 60px - 10px)',  justifyContent: property.editorRightAlign === true && !singleColumn ? 'flex-end' : 'flex-start' }">
             <component v-if = "!property.readonly" 
                        :is               = "editor" 
                        :object           = "object" 
@@ -27,6 +27,7 @@ import { ObjectProperty, PropertyType } from "./types";
 export interface ObjectInspectorPropertyProps {
     object?: any;
     property: ObjectProperty;
+    singleColumn: boolean;
 }
 
 export interface ObjectInspectorPropertyEvents {
@@ -117,8 +118,7 @@ const readonlyValue = computed(() => {
     vertical-align: middle;
 
     width:     var(--label-width);
-    min-width: var(--label-width);
-    max-width: var(--label-width);    
+    
 }
 
 .property-editor {

@@ -22,9 +22,10 @@
             </div>
             
             <ObjectInspectorSection v-if="schema !== null" v-show="expanded" v-for="(section, index) in schema.tabs[currentTab > schema.tabs.length - 1 ? 0 : currentTab].sections" 
-                :key      = "section.name" 
-                :section  = "section" 
-                :object   = "object"
+                :key          = "section.name" 
+                :section      = "section" 
+                :object       = "object"
+                :singleColumn = "schema.singleColumn === true"
                 @property-changed = "(changedProperty, newValue) => emit('property-changed', changedProperty, newValue)" />
 
             <!-- Debug -->
