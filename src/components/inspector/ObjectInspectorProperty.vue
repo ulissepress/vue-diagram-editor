@@ -15,19 +15,18 @@
 
 
 <script setup lang="ts">
-import { computed, onUpdated } from "vue";
+import { computed, inject, onUpdated } from "vue";
 import { getObjectValue } from "../inspector/property-editors/utils";
 import { getEditorForProperty } from "./helpers";
 
 //@ts-ignore
-import { ObjectProperty, PropertyType } from "./types";
+import { ObjectInspectorModel, ObjectProperty, PropertyType } from "./types";
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface ObjectInspectorPropertyProps {
     object?: any;
     property: ObjectProperty;
-    singleColumn: boolean;
 }
 
 export interface ObjectInspectorPropertyEvents {
@@ -48,17 +47,14 @@ onUpdated(() => {
 
 const editor = computed(() => getEditorForProperty(property.type || PropertyType.TEXT))
 
+const schema       = inject<ObjectInspectorModel>('object-inspector-schema')
+const singleColumn = computed(() => schema?.singleColumn === true);
+
 
 const readonlyValue = computed(() => {
-   const f = property.formatValue;
-   console.log('formatting readonly value 0', f, property);
+   const fmtFunc = property.formatValue;
 
-   if(!f) return getObjectValue(object, property.name);
-
-   console.log('formatting readonly value obj', object)
-   console.log('formatting readonly value prop', property)
-   console.log('formatting readonly value value', getObjectValue(object, property.name))
-   return f(object, property, getObjectValue(object, property.name));
+   return fmtFunc ? fmtFunc(object, property, getObjectValue(object, property.name)) : getObjectValue(object, property.name);
 })
 
 </script>

@@ -1,11 +1,8 @@
 <template>
     <div style="width: 100%; height: 95%; padding-top: 16px; margin: 0 auto;">
-        <DiagramEditor :elements = "elements"
-                       :editable = "true" 
-                       :settings = "{
-                            backgroundColor: '#FFF8D2',
-                            customWidgets: true
-                       }" />
+        <DiagramEditor :elements      = "elements"
+                       :editable      = "true" 
+                       :customWidgets = "true" />
     </div>
 </template>
 

@@ -9,7 +9,6 @@
             :key          = "property.name" 
             :property     = "property"
             :object       = "object" 
-            :singleColumn = "singleColumn"
             @property-changed = "(propertyChanged, newValue) => emit('property-changed', propertyChanged, newValue)" />
     </div>
 </template>
@@ -26,7 +25,6 @@ import { InspectorSection, ObjectProperty } from "./types";
 export interface ObjectInspectorSectionProps {
     object?: any;
     section: InspectorSection;
-    singleColumn: boolean;
 }
 
 export interface ObjectInspectorSectionvents {

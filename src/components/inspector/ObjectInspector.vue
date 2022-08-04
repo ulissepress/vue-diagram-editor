@@ -22,24 +22,17 @@
             </div>
             
             <ObjectInspectorSection v-if="schema !== null" v-show="expanded" v-for="(section, index) in schema.tabs[currentTab > schema.tabs.length - 1 ? 0 : currentTab].sections" 
-                :key          = "section.name" 
-                :section      = "section" 
-                :object       = "object"
-                :singleColumn = "schema.singleColumn === true"
+                :key              = "section.name" 
+                :section          = "section" 
+                :object           = "object"
                 @property-changed = "(changedProperty, newValue) => emit('property-changed', changedProperty, newValue)" />
-
-            <!-- Debug -->
-            <!-- <div v-show="expanded">
-                <hr />
-                <pre style="color: #ddd;">{{ object }}</pre>
-            </div> -->
         </template>
     </div>
 </template>
 
 
 <script setup lang="ts">
-import { onBeforeMount, onUpdated, ref } from 'vue';
+import { onBeforeMount, onUpdated, provide, ref } from 'vue';
 import Icon from "../diagram-editor/components/Icon.vue";
 import { registerPredefinedEditors } from './helpers';
 import ObjectInspectorSection from './ObjectInspectorSection.vue';
@@ -75,15 +68,11 @@ onUpdated(() => {
     console.log('ObjectInspector.vue: onUpdated');
 });
 
+provide('object-inspector-schema', schema);
+    
 
 const expanded   = ref(true);
 const currentTab = ref(0)
-// const selectedTab = computed(() => {   
-//     if(!schema) return 0;
-    
-//     console.log('ObjectInspector.vue: selectedTab', currentTab.value, schema.tabs.length);
-//     return currentTab.value > schema.tabs.length - 1 ? 0 : currentTab.value;
-// })
 
 function getTabSections() {
     console.log('ObjectInspector.vue: getTabSections', schema, currentTab.value);
