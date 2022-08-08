@@ -36,8 +36,8 @@
                     :to          = "getItemById(items, c.to.item)!"
                     :connection  = "c"
                     :style       = "{ zIndex: c.z }"
-                    :selected    = "c.id === selectedItem?.id"
-                    @selected    = "selectItem(c)" />
+                    :selected    = "c.id === objectToInspect?.id"
+                    @selected    = "selectConnection(c)" />
                         
                 <!-- Use to render a connection line during a new connection creation -->
                 <RawConnection v-if="creatingConnection && connectionInfo.startItem" 
@@ -82,7 +82,7 @@
             <!-- Manage drag / resize / rotate / rounding of selected item -->
             <Moveable 
                 ref     = "moveable"
-                :target = "isItem(selectedItem) ? [`[data-item-id='${selectedItem.id}']`] : []"
+                :target = "targets"
                 :zoom   = "1 / zoomFactor"
                 :origin = "false"  
 
@@ -103,8 +103,8 @@
                 :verticalGuidelines      = "verticalGuidelines"
                 :elementGuidelines       = "showGuides ? elementGuidelines : []"
                 
-                :clippable         = "isItem(selectedItem) && selectedItem.clipType !== ClipType.NONE"
-                :defaultClipPath   = "isItem(selectedItem) ? selectedItem.clipType : ClipType.NONE"
+                :clippable         = "targets.length === 1 && selectedItem?.clipType !== ClipType.NONE"
+                :defaultClipPath   = "targets.length === 1  ? selectedItem?.clipType : ClipType.NONE"
                 :clipArea          = "false"
                 :clipRelative      = "false"
                 :dragWithClip      = "true"
@@ -112,20 +112,28 @@
 
                 :draggable = "selectedItemActive"
                 :rotatable = "selectedItemActive"
-                :resizable = "selectedItemActive && (selectedItem as Item)?.supportsResizable === true"
+                :resizable = "targets.length > 0"
                 :roundable = "selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
 
                 @dragStart   = "onDragStart"
                 @drag        = "onDrag"
                 @dragEnd     = "onDragEnd"
 
+                @dragGroupStart = "onDragGroupStart"
+                @dragGroup      = "onDragGroup"
+                @dragGroupEnd   = "onDragGroupEnd"
+
                 @resizeStart = "onResizeStart"
                 @resize      = "onResize"
                 @resizeEnd   = "onResizeEnd"
+
+                @resizeGroup = "onResizeGroup"
+                
                 
                 @rotateStart = "onRotateStart"
                 @rotate      = "onRotate"
                 @rotateEnd   = "onRotateEnd"
+                @rotateGroup = "onRotateGroup"
 
                 @roundStart  = "onRoundStart"
                 @round       = "onRound"
@@ -177,7 +185,8 @@
         <!-- Object Inspector -->
         <div v-if='editable && showInspector' class="object-inspector-container" :style="{ transform: `translate(${inspectorCoords.x}px, ${inspectorCoords.y}px)`}">
             <ObjectInspector :schema = "getObjectToInspect()[1]"
-                             :object = "getObjectToInspect()[0]"                                
+                             :object = "getObjectToInspect()[0]"
+                             :title = "selectedItem?.id"
                              @property-changed="onPropertyChange" />                                
         </div>
         <!-- Manage drag of inspector -->
@@ -298,13 +307,10 @@ const showGuides    = ref(true);               // Show or hide all the guides
 const showInspector = ref(true);               // Show or hide all the guides
 const showKeyboard  = ref(false);              // Show or hide all the guides
 
-const selectedItem  = ref<DiagramElement | null>(null);
+const selectedItem  = computed(() => targets.value.length === 1 ? getItemFromElement(targets.value[0]) : null );
 
 const selectedItemActive = computed(() => {
-    if(!selectedItem.value) return false;
-
-    // An item is 'active' if not locked, a connection is always 'active'
-    return isItem(selectedItem.value) ? (!selectedItem.value.locked === true) : true;
+    return targets.value.length > 0    
 })
 
 const shiftPressed   = useKeyModifier('Shift')
@@ -323,6 +329,10 @@ const inlineEditing = ref(false);
 const horizontalGuidelines = computed(() => showGuides.value ? (viewportSize ? [0, viewportSize[1]/2, viewportSize[1], ...hGuideValues.value] : hGuideValues.value) : []);
 const verticalGuidelines   = computed(() => showGuides.value ? (viewportSize ? [0, viewportSize[0]/2, viewportSize[0], ...vGuideValues.value] : vGuideValues.value) : []);
 const elementGuidelines    = computed(() => viewport.value   ? Array.prototype.slice.call(viewport.value!.querySelectorAll(".item"), 0).filter(n => !n.classList.contains('target')) : []);
+
+
+const targets         = ref<HTMLDivElement[]>([]);
+const objectToInspect = ref<any | null>(null);
 
 
 // Temporary variables
@@ -368,18 +378,40 @@ function onMouseLeave(item: Item, e: MouseEvent) {
     if('hover' in item) delete item.hover;
 }
 
-function selectItem(item: Item | ItemConnection, e?: MouseEvent)  : void {
-    // Item already selected?
-    if (item.id === selectedItem.value?.id) return;
 
+function selectConnection(connection: ItemConnection) {
+    if(!connection) return;
+    selectNone();
+    nextTick(() => objectToInspect.value = connection );
+    
+}
+
+function selectItem(item: Item, e?: MouseEvent)  : void {
+
+    const el = getTargetElement(item as Item);
+    if(!el) return;
+
+    // Already selected
+    if(targets.value.includes(el)) return;
+
+    // Item already selected?
     console.log('selectItem', item, e);
 
-    selectNone();
-    nextTick(() => {
-        selectedItem.value = item;
-        if (e) nextTick(() => { moveable.value?.dragStart(e); });        
+    if(shiftPressed.value === true) {
+        targets.value.push(el);
+        objectToInspect.value = null;
+    } else {
+        targets.value = [el];
+        objectToInspect.value = item;
+    }
 
-        if(moveableInspector.value) moveableInspector.value.updateRect();
+    console.log('### TARGETS', targets.value.length, targets.value);
+    
+
+    //selectNone();
+    nextTick(() => {
+        moveableInspector.value?.updateTarget();
+        if(e) nextTick(() => { moveable.value?.dragStart(e); });                
     });
 }
 
@@ -388,17 +420,30 @@ function selectNone() : void {
     if(target)  {
         const elementToEdit = target.querySelector('.diagram-item-inline-edit') as HTMLElement;
         if(elementToEdit) {
+
             elementToEdit.removeAttribute('contenteditable');            
-            selectedItem.value!.title = elementToEdit.innerHTML;
+            if(selectedItem.value)  selectedItem.value.title = elementToEdit.innerHTML; 
             inlineEditing.value = false;
         }                
     }
-    
-    selectedItem.value = null;
-    nextTick(() => { if(moveableInspector.value) moveableInspector.value.updateRect(); });
 
+    targets.value = [];
+    objectToInspect.value = null;
+    console.log('### selectNone', targets.value);
+    
+    nextTick(() => { if(moveableInspector.value) moveableInspector.value.updateRect(); });
 }
 
+function setObjectToInspect(item: Item | ItemConnection) : void {
+    const el = getTargetElement(item as Item);
+    if(!el) return;
+    const elementToEdit = el.querySelector('.diagram-item-inline-edit') as HTMLElement;
+    if(elementToEdit) {
+        elementToEdit.setAttribute('contenteditable', 'true');
+        elementToEdit.focus();
+        inlineEditing.value = true;
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Drag item
@@ -408,7 +453,7 @@ function onDragStart(e: any) : void {
     
     const target = getTargetElement(selectedItem.value);
     if(target && target.contentEditable === "true") {
-        e.stop();
+        e.stopDrag();
         return;
     }
 
@@ -436,6 +481,27 @@ function onDragEnd(e: any) : void {
     historyManager.value.execute(new MoveCommand(selectedItem.value, [origin.x, origin.y], [selectedItem.value.x, selectedItem.value.y]));
 }
 
+function onDragGroupStart(e: any) : void {
+
+    console.log('onDragGroupStart', e);
+    // Save current position of selected items
+}
+
+function onDragGroup(ev: any) : void {
+    for(const e of ev.events) {
+        const item = getItemFromElement(e.target);
+        if(!item) continue;
+        
+        item.x = Math.floor(e.beforeTranslate[0]);
+        item.y = Math.floor(e.beforeTranslate[1]);
+        e.target.style.transform = e.transform;  
+    }
+}
+
+function onDragGroupEnd(e: any) : void {
+       console.log('onDragGroupEnd', e);
+
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Resize item
@@ -469,6 +535,23 @@ function onResizeEnd(e: any) : void {
 }
 
 
+function onResizeGroup(ev: any) : void {
+    for(const e of ev.events) {
+        const item = getItemFromElement(e.target);
+        if(!item) continue;
+        
+        // console.log('onresize', e);
+        item.x = Math.floor(e.drag.beforeTranslate[0]);
+        item.y = Math.floor(e.drag.beforeTranslate[1]);
+        item.w = Math.floor(e.width);
+        item.h = Math.floor(e.height);
+
+        e.target.style.transform = e.drag.transform;  
+        e.target.style.width     = `${Math.floor(e.width)}px`;
+        e.target.style.height    = `${Math.floor(e.height)}px`;
+    }
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Rotate item
 // ---------------------------------------------------------------------------------------------------------------------
@@ -486,6 +569,17 @@ function onRotate(e: any) : void {
 
 function onRotateEnd(e: any) : void {
     if(isItem(selectedItem.value)) historyManager.value.execute(new RotateCommand(selectedItem.value, origin.r, selectedItem.value.r));
+}
+
+
+function onRotateGroup(ev: any) : void {
+    for(const e of ev.events) {
+        const item = getItemFromElement(e.target);
+        if(!item) continue;
+        
+        item.r = e.beforeRotate % 360;
+        e.target.style.transform = e.drag.transform;
+    }
 }
 
 
@@ -622,7 +716,7 @@ function onCanvasClick(e: any): void {
 
     // Current tool is 'select' => clicking the canvas unselect all
     if(currentTool.value === EditorTool.SELECT) {
-        console.log('Unselecting all');
+        console.log('Unselecting all', e.target);
         selectNone();
         return;
     }
@@ -817,7 +911,7 @@ function pasteItem() {
     historyManager.value.execute(new AddItemCommand(elements, newItem));
     itemToPaste.value = newItem;
     nextTick(() => selectItem(newItem));
-
+    
     emit('add-item', newItem);
 }
 // ---------------------------------------------------------------------------------------------------------------------
@@ -828,6 +922,15 @@ function getTargetElement(item: Item) : HTMLDivElement | undefined{
     if(el === undefined || el === null) return undefined;
 
     return el as HTMLDivElement;
+}
+
+
+function getItemFromElement(el: HTMLElement) : Item | undefined {
+    if(!el) return undefined;
+    const itemId = el.getAttribute('data-item-id');
+    if(!itemId) return undefined;
+    return getItemById(items.value, itemId)
+
 }
 
 function inlineEdit(item: Item) {
@@ -844,12 +947,12 @@ function inlineEdit(item: Item) {
 }
 
 function onDragStartInspector(e: any) : void {    
+    console.log('onDragStartInspector', e);         
     if(!e.inputEvent.target.className.includes('inspector-title-drag-handle')) {
-        e.stop();
+        e.stopDrag();
         return;
     }
 
-    console.log('onDragStartInspector', e);         
 }
 
 function onDragInspector(e: any) : void {
@@ -860,9 +963,9 @@ function onDragInspector(e: any) : void {
 
 
 function getObjectToInspect() : [any, ObjectInspectorModel | null] {
-    if(selectedItem.value) return [selectedItem.value,  getItemBlueprint(selectedItem.value.component)[1]]
+    if(objectToInspect.value === null) return [null, null];
 
-    return [ null, null]
+    return [objectToInspect.value,  getItemBlueprint(objectToInspect.value.component)[1]]
 }
 
 </script>

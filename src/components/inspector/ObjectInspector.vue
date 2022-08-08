@@ -9,10 +9,10 @@
             </div>
         </div>
         <div v-if="expanded && (object === null || object === undefined)">
-            <div style="color: #aaa; font-size: 11px; text-align: center; margin-bottom: 8px; font-style: italic;">No selected object</div>
+            <div style="color: #aaa; font-size: 11px; text-align: center; margin-bottom: 8px; font-style: italic;">No / multiple selected object(s)</div>
         </div>
         <template v-else>
-            <div v-if="schema !== null" v-show="expanded" class="tab-container">
+            <div v-if="schema !== null && schema.tabs.length > 1" v-show="expanded" class="tab-container">
                 <ObjectInspectorTab v-for="(tab, index) in schema.tabs" 
                     :key      = "tab.title" 
                     :tab      = "tab" 

@@ -267,7 +267,7 @@ export const connectionModel: ObjectInspectorModel = {
             sections: [        
                 {   // Style
                     name: "style",
-                    title: "Style",
+                    title: "Connection Style",
                     properties: [ 
                         { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionType.LINE,  icon: "horizontal_rule" }, 
