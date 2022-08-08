@@ -101,7 +101,7 @@
                 :isDisplayInnerSnapDigit = "true"
                 :horizontalGuidelines    = "horizontalGuidelines"
                 :verticalGuidelines      = "verticalGuidelines"
-                :elementGuidelines       = "showGuides ? elementGuidelines : []"
+                :elementGuidelines       = "showGuides ? elementGuidelines() : []"
                 
                 :clippable         = "targets.length === 1 && selectedItem?.clipType !== ClipType.NONE"
                 :defaultClipPath   = "targets.length === 1  ? selectedItem?.clipType : ClipType.NONE"
@@ -231,7 +231,9 @@ import ObjectInspector from '../inspector/ObjectInspector.vue';
 import { ObjectInspectorModel, ObjectProperty } from '../inspector/types';
 import AddConnectionCommand from './commands/AddConnectionCommand';
 import ClipCommand from './commands/ClipCommand';
+import Command from './commands/Command';
 import DeleteCommand from './commands/DeleteCommand';
+import GroupCommand from './commands/GroupCommand';
 import Icon from './components/Icon.vue';
 import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
@@ -309,9 +311,7 @@ const showKeyboard  = ref(false);              // Show or hide all the guides
 
 const selectedItem  = computed(() => targets.value.length === 1 ? getItemFromElement(targets.value[0]) : null );
 
-const selectedItemActive = computed(() => {
-    return targets.value.length > 0    
-})
+const selectedItemActive = computed(() => targets.value.length > 0);
 
 const shiftPressed   = useKeyModifier('Shift')
 const historyManager = ref(new HistoryManager());
@@ -322,13 +322,13 @@ const creatingConnection = computed<boolean>(() => currentTool.value === EditorT
 const items       = computed(() => elements.filter(e => isItem(e)) as Item[]);
 const connections = computed(() => elements.filter(e => isConnection(e)) as ItemConnection[]);
 
-const itemToPaste   = ref(null as Item | null);
+const itemToPaste   = ref<Item[] | null> (null);
 const inlineEditing = ref(false);
 
 
 const horizontalGuidelines = computed(() => showGuides.value ? (viewportSize ? [0, viewportSize[1]/2, viewportSize[1], ...hGuideValues.value] : hGuideValues.value) : []);
 const verticalGuidelines   = computed(() => showGuides.value ? (viewportSize ? [0, viewportSize[0]/2, viewportSize[0], ...vGuideValues.value] : vGuideValues.value) : []);
-const elementGuidelines    = computed(() => viewport.value   ? Array.prototype.slice.call(viewport.value!.querySelectorAll(".item"), 0).filter(n => !n.classList.contains('target')) : []);
+const elementGuidelines    = () => viewport.value ? Array.prototype.slice.call(viewport.value!.querySelectorAll(".item"), 0).filter(n => !n.classList.contains('target')) : [];
 
 
 const targets         = ref<HTMLDivElement[]>([]);
@@ -391,12 +391,11 @@ function selectItem(item: Item, e?: MouseEvent)  : void {
     const el = getTargetElement(item as Item);
     if(!el) return;
 
-    // Already selected
+    // Already selected?
     if(targets.value.includes(el)) return;
 
-    // Item already selected?
     console.log('selectItem', item, e);
-
+        
     if(shiftPressed.value === true) {
         targets.value.push(el);
         objectToInspect.value = null;
@@ -641,21 +640,45 @@ function onScroll(e: any) : void {
 }
  
 
-/** Send the selected item to the bottom of the z-index */
+/** Send the selected items to the bottom of the z-index */
 function sendToBack() : void {
-    if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, findMinZ(items.value as Item[]) - 1));    
+    if(targets.value.length === 0) return;
+
+    const newZ = findMinZ(items.value as Item[]) - 1;
+
+    const commands: Command[] = [];
+    for(const e of targets.value) {
+        const item = getItemFromElement(e);
+        if(item) commands.push(new ChangeZOrderCommand(item, item.z, newZ))
+    }
+    historyManager.value.execute(new GroupCommand(commands));
 }
 
-/** Send the selected item to the top of the z-index */
+
+/** Send the selected items to the top of the z-index */
 function bringToFront() : void {
-    if(selectedItem.value) historyManager.value.execute(new ChangeZOrderCommand(selectedItem.value, selectedItem.value.z, findMaxZ(items.value as Item[]) + 1));    
+    if(targets.value.length === 0) return;
+
+    const newZ = findMaxZ(items.value as Item[]) + 1;
+
+    const commands: Command[] = [];
+    for(const e of targets.value) {
+        const item = getItemFromElement(e);
+        if(item) commands.push(new ChangeZOrderCommand(item, item.z, newZ))
+    }
+    historyManager.value.execute(new GroupCommand(commands));
 }
 
 /** Delete current selected item / connection */
 function deleteItem() {
-    if(isItem(selectedItem.value)) {
-        historyManager.value.execute(new DeleteCommand(elements, selectedItem.value));
-        emit('delete-item', selectedItem.value);
+    // Are there any items selected (1 or more)
+    if(targets.value.length > 0) {
+        const commands: Command[] = [];
+        for(const e of targets.value) {
+            const itemToDelete = getItemFromElement(e);
+            if(itemToDelete) commands.push(new DeleteCommand(elements, itemToDelete))
+        }
+        historyManager.value.execute(new GroupCommand(commands));
         selectNone();
     }
 
@@ -876,16 +899,16 @@ function setupKeyboardHandlers() {
 
 // Clipboard management
 // ---------------------------------------------------------------------------------------------------------------------
-function deepCloneItem(item: any) : any {
-    return JSON.parse(JSON.stringify(item));
+function deepCloneItem(obj: any) : any {
+    return JSON.parse(JSON.stringify(obj));
 }
 
 function copyItem() {
-    if(!isItem(selectedItem.value)) return;
+    if(targets.value.length === 0) return;
      
-    console.log('Copying item', selectedItem.value);
+    console.log('Copying items', targets.value);
 
-    itemToPaste.value = selectedItem.value;
+    itemToPaste.value = targets.value.map(el => getItemFromElement(el)) as Item[];
 
     // TODO:  notify the user visually that the item has been copied
 }
@@ -894,7 +917,7 @@ function cutItem() {
     if(!isItem(selectedItem.value)) return;
     
     console.log('Cutting item', selectedItem.value);
-    itemToPaste.value = selectedItem.value;
+    itemToPaste.value = targets.value.map(el => getItemFromElement(el)) as Item[];
     deleteItem();
 }
 
@@ -902,17 +925,20 @@ function pasteItem() {
     if(!itemToPaste.value) return;
     console.log('Paste item', selectedItem.value);
 
-    const newItem = deepCloneItem(itemToPaste.value) as Item;
+    const newItems = deepCloneItem(itemToPaste.value) as Item[];
 
-    newItem.id = getUniqueId(); 
-    newItem.x += 20;
-    newItem.y += 20;
+    for(const newItem of newItems) {
+        newItem.id = getUniqueId(); 
+        newItem.x += 20;
+        newItem.y += 20;
+        historyManager.value.execute(new AddItemCommand(elements, newItem));
+    }
+
         
-    historyManager.value.execute(new AddItemCommand(elements, newItem));
-    itemToPaste.value = newItem;
-    nextTick(() => selectItem(newItem));
-    
-    emit('add-item', newItem);
+    itemToPaste.value = newItems;
+    selectNone();
+    nextTick(() => newItems.map(item => selectItem(item)));
+        
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
