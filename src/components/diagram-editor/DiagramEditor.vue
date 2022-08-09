@@ -208,7 +208,7 @@
 
 <script setup lang="ts">
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
-import { computed, nextTick, onMounted, onUpdated, ref } from "vue";
+import { computed, getCurrentInstance, nextTick, onMounted, onUpdated, ref } from "vue";
 import Guides from "vue3-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
@@ -229,6 +229,7 @@ import { ClipType, ConnectionHandle, ConnectionType, DiagramElement, EditorTool,
 
 import ObjectInspector from '../inspector/ObjectInspector.vue';
 import { ObjectInspectorModel, ObjectProperty } from '../inspector/types';
+import { registerBasicBlocks } from './blocks/utils';
 import AddConnectionCommand from './commands/AddConnectionCommand';
 import ClipCommand from './commands/ClipCommand';
 import Command from './commands/Command';
@@ -269,8 +270,7 @@ const emit = defineEmits<DiagramEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 onMounted(() => {
-    console.log('DiagramEditor onMounted')
-    
+    registerBasicBlocks(getCurrentInstance()!.appContext.app);
     registerDefaultItemTypes();
 
     // Initialize rulers and infinite viewer
