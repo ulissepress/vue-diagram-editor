@@ -4,10 +4,9 @@ import { ObjectInspectorModel, ObjectProperty } from './../inspector/types';
 
 export const separator$ : ObjectProperty = { name: "" };
 
-export const id$    : ObjectProperty = { name: "id",     label: "ID",   type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (obj, prop, value) => value + ' (' + obj.component + ')' };
-export const title$ : ObjectProperty = { name: "title",  label: "Text", type: PropertyType.TEXT,  editorFullsize: true };
-
-export const fontSize$ : ObjectProperty = { name: "fontSize",     label: "Font Size",  type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 4, max: 120, step: 1 } };
+export const id$       : ObjectProperty = { name: "id",      label: "ID",          type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (obj, prop, value) => value + ' (' + obj.component + ')' };
+export const title$    : ObjectProperty = { name: "title",   label: "Text",        type: PropertyType.TEXT,  editorFullsize: true };
+export const fontSize$ : ObjectProperty = { name: "fontSize", label: "Font Size",  type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 4, max: 120, step: 1 } };
 
 export const textHAlign$ : ObjectProperty = { 
     name: "textHAlign",  label: "H Align",  type: PropertyType.ICON_LIST, editorOptions: { 
@@ -30,8 +29,8 @@ export const locked$    : ObjectProperty = { name: "locked",           label: "L
 
 export const x$ : ObjectProperty = { name: "x", label: "X",      type: PropertyType.NUMBER };
 export const y$ : ObjectProperty = { name: "y", label: "Y",      type: PropertyType.NUMBER };
-export const w$ : ObjectProperty = { name: "w", label: "Width",  type: PropertyType.NUMBER };
-export const h$ : ObjectProperty = { name: "h", label: "Height", type: PropertyType.NUMBER };
+export const w$ : ObjectProperty = { name: "w", label: "Width",  type: PropertyType.NUMBER, editorOptions: { min: 0 } };
+export const h$ : ObjectProperty = { name: "h", label: "Height", type: PropertyType.NUMBER, editorOptions: { min: 0 } };
 
 export const rotate$  : ObjectProperty = { name: "r",             label: "Rotation",  type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: -360, max: 360, step: 1 }};
 export const radius$  : ObjectProperty = { name: "borderRadius",  label: "Radius",    type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 0,    max: 100, step: 1 }};
@@ -58,9 +57,9 @@ export const shadowSection$ = {   // Shadow
     title: "Shadow",
     properties: [
         { name: "shadow.enabled",  label: "Enabled", type: PropertyType.BOOLEAN, editorFullsize: true },
-        { name: "shadow.offsetX",  label: "X",       type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: -50, max: 50, step: 1 } },
-        { name: "shadow.offsetY",  label: "Y",       type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: -50, max: 50, step: 1 } },
-        { name: "shadow.blur",     label: "Blur",    type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0,   max: 20, step: 1 } },
+        { name: "shadow.offsetX",  label: "X",       type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: -100, max: 100, step: 1 } },
+        { name: "shadow.offsetY",  label: "Y",       type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: -100, max: 100, step: 1 } },
+        { name: "shadow.blur",     label: "Blur",    type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0,    max: 50,  step: 1 } },
         { name: "shadow.color",    label: "Color",   type: PropertyType.COLOR,   editorFullsize: true },
     ] 
 }
@@ -69,13 +68,13 @@ export const borderWithoutRadiusSection$ = {   // Border
     name: "border",
     title: "Border",
     properties: [
-        { name: "border.width",  label: "Width", type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 0, max: 50, step: 1 } },
+        { name: "border.width",  label: "Width", type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 0, max: 100, step: 1 } },
         { name: "border.style",  label: "Style", type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
             items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
                      { name: ConnectionStyle.DASHED, text: "Dashed" },
                      { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
         }},
-        { name: "border.color",  label: "Color", type: PropertyType.COLOR,     editorFullsize: true },
+        { name: "border.color",  label: "Color", type: PropertyType.COLOR, editorFullsize: true },
     ] 
 }
 
@@ -212,7 +211,7 @@ export const imageModel: ObjectInspectorModel = {
                     title: "Filters",
                     properties: [
                         { name: "filtersEnabled",     label: "Enabled",    type: PropertyType.BOOLEAN, editorFullsize: true },
-                        { name: "filters.blur",       label: "Blur",       type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 10,   step: 1 }},
+                        { name: "filters.blur",       label: "Blur",       type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 50,   step: 1 }},
                         { name: "filters.grayscale",  label: "Grayscale",  type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 100,  step: 1 }},
                         { name: "filters.brightness", label: "Brightness", type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 200,  step: 1 }},
                         { name: "filters.contrast",   label: "Contrast",   type: PropertyType.RANGE,   editorFullsize: true, editorOptions: { min: 0, max: 200,  step: 1 }},
@@ -291,7 +290,6 @@ export const connectionModel: ObjectInspectorModel = {
                                      { name: ConnectionMarker.CIRCLE, icon: "circle:filled" },
                                      { name: ConnectionMarker.ARROW,  icon: "east"  } ] 
                         }},
-
                         separator$,
                         { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR },
                         { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
@@ -312,8 +310,8 @@ export const lineModel: ObjectInspectorModel = {
                     name: "style",
                     title: "Style",
                     properties: [ 
-                        { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
-                        { name: "style",  label: "Style", type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                        { name: "thick", label: "Thick", type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
+                        { name: "style", label: "Style", type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
                                      { name: ConnectionStyle.DASHED, text: "Dashed" },
                                      { name: ConnectionStyle.DOTTED, text: "Dotted" } ] 
