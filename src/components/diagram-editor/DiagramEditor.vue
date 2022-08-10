@@ -1056,16 +1056,11 @@ function onItemSelectionEnd(e: any) {
         // Clicking the canvas with other tools => create a new item of related type
         const toolDef  = getToolDefinition(currentTool.value);   
         
-        const scrollTop  = viewer.value.getScrollTop()  / zoomFactor.value;
-        const scrollLeft = viewer.value.getScrollLeft() / zoomFactor.value;
-        const top        = e.rect.top  + scrollTop  + 40;
-        const left       = e.rect.left + scrollLeft + 80;
-
         const newItem  = deepCloneItem({
             ...getItemBlueprint(toolDef.itemType!)[0],
             id: getUniqueId(),
-            x:  mouseCoords.value.x - e.rect.width/ zoomFactor.value, // Math.floor(left / zoomFactor.value),         // mouseCoords.value.x,
-            y:  mouseCoords.value.y - e.rect.height/ zoomFactor.value, // Math.floor(top  / zoomFactor.value),         // mouseCoords.value.y
+            x:  Math.floor(mouseCoords.value.x - e.rect.width  / zoomFactor.value),
+            y:  Math.floor(mouseCoords.value.y - e.rect.height / zoomFactor.value), 
             w:  Math.floor(e.rect.width  / zoomFactor.value),
             h:  Math.floor(e.rect.height / zoomFactor.value)
         })
