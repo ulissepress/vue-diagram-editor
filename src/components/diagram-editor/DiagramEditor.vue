@@ -20,8 +20,7 @@
 
             @wheel          = "onScroll" 
             @scroll         = "onScroll"              
-            @mousemove      = "onMouseMove"
-            @click.stop     = "editable && !shiftPressed && onCanvasClick($event)">
+            @mousemove      = "onMouseMove">
             
             <div ref="viewport" 
                  :class="{ 'viewport': true, 'viewport-area': viewportSize }" 
@@ -145,6 +144,20 @@
             </div> <!-- viewport -->
         </VueInfiniteViewer>
         
+        <VueSelecto v-if="!shiftPressed"
+            container             = ".viewer"
+            :selectableTargets    = '[".item"]'
+            :selectByClick        = "true"
+            :selectFromInside     = "true"
+            :continueSelect       = "false"
+            :toggleContinueSelect = "'shift'"
+            :hitRate              = "0"
+            :preventDefault       = "true"
+            @dragStart            = "onItemSelectionDragStart"
+            @select               = "onItemSelection" 
+            @selectEnd            = "onItemSelectionEnd" 
+            />
+        
         
 
         <div class="toolbars-container" :style="{ top: showRulers && editable ? '40px' : '10px', left: showRulers && editable ? '40px' : '10px' }">
@@ -227,6 +240,7 @@ import ToolsToolbar from './components/ToolsToolbar.vue';
 import ZoomToolbar from './components/ZoomToolbar.vue';
 import { ClipType, ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 
+import { VueSelecto } from "vue3-selecto";
 import ObjectInspector from '../inspector/ObjectInspector.vue';
 import { ObjectInspectorModel, ObjectProperty } from '../inspector/types';
 import { registerBasicBlocks } from './blocks/utils';
@@ -732,38 +746,38 @@ function selectCurrentTool(tool: EditorTool) : void {
 
 /** Handle the clik in the overall canvas */
 function onCanvasClick(e: any): void {
-    // console.log('onCanvasClick', e);
+    console.log('onCanvasClick', e);
 
     // Was just clicking the scrollbar for scrolling?
     if(e.target?.classList?.contains('infinite-viewer-scroll-thumb')) return;
 
-    // Current tool is 'select' => clicking the canvas unselect all
-    if(currentTool.value === EditorTool.SELECT) {
-        console.log('Unselecting all', e.target);
-        selectNone();
-        return;
-    }
+    // // Current tool is 'select' => clicking the canvas unselect all
+    // if(currentTool.value === EditorTool.SELECT) {
+    //     console.log('Unselecting all', e.target);
+    //     selectNone();
+    //     return;
+    // }
 
-    // Clicking in the canvas resets the current connection creation
-    if(currentTool.value === EditorTool.CONNECTION) {
-        connectionInfo.startItem = null;
-        connectionInfo.endItem   = null;
-        return;
-    }
+    // // Clicking in the canvas resets the current connection creation
+    // if(currentTool.value === EditorTool.CONNECTION) {
+    //     connectionInfo.startItem = null;
+    //     connectionInfo.endItem   = null;
+    //     return;
+    // }
     
 
-    // Clicking the canvas with other tools => create a new item of related type
-    const toolDef  = getToolDefinition(currentTool.value);    
-    const newItem  = deepCloneItem({
-        ...getItemBlueprint(toolDef.itemType!)[0],
-        id: getUniqueId(),
-        x: mouseCoords.value.x,
-        y: mouseCoords.value.y
-    })
+    // // Clicking the canvas with other tools => create a new item of related type
+    // const toolDef  = getToolDefinition(currentTool.value);    
+    // const newItem  = deepCloneItem({
+    //     ...getItemBlueprint(toolDef.itemType!)[0],
+    //     id: getUniqueId(),
+    //     x: mouseCoords.value.x,
+    //     y: mouseCoords.value.y
+    // })
     
-    console.log('creating new item', toolDef, toolDef.itemType, newItem)
-    historyManager.value.execute(new AddItemCommand(elements, newItem));
-    emit('add-item', newItem);
+    // console.log('creating new item', toolDef, toolDef.itemType, newItem)
+    // historyManager.value.execute(new AddItemCommand(elements, newItem));
+    // emit('add-item', newItem);
 }
 
 /** Handle a click on the connection handles */
@@ -973,15 +987,20 @@ function inlineEdit(item: Item) {
 }
 
 function onDragStartInspector(e: any) : void {    
-    console.log('onDragStartInspector', e);         
     if(!e.inputEvent.target.className.includes('inspector-title-drag-handle')) {
         e.stopDrag();
         return;
     }
-
+    console.log('onDragStartInspector', e);         
 }
 
 function onDragInspector(e: any) : void {
+    if(!e.inputEvent.target.className.includes('inspector-title-drag-handle')) {
+        e.stopDrag();
+        return;
+    }
+    console.log('onDragInspector', e);         
+
     inspectorCoords.value.x = Math.floor(e.beforeTranslate[0]);
     inspectorCoords.value.y = Math.floor(e.beforeTranslate[1]);
     e.target.style.transform = e.transform;  
@@ -994,6 +1013,68 @@ function getObjectToInspect() : [any, ObjectInspectorModel | null] {
     return [objectToInspect.value,  getItemBlueprint(objectToInspect.value.component)[1]]
 }
 
+function checkToIgnoreTheEvent(e: any): boolean {
+    // Is the click from a toolbar or the inspector?   
+    // TODO:  this can be omitted if the toolbar/inspector are moved out from the canvas
+    if(e.inputEvent.target.closest('div.toolbars-container')) { e.stop(); return true; }
+    if(e.inputEvent.target.classList.contains('object-inspector-container') || e.inputEvent.target.closest('div.object-inspector-container')) { e.stop(); return true; };
+
+    return false;
+}
+
+function onItemSelectionDragStart(e: any) {
+    if(checkToIgnoreTheEvent(e)) return;
+
+    console.log('onItemSelectionDragStart', e.selected);
+}
+
+
+function onItemSelection(e: any) {
+    if(checkToIgnoreTheEvent(e)) return;
+
+    console.log('onItemSelection', e.selected);
+    targets.value = e.selected;
+}
+
+function onItemSelectionEnd(e: any) {
+    if(checkToIgnoreTheEvent(e)) return;    
+    console.log('onItemSelectionEnd', e);
+
+    targets.value = e.selected;
+
+    // NOTE: the end of selection is also triggered when the user 'click' on the canvas
+
+    // Clicking in the canvas resets the current connection creation
+    if(currentTool.value === EditorTool.CONNECTION) {
+        connectionInfo.startItem = null;
+        connectionInfo.endItem   = null;
+        return;
+    }
+    
+    // If the current tool is not the SELECTOR => Create new item based on current tool selection (shape, ...)
+    if(currentTool.value !== EditorTool.SELECT) {
+        // Clicking the canvas with other tools => create a new item of related type
+        const toolDef  = getToolDefinition(currentTool.value);   
+        
+        const scrollTop  = viewer.value.getScrollTop()  / zoomFactor.value;
+        const scrollLeft = viewer.value.getScrollLeft() / zoomFactor.value;
+        const top        = e.rect.top  + scrollTop  + 40;
+        const left       = e.rect.left + scrollLeft + 80;
+
+        const newItem  = deepCloneItem({
+            ...getItemBlueprint(toolDef.itemType!)[0],
+            id: getUniqueId(),
+            x:  mouseCoords.value.x - e.rect.width/ zoomFactor.value, // Math.floor(left / zoomFactor.value),         // mouseCoords.value.x,
+            y:  mouseCoords.value.y - e.rect.height/ zoomFactor.value, // Math.floor(top  / zoomFactor.value),         // mouseCoords.value.y
+            w:  Math.floor(e.rect.width  / zoomFactor.value),
+            h:  Math.floor(e.rect.height / zoomFactor.value)
+        })
+        
+        console.log('creating new item', toolDef, toolDef.itemType, newItem)
+        historyManager.value.execute(new AddItemCommand(elements, newItem));
+        emit('add-item', newItem);
+    }
+}
 </script>
 
 
