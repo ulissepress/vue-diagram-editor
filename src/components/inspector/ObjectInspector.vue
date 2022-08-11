@@ -95,7 +95,7 @@ function getTabSections() {
     height: auto;
     max-height: 100%;
 
-    background-color: #333;
+    background-color: #2c2c2c;
     
     overflow-x: hidden;
     overflow-y: auto;

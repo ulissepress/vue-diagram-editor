@@ -1,5 +1,41 @@
 <template>
-    <div class="editor-container">
+    <div class="editor-layout">
+        <div class="editor-toolbars">
+            <!-- Editor Toolbar -->
+            <ToolsToolbar v-if='editable'  :customWidgets = "customWidgets === true" :selectedTool  = "currentTool"  @toolSelected  = "selectCurrentTool" />
+            <div class='toolbar-separator'></div>
+            <ZoomToolbar :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
+            <div class='toolbar-separator'></div>
+            <div v-if="editable" class="toolbar">
+                <button class='toolbar-item' @click="undo" :disabled="!historyManager.canUndo()" title="Undo"><Icon icon="undo" size="20px"/></button>
+                <button class='toolbar-item' @click="redo" :disabled="!historyManager.canRedo()" title="Redo"><Icon icon="redo" size="20px"/></button>
+                
+                <div class='toolbar-item-separator'></div>
+                <button class='toolbar-item' @click="deleteItem" :disabled="!selectedItemActive" title="Delete"><Icon icon="delete" size="20px"/></button>
+                
+                <div class='toolbar-item-separator'></div>
+                <button class='toolbar-item' @click="copyItem"   :disabled="!isItem(selectedItem)"  title="Copy"><Icon icon="content_copy"   size="18px"/></button>
+                <button class='toolbar-item' @click="cutItem"    :disabled="!isItem(selectedItem)"  title="Cut"><Icon icon="content_cut"     size="18px"/></button>
+                <button class='toolbar-item' @click="pasteItem"  :disabled="itemToPaste === null"   title="Paste"><Icon icon="content_paste" size="18px"/></button>
+                
+                <div class='toolbar-item-separator'></div>               
+                <button class='toolbar-item' @click="sendToBack" :disabled="!selectedItemActive" title="Send to back">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" :style="{ transform: 'scale(1.1)', opacity: selectedItemActive ? 1 : 0.3, stroke: '#fafafa'}"><path d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"  /></svg>
+                </button>
+                <button class='toolbar-item' @click="bringToFront" :disabled="!selectedItemActive" title="Bring to front">
+                    <svg xmlns="http://www.w3.org/2000/svg" :style="{transform: 'scale(1.1)', opacity: selectedItemActive ? 1 : 0.3, stroke: '#fafafa'}" viewBox="0 0 24 24"><g><path fill="none" d="M0 0H24V24H0z"/><path d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"/> </g></svg>
+                </button>
+            </div>   
+            <div class='toolbar-item-separator'></div>               
+            <div v-if="editable" class="toolbar">
+                <button class='toolbar-item' @click="showRulers    = !showRulers"    title="Show / Hide rulers"               :style="{ backgroundColor: showRulers    ? '#4af': '', color: showRulers    ? 'white': '' }"><Icon icon="straighten" size="18px"/></button>
+                <button class='toolbar-item' @click="showGuides    = !showGuides"    title="Show / Hide alignment guidelines" :style="{ backgroundColor: showGuides    ? '#4af': '', color: showGuides    ? 'white': '' }"><Icon icon="border_style" size="18px"/></button>
+                <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': '' }"><Icon icon="brush" size="18px"/></button>
+                <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard  ? '#4af': '', color: showKeyboard  ? 'white': '' }"><Icon icon="keyboard_hide" size="18px"/></button>
+            </div>
+        </div> <!-- editor-toolbars -->  
+        <div class="editor-canvas">
+            <div class="editor-container">
     
         <!-- Rulers -->
         <Guides v-show='guidesVisible' class="ruler ruler-horizontal" :showGuides="showGuides" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width' : '100%', height: '30px' }" />
@@ -158,50 +194,6 @@
             @selectEnd            = "onItemSelectionEnd" 
             />
         
-        
-
-        <div class="toolbars-container" :style="{ top: showRulers && editable ? '40px' : '10px', left: showRulers && editable ? '40px' : '10px' }">
-            <!-- Editor Toolbar -->
-            <ToolsToolbar v-if='editable'  :customWidgets = "customWidgets === true" :selectedTool  = "currentTool"  @toolSelected  = "selectCurrentTool" />
-            <div class='toolbar-separator'></div>
-            <ZoomToolbar :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
-            <div class='toolbar-separator'></div>
-            <div v-if="editable" class="toolbar">
-                <button class='toolbar-item' @click="undo" :disabled="!historyManager.canUndo()" title="Undo"><Icon icon="undo"/></button>
-                <button class='toolbar-item' @click="redo" :disabled="!historyManager.canRedo()" title="Redo"><Icon icon="redo"/></button>
-                
-                <div class='toolbar-item-separator'></div>
-                <button class='toolbar-item' @click="deleteItem" :disabled="!selectedItemActive" title="Delete"><Icon icon="delete"/></button>
-                
-                <div class='toolbar-item-separator'></div>
-                <button class='toolbar-item' @click="copyItem"   :disabled="!isItem(selectedItem)"  title="Copy"><Icon icon="content_copy"/></button>
-                <button class='toolbar-item' @click="cutItem"    :disabled="!isItem(selectedItem)"  title="Cut"><Icon icon="content_cut"/></button>
-                <button class='toolbar-item' @click="pasteItem"  :disabled="itemToPaste === null" title="Paste"><Icon icon="content_paste"/></button>
-                
-                <div class='toolbar-item-separator'></div>               
-                <button class='toolbar-item' @click="sendToBack" :disabled="!selectedItemActive" title="Send to back">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" :style="{ transform: 'scale(1.5)', opacity: selectedItemActive ? 1 : 0.3}"><path d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"  /></svg>
-                </button>
-                <button class='toolbar-item' @click="bringToFront" :disabled="!selectedItemActive" title="Bring to front">
-                    <svg xmlns="http://www.w3.org/2000/svg" :style="{transform: 'scale(1.5)', opacity: selectedItemActive ? 1 : 0.3}" viewBox="0 0 24 24"><g><path fill="none" d="M0 0H24V24H0z"/><path d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"/> </g></svg>
-                </button>
-            </div>   
-            <div class='toolbar-separator'></div>
-            <div v-if="editable" class="toolbar">
-                <button class='toolbar-item' @click="showRulers    = !showRulers"    title="Show / Hide rulers"               :style="{ backgroundColor: showRulers    ? '#4af': '', color: showRulers    ? 'white': '' }"><Icon icon="straighten" /></button>
-                <button class='toolbar-item' @click="showGuides    = !showGuides"    title="Show / Hide alignment guidelines" :style="{ backgroundColor: showGuides    ? '#4af': '', color: showGuides    ? 'white': '' }"><Icon icon="border_style" /></button>
-                <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': '' }"><Icon icon="brush" /></button>
-                <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard  ? '#4af': '', color: showKeyboard  ? 'white': '' }"><Icon icon="keyboard_hide" /></button>
-            </div>
-        </div>
-
-        <!-- Object Inspector -->
-        <div v-if='editable && showInspector' class="object-inspector-container" :style="{ transform: `translate(${inspectorCoords.x}px, ${inspectorCoords.y}px)`}">
-            <ObjectInspector :schema = "getObjectToInspect()[1]"
-                             :object = "getObjectToInspect()[0]"
-                             :title = "selectedItem?.id"
-                             @property-changed="onPropertyChange" />                                
-        </div>
         <!-- Manage drag of inspector -->
         <Moveable v-if='editable && showInspector'
             ref               = "moveableInspector"
@@ -216,7 +208,17 @@
 
         <KeyboardHelp v-if="showKeyboard" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);  z-order: 1000;" />
         
-    </div> <!-- editor-container -->    
+            </div> <!-- editor-container -->    
+            <div class="inspector-container">
+                <ObjectInspector :schema = "getObjectToInspect()[1]"
+                                 :object = "getObjectToInspect()[0]"
+                                 :title = "selectedItem?.id"
+                                 @property-changed="onPropertyChange" /> 
+            </div><!-- inspector-container -->
+        </div><!-- editor-canvas -->
+    </div><!-- editor-layout -->
+
+   
 </template>
 
 <script setup lang="ts">
@@ -225,32 +227,30 @@ import { computed, getCurrentInstance, nextTick, onMounted, onUpdated, ref } fro
 import Guides from "vue3-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
+import { VueSelecto } from "vue3-selecto";
+import ObjectInspector from '../inspector/ObjectInspector.vue';
+import { ObjectInspectorModel, ObjectProperty } from '../inspector/types';
+import RawConnection from './blocks/RawConnection.vue';
+import { registerBasicBlocks } from './blocks/utils';
+import AddConnectionCommand from './commands/AddConnectionCommand';
+import AddItemCommand from './commands/AddItemCommand';
 import ChangeZOrderCommand from './commands/ChangeZOrderCommand';
+import ClipCommand from './commands/ClipCommand';
+import Command from './commands/Command';
+import DeleteCommand from './commands/DeleteCommand';
+import GroupCommand from './commands/GroupCommand';
 import HistoryManager from './commands/HistoryManager';
 import { LockCommand, UnlockCommand } from './commands/LockCommand';
 import MoveCommand from './commands/MoveCommand';
 import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
 import RoundCommand from './commands/RoundCommand';
-import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBlueprint, getItemById, getItemStyle, getUniqueId, registerDefaultItemTypes } from './helpers';
-
-import RawConnection from './blocks/RawConnection.vue';
-import AddItemCommand from './commands/AddItemCommand';
-import ToolsToolbar from './components/ToolsToolbar.vue';
-import ZoomToolbar from './components/ZoomToolbar.vue';
-import { ClipType, ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
-
-import { VueSelecto } from "vue3-selecto";
-import ObjectInspector from '../inspector/ObjectInspector.vue';
-import { ObjectInspectorModel, ObjectProperty } from '../inspector/types';
-import { registerBasicBlocks } from './blocks/utils';
-import AddConnectionCommand from './commands/AddConnectionCommand';
-import ClipCommand from './commands/ClipCommand';
-import Command from './commands/Command';
-import DeleteCommand from './commands/DeleteCommand';
-import GroupCommand from './commands/GroupCommand';
 import Icon from './components/Icon.vue';
 import KeyboardHelp from './components/KeyboardHelp.vue';
+import ToolsToolbar from './components/ToolsToolbar.vue';
+import ZoomToolbar from './components/ZoomToolbar.vue';
+import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBlueprint, getItemById, getItemStyle, getUniqueId, registerDefaultItemTypes } from './helpers';
+import { ClipType, ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
 export type Item = _Item & { hover?: boolean }
 
@@ -1041,7 +1041,7 @@ function onItemSelectionEnd(e: any) {
     console.log('onItemSelectionEnd', e);
 
     targets.value = e.selected;
-
+    objectToInspect.value = targets.value.length === 1 ? targets.value[0] : null
     // NOTE: the end of selection is also triggered when the user 'click' on the canvas
 
     // Clicking in the canvas resets the current connection creation
@@ -1078,12 +1078,48 @@ function onItemSelectionEnd(e: any) {
 </style>
 
 <style scoped>
+.editor-layout {
+    position: relative;
+    border: 1px solid #ccc;
+    width: 100%;
+    height: 100%;    
+    background-color: white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.editor-toolbars {
+    background-color: #2c2c2c;
+    width: 100%;
+    height: 50px;
+    display: flex;
+}
+
+.editor-canvas {
+    display: flex;
+    flex-direction: row;
+    
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+
+.inspector-container {
+    min-width: 300px;
+    width: 300px;
+    background-color: #2c2c2c;
+}
+
 .editor-container {
     position: relative;
     border: 1px solid #ccc;
     width: 100%;
     height: 100%;    
     background-color: white;
+    flex-grow: 1;
 
 }
 
@@ -1146,7 +1182,7 @@ function onItemSelectionEnd(e: any) {
     left: 0px; 
     width: 30px; 
     height: 30px; 
-    background-color: #333;
+    background-color: #2c2c2c;
 }
 
 .toolbars-container {
@@ -1164,7 +1200,7 @@ function onItemSelectionEnd(e: any) {
     width: 16px;
 }
 .toolbar-item-separator {
-    width: 8px;
+    width: 4px;
 }
 
 .toolbar {
@@ -1175,9 +1211,8 @@ function onItemSelectionEnd(e: any) {
  
     width: auto;
     height: auto;
-    background-color: #fefefe;
-    border: 1px solid #ccc;
-    box-shadow: 2px 2px 5px #ccc;
+    background-color: #2c2c2c;
+    border: 0px solid #ccc;
     gap: 0px;
     user-select: none;
 }
@@ -1187,20 +1222,22 @@ function onItemSelectionEnd(e: any) {
     justify-content: center;
     align-items: center; 
     cursor: pointer;
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    padding: 4px;
+    height: auto;
     text-align: center;
-    background-color: #fefefe;
-    color: #676767; 
+    background-color: #2c2c2c;
+    color: #fafafa; 
     border: 0px;
 }
 
 .toolbar-item:disabled {
-    color: #b5b5b5; 
+    color: #888; 
 }
 
 .toolbar-item:hover {
     background-color: #efefef;
+    color: #4af;
 }
 
 .item {

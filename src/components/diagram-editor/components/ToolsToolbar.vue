@@ -9,7 +9,7 @@
                 'selected' : selectedTool == t.type,
                 'separator': t.type === 'separator', 
             }">
-                <Icon v-if="t.type !== 'separator'" :icon="t.icon || ''" />
+                <Icon v-if="t.type !== 'separator'" :icon="t.icon || ''" size="20px"/>
         </div>
     </div>
 </template>
@@ -61,7 +61,7 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
 
 <style scoped>
 .toolbar {
-    background-color: #fefefe;
+    background-color: #2c2c2c;
     border: 1px solid #ccc;
     display: flex;
     flex-direction: row;
@@ -69,15 +69,15 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
     align-items: center;
     gap: 0px;
     user-select: none;
-    box-shadow: 2px 2px 5px #ccc;
+    margin-left: 8px;
 }
 
 .tool {
-    width: auto;
+    width: 18px;
     height: auto;
     padding: 4px;
 
-    color: #676767; 
+    color: #fafafa; 
     display: flex;
     justify-content: center;
     align-items: center; 
@@ -87,6 +87,7 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
 
 .tool:hover {
     background-color: #efefef;
+    color: #4af;
 }
 
 .tool.selected {

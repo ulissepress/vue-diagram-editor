@@ -1,8 +1,8 @@
-import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
 import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
+import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
 
-import { ObjectInspectorModel } from '../inspector/types';
 import { StyleValue } from "vue";
+import { ObjectInspectorModel } from '../inspector/types';
 
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
@@ -84,7 +84,7 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         border: {
             width: 0,
             style: ConnectionStyle.SOLID,
-            color: '#333333',
+            color: '#2c2c2c',
         },
         
         shadow: {
@@ -123,7 +123,7 @@ export function createConnection(fromID: string, toID: string, c?: DeepPartial<I
         style: c?.style || ConnectionStyle.SOLID,
         thick: c?.thick || 1,
 
-        backgroundColor: c?.backgroundColor || "#333",        
+        backgroundColor: c?.backgroundColor || "#2c2c2c",        
     } as ItemConnection
 }
 
@@ -194,7 +194,7 @@ export function registerDefaultItemTypes() {
         border: {
             width: 0,
             style: ConnectionStyle.SOLID,
-            color: '#333333',
+            color: '#2c2c2c',
         },
 
         shadow: {
@@ -222,7 +222,7 @@ export function registerDefaultItemTypes() {
         ...defaults,
         title: "Hello World",
         backgroundColor: "transparent",
-        textColor: "#333333",
+        textColor: "#2c2c2c",
 
         component: type,
     }, textModel);
@@ -284,7 +284,7 @@ export function registerDefaultItemTypes() {
         w: 70,
         h: 70,
         backgroundColor: '#ff0000',
-        textColor: "#333333",
+        textColor: "#2c2c2c",
     }, shapeWithoutRadiusModel);
 
     // ----------------------------------------------------------------------
@@ -325,7 +325,7 @@ export function registerDefaultItemTypes() {
         supportsRoundable: true,
 
         backgroundColor: 'transparent',
-        textColor: "#333333",
+        textColor: "#2c2c2c",
         fontSize: 60,
         filled: false,
         w: 60,

@@ -1,9 +1,9 @@
 <template>
     <div class="toolbar">
-        <div class="btn" @click="zoomOut" title="Zoom Out"><Icon icon="zoom_out" /></div>
+        <div class="btn" @click="zoomOut" title="Zoom Out"><Icon icon="zoom_out" size="20px"/></div>
         <div class="zoom-info" title="Current Zoom">{{ zoomManager.getZoomFactor() * 100 }}%</div>         
-        <div class="btn" @click="zoomIn" title="Zoom In"><Icon icon="zoom_in"/></div>
-        <div class="btn" @click="zoomReset" title="Zoom Reset"><Icon icon="center_focus_weak"/></div>
+        <div class="btn" @click="zoomIn" title="Zoom In"><Icon icon="zoom_in" size="20px"/></div>
+        <div class="btn" @click="zoomReset" title="Zoom Reset"><Icon icon="center_focus_weak" size="20px"/></div>
     </div>
 </template>
 
@@ -58,10 +58,8 @@ function zoomOut() {
  
     width: auto;
     height: auto;
-    background-color: #fefefe;
-    border: 1px solid #ccc;
-    box-shadow: 2px 2px 5px #ccc;
-    gap: 0px;
+    background-color: #2c2c2c;
+    gap: 4px;
     user-select: none;
 }
 
@@ -70,22 +68,25 @@ function zoomOut() {
     justify-content: center;
     align-items: center; 
     cursor: pointer;
-    width: 32px;
-    height: 32px;
+    width: 20px;
+    padding: 4px;
+    height: auto;
     text-align: center;
-    background-color: #fefefe;
-    color: #888;
+    background-color: #2c2c2c;
+    color: #fafafa;
 
 }
 
 
 .btn:hover {
     background-color: #efefef;
+    color: #4af;
 }
 .zoom-info {
     width: 40px;
     font-size: 12px;
     text-align: center;
+    color: #fafafa;
 }
 
 
