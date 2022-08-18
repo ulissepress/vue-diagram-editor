@@ -31,7 +31,7 @@ function zoomReset()
 { 
     const oldZoom = zoomManager.getZoomFactor();
     const newZoom = zoomManager.zoomReset();
-    if(oldZoom !== newZoom) emit("zoom-changed", newZoom, true)
+    emit("zoom-changed", newZoom, true)
 }
 
 function zoomIn()    

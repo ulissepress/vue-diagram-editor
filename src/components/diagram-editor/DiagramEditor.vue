@@ -73,11 +73,11 @@
                             :to          = "getItemById(items, c.to.item)!"
                             :connection  = "c"
                             :style       = "{ zIndex: c.z }"
-                            :selected    = "c.id === _objectToInspect?.id"
+                            :selected    = "editable && c.id === _objectToInspect?.id"
                             @selected    = "selectConnection(c)" />
                                 
                         <!-- Use to render a connection line during a new connection creation -->
-                        <RawConnection v-if="creatingConnection && connectionInfo.startItem" 
+                        <RawConnection v-if="editable && creatingConnection && connectionInfo.startItem" 
                                         :x1    = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).x" 
                                         :y1    = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y" 
                                         :x2    = "mouseCoords.x" 
@@ -117,7 +117,7 @@
                         </div> <!-- item -->
                         
                     <!-- Manage drag / resize / rotate / rounding of selected item -->
-                    <Moveable 
+                    <Moveable v-if="editable"
                         ref     = "moveable"
                         :target = "targets"
                         :zoom   = "1 / zoomFactor"
@@ -182,7 +182,7 @@
                     </div> <!-- viewport -->
                 </VueInfiniteViewer>
                 
-                <VueSelecto v-if="!shiftPressed"
+                <VueSelecto v-if="!shiftPressed && editable"
                     container             = ".viewer"
                     :selectableTargets    = '[".item"]'
                     :selectByClick        = "true"
@@ -199,7 +199,7 @@
                 <KeyboardHelp v-if="showKeyboard" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);  z-order: 1000;" />                
             </div> <!-- editor-container -->    
             
-            <div class="inspector-container">
+            <div class="inspector-container" v-if="showInspector && editable" >
                 <ObjectInspector :schema = "getObjectToInspect()[1]"
                                  :object = "getObjectToInspect()[0]"
                                  :title  = "getInspectorTitle()"
@@ -315,7 +315,7 @@ const shiftPressed   = useKeyModifier('Shift')
 const historyManager = ref(new HistoryManager());
 const currentTool    = ref(EditorTool.SELECT);
 
-const creatingConnection = computed<boolean>(() => currentTool.value === EditorTool.CONNECTION);
+const creatingConnection = computed<boolean>(() => currentTool.value === EditorTool.CONNECTION && editable);
 
 const items       = computed(() => elements.filter(e => isItem(e)) as Item[]);
 const connections = computed(() => elements.filter(e => isConnection(e)) as ItemConnection[]);
@@ -1040,7 +1040,9 @@ function onSelectionEnd(e: any) {
 .editor-toolbars {
     background-color: #2c2c2c;
     width: 100%;
-    height: 50px;
+    height: 30px;
+    max-height: 30px;
+    min-height: 30px;
     display: flex;
 }
 
