@@ -262,11 +262,11 @@ export const textModel: ObjectInspectorModel = {
 export const connectionModel: ObjectInspectorModel = {
     tabs: [ 
         {
-            title: "Style",
+            title: "Connection",
             sections: [        
                 {   // Style
-                    name: "style",
-                    title: "Connection Style",
+                    name: "connection_type",
+                    title: "Type",
                     properties: [ 
                         { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionType.LINE,  icon: "horizontal_rule" }, 
@@ -290,11 +290,16 @@ export const connectionModel: ObjectInspectorModel = {
                                      { name: ConnectionMarker.CIRCLE, icon: "circle:filled" },
                                      { name: ConnectionMarker.ARROW,  icon: "east"  } ] 
                         }},
-                        separator$,
-                        { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR },
+                    ]
+                },
+                {   // Style
+                    name: "connection_style",
+                    title: "Style",
+                    properties: [ 
+                       { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR },
                         { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
                     ]
-                },         
+                },            
             ] // sections
         } // tab
     ] // tabs

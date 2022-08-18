@@ -1,16 +1,18 @@
 <template>
     <div class="shape" :style="{
-            justifyContent:  item.textHAlign,
-            alignItems:      item.textVAlign,
-            backgroundColor: item.backgroundColor, 
-            color:           item.textColor, 
-            borderRadius:    item.borderRadius + 'px',
-            fontSize:        item.fontSize + 'px',
-            opacity:         item.opacity / 100,
-            border:          cssBorder(item),
-            boxShadow:       cssShadow(item),
-        }" ><div><div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }"/></div> 
-        </div>
+        justifyContent:  item.textHAlign,
+        alignItems:      item.textVAlign,
+        backgroundColor: item.backgroundColor, 
+        color:           item.textColor, 
+        borderRadius:    item.borderRadius + 'px',
+        fontSize:        item.fontSize + 'px',
+        opacity:         item.opacity / 100,
+        border:          cssBorder(item),
+        boxShadow:       cssShadow(item) }" >
+        <div>
+            <div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }" />
+        </div> 
+    </div>
 </template>
 
 <script setup lang="ts">

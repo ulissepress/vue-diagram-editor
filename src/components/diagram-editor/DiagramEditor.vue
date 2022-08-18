@@ -20,10 +20,11 @@
                 
                 <div class='toolbar-item-separator'></div>               
                 <button class='toolbar-item' @click="sendToBack" :disabled="!selectedItemActive" title="Send to back">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" :style="{ transform: 'scale(1.1)', opacity: selectedItemActive ? 1 : 0.3, stroke: '#fafafa'}"><path d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"  /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" :style="{ transform: 'scale(1.1)', opacity: selectedItemActive ? 1 : 0.3, fill: '#fafafa' }">
+                        <path d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"  /></svg>
                 </button>
                 <button class='toolbar-item' @click="bringToFront" :disabled="!selectedItemActive" title="Bring to front">
-                    <svg xmlns="http://www.w3.org/2000/svg" :style="{transform: 'scale(1.1)', opacity: selectedItemActive ? 1 : 0.3, stroke: '#fafafa'}" viewBox="0 0 24 24"><g><path fill="none" d="M0 0H24V24H0z"/><path d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"/> </g></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" :style="{transform: 'scale(1.1)', opacity: selectedItemActive ? 1 : 0.3, stroke: '#fafafa', fill: 'none'}" viewBox="0 0 24 24"><path d="M0 0H24V24H0z"/><path d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"/></svg>
                 </button>
             </div>   
             <div class='toolbar-item-separator'></div>               
@@ -34,191 +35,178 @@
                 <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard  ? '#4af': '', color: showKeyboard  ? 'white': '' }"><Icon icon="keyboard_hide" size="18px"/></button>
             </div>
         </div> <!-- editor-toolbars -->  
+
         <div class="editor-canvas">
             <div class="editor-container">
     
-        <!-- Rulers -->
-        <Guides v-show='guidesVisible' class="ruler ruler-horizontal" :showGuides="showGuides" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width' : '100%', height: '30px' }" />
-        <Guides v-show='guidesVisible' class="ruler ruler-vertical"   :showGuides="showGuides" @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': '100%', width:  '30px', top: '-30px' }" />
-        <div    v-show='guidesVisible' class="rulers-left-top-box"></div>
+                <!-- Rulers -->
+                <Guides v-show='guidesVisible' class="ruler ruler-horizontal" :showGuides="showGuides" @changeGuides="hGuideValues = $event.guides" type="horizontal" ref="hGuides" :zoom="zoomFactor" :snapThreshold="5" :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)" :rulerStyle = "{ left: '30px', width: 'calc(100% - 30px)',  height: '30px' }" :style="{ 'width' : '100%', height: '30px' }" />
+                <Guides v-show='guidesVisible' class="ruler ruler-vertical"   :showGuides="showGuides" @changeGuides="vGuideValues = $event.guides" type="vertical"   ref="vGuides" :zoom="zoomFactor" :snapThreshold="5" :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)" :rulerStyle = "{ top: '30px',  height: 'calc(100% - 30px)', width:  '30px' }" :style="{ 'height': '100%', width:  '30px', top: '-30px' }" />
+                <div    v-show='guidesVisible' class="rulers-left-top-box"></div>
 
-        <!-- Editor Canvas -->
-        <VueInfiniteViewer 
-            ref             = "viewer" 
-            class           = "viewer"
-            :style          = "{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair' }"
-            
-            :useMouseDrag   = "shiftPressed"
-            :useWheelScroll = "true"
-            :zoom           = "zoomFactor"  
-            :zoomOffsetX    = "mouseCoords.x"
-            :zoomOffsetY    = "mouseCoords.y"
-
-            @wheel          = "onScroll" 
-            @scroll         = "onScroll"              
-            @mousemove      = "onMouseMove">
-            
-            <div ref="viewport" 
-                 :class="{ 'viewport': true, 'viewport-area': viewportSize }" 
-                 :style="{ width:  viewportSize ? viewportSize[0] + 'px' : '100%', 
-                           height: viewportSize ? viewportSize[1] + 'px' : '100%' }">
-                
-                <!-- Render Connections (default component='Connection') -->
-                <component v-for = "(c, i) in connections"
-                    :is          = "c.component"
-                    :key         = "c.id"
-                    :from        = "getItemById(items, c.from.item)!"
-                    :to          = "getItemById(items, c.to.item)!"
-                    :connection  = "c"
-                    :style       = "{ zIndex: c.z }"
-                    :selected    = "c.id === objectToInspect?.id"
-                    @selected    = "selectConnection(c)" />
-                        
-                <!-- Use to render a connection line during a new connection creation -->
-                <RawConnection v-if="creatingConnection && connectionInfo.startItem" 
-                                :x1    = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).x" 
-                                :y1    = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y" 
-                                :x2    = "mouseCoords.x" 
-                                :y2    = "mouseCoords.y"
-                                :type  = "ConnectionType.LINE"                                
-                                style  = "z-index: -100000;"
-                                selected />
-                            
-                <!-- Render Items -->
-                <div v-for="(item, i) in items"                 
-                    class          = "item"
-                    :key           = "item.id" 
-                    :data-item-id  = "item.id"
-                    :class         = "{ 'target': item.id === selectedItem?.id, 'locked': item.locked === true, 'mouse-hover': item.hover }" 
-                    :style         = "getItemStyle(item)"
-                   
-                    @click.stop     = "!creatingConnection && editable && selectItem(item)" 
-                    @dblclick.stop  = "!creatingConnection && editable && inlineEdit(item)"
+                <!-- Editor Canvas -->
+                <VueInfiniteViewer 
+                    ref             = "viewer" 
+                    class           = "viewer"
+                    :style          = "{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair' }"
                     
-                    @mousedown       = "!creatingConnection && editable && selectItem(item, $event)" 
-                    @mouseover.stop  = "creatingConnection && onMouseOver(item, $event)"
-                    @mouseleave.self = "creatingConnection && onMouseLeave(item, $event)" > 
+                    :useMouseDrag   = "shiftPressed"
+                    :useWheelScroll = "true"
+                    :zoom           = "zoomFactor"  
+                    :zoomOffsetX    = "mouseCoords.x"
+                    :zoomOffsetY    = "mouseCoords.y"
 
-                        <component :is="item.component" :item="item" />
+                    @wheel          = "onScroll" 
+                    @scroll         = "onScroll"              
+                    @mousemove      = "onMouseMove">
+                    
+                    <div ref="viewport" 
+                        :class="{ 'viewport': true, 'viewport-area': viewportSize }" 
+                        :style="{ width:  viewportSize ? viewportSize[0] + 'px' : '100%', 
+                                  height: viewportSize ? viewportSize[1] + 'px' : '100%' }">
+                        
+                        <!-- Render Connections (default component='Connection') -->
+                        <component v-for = "(c, i) in connections"
+                            :is          = "c.component"
+                            :key         = "c.id"
+                            :from        = "getItemById(items, c.from.item)!"
+                            :to          = "getItemById(items, c.to.item)!"
+                            :connection  = "c"
+                            :style       = "{ zIndex: c.z }"
+                            :selected    = "c.id === _objectToInspect?.id"
+                            @selected    = "selectConnection(c)" />
+                                
+                        <!-- Use to render a connection line during a new connection creation -->
+                        <RawConnection v-if="creatingConnection && connectionInfo.startItem" 
+                                        :x1    = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).x" 
+                                        :y1    = "getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y" 
+                                        :x2    = "mouseCoords.x" 
+                                        :y2    = "mouseCoords.y"
+                                        :type  = "ConnectionType.LINE"                                
+                                        style  = "z-index: -100000;"
+                                        selected />
+                                    
+                        <!-- Render Items -->
+                        <div v-for="(item, i) in items"                 
+                            class          = "item"
+                            :key           = "item.id" 
+                            :data-item-id  = "item.id"
+                            :class         = "{ 'target': item.id === selectedItem?.id, 'locked': item.locked === true, 'mouse-hover': item.hover }" 
+                            :style         = "getItemStyle(item)"
+                        
+                            @click.stop     = "!creatingConnection && editable && selectItem(item)" 
+                            @dblclick.stop  = "!creatingConnection && editable && inlineEdit(item)"
+                            
+                            @mousedown       = "!creatingConnection && editable && selectItem(item, $event)" 
+                            @mouseover.stop  = "creatingConnection && onMouseOver(item, $event)"
+                            @mouseleave.self = "creatingConnection && onMouseLeave(item, $event)" > 
 
-                        <!-- Item decorators (delete, locked, size info) -->
-                        <div class="decorator decorator-delete" v-if="!creatingConnection && editable && item.id === selectedItem?.id && (selectedItem as Item)?.locked !== true" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
-                        <div class="decorator decorator-locked" v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
-                        <div class="decorator decorator-size"   v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
+                                <component :is="item.component" :item="item" />
 
-                        <!-- Connection Handles - When the item is rotated, only the center handle is active -->
-                        <div class="connection-handle connection-handle-left"   v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.LEFT)"></div>
-                        <div class="connection-handle connection-handle-right"  v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.RIGHT)"></div>
-                        <div class="connection-handle connection-handle-top"    v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.TOP)"></div>
-                        <div class="connection-handle connection-handle-bottom" v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.BOTTOM)"></div>
-                        <div class="connection-handle connection-handle-center" v-if="editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.CENTER)"></div>
-                </div> <!-- item -->
+                                <!-- Item decorators (delete, locked, size info) -->
+                                <div class="decorator decorator-delete" v-if="!creatingConnection && editable && item.id === selectedItem?.id && (selectedItem as Item)?.locked !== true" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
+                                <div class="decorator decorator-locked" v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
+                                <div class="decorator decorator-size"   v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
+
+                                <!-- Connection Handles - When the item is rotated, only the center handle is active -->
+                                <div class="connection-handle connection-handle-left"   v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.LEFT)"></div>
+                                <div class="connection-handle connection-handle-right"  v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.RIGHT)"></div>
+                                <div class="connection-handle connection-handle-top"    v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.TOP)"></div>
+                                <div class="connection-handle connection-handle-bottom" v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.BOTTOM)"></div>
+                                <div class="connection-handle connection-handle-center" v-if="editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.CENTER)"></div>
+                        </div> <!-- item -->
+                        
+                    <!-- Manage drag / resize / rotate / rounding of selected item -->
+                    <Moveable 
+                        ref     = "moveable"
+                        :target = "targets"
+                        :zoom   = "1 / zoomFactor"
+                        :origin = "false"  
+
+                        :stopPropagation = "true"
+                        
+                        :throttleDrag   = "1"
+                        :throttleResize = "1"
+                        :throttleRotate = "shiftPressed ? 45 : 1"
+                        :keepRatio      = "shiftPressed"
+
+                        :snappable               = "showGuides"
+                        :snapGap                 = "true"
+                        :snapThreshold           = "5" 
+                        :snapDirections          = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
+                        :elementSnapDirections   = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
+                        :isDisplayInnerSnapDigit = "true"
+                        :horizontalGuidelines    = "horizontalGuidelines"
+                        :verticalGuidelines      = "verticalGuidelines"
+                        :elementGuidelines       = "showGuides ? elementGuidelines() : []"
+                        
+                        :clippable         = "targets.length === 1 && selectedItem?.clipType !== ClipType.NONE"
+                        :defaultClipPath   = "targets.length === 1  ? selectedItem?.clipType : ClipType.NONE"
+                        :clipArea          = "false"
+                        :clipRelative      = "false"
+                        :dragWithClip      = "true"
+                        :clipSnapThreshold = "5"
+
+                        :draggable = "selectedItemActive"
+                        :rotatable = "selectedItemActive"
+                        :resizable = "selectedItemActive"
+                        :roundable = "selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
+
+                        @dragStart   = "onDragStart"
+                        @drag        = "onDrag"
+                        @dragEnd     = "onDragEnd"
+
+                        @dragGroupStart = "onDragGroupStart"
+                        @dragGroup      = "onDragGroup"
+                        @dragGroupEnd   = "onDragGroupEnd"
+
+                        @resizeStart = "onResizeStart"
+                        @resize      = "onResize"
+                        @resizeEnd   = "onResizeEnd"
+
+                        @resizeGroup = "onResizeGroup"
+                        
+                        
+                        @rotateStart = "onRotateStart"
+                        @rotate      = "onRotate"
+                        @rotateEnd   = "onRotateEnd"
+                        @rotateGroup = "onRotateGroup"
+
+                        @roundStart  = "onRoundStart"
+                        @round       = "onRound"
+                        @roundEnd    = "onRoundEnd" 
+                        
+                        @clipStart   = "onClipStart"
+                        @clip        = "onClip"
+                        @clipEnd     = "onClipEnd" />                
+                    </div> <!-- viewport -->
+                </VueInfiniteViewer>
                 
-            <!-- Manage drag / resize / rotate / rounding of selected item -->
-            <Moveable 
-                ref     = "moveable"
-                :target = "targets"
-                :zoom   = "1 / zoomFactor"
-                :origin = "false"  
-
-                :stopPropagation = "true"
+                <VueSelecto v-if="!shiftPressed"
+                    container             = ".viewer"
+                    :selectableTargets    = '[".item"]'
+                    :selectByClick        = "true"
+                    :selectFromInside     = "true"
+                    :continueSelect       = "false"
+                    :toggleContinueSelect = "'shift'"
+                    :hitRate              = "0"
+                    :preventDefault       = "true"
+                    @dragStart            = "onSelectionDragStart"
+                    @select               = "onSelection" 
+                    @selectEnd            = "onSelectionEnd" 
+                    />
                 
-                :throttleDrag   = "1"
-                :throttleResize = "1"
-                :throttleRotate = "shiftPressed ? 45 : 1"
-                :keepRatio      = "shiftPressed"
-
-                :snappable               = "showGuides"
-                :snapGap                 = "true"
-                :snapThreshold           = "5" 
-                :snapDirections          = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
-                :elementSnapDirections   = "{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
-                :isDisplayInnerSnapDigit = "true"
-                :horizontalGuidelines    = "horizontalGuidelines"
-                :verticalGuidelines      = "verticalGuidelines"
-                :elementGuidelines       = "showGuides ? elementGuidelines() : []"
-                
-                :clippable         = "targets.length === 1 && selectedItem?.clipType !== ClipType.NONE"
-                :defaultClipPath   = "targets.length === 1  ? selectedItem?.clipType : ClipType.NONE"
-                :clipArea          = "false"
-                :clipRelative      = "false"
-                :dragWithClip      = "true"
-                :clipSnapThreshold = "5"
-
-                :draggable = "selectedItemActive"
-                :rotatable = "selectedItemActive"
-                :resizable = "targets.length > 0"
-                :roundable = "selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
-
-                @dragStart   = "onDragStart"
-                @drag        = "onDrag"
-                @dragEnd     = "onDragEnd"
-
-                @dragGroupStart = "onDragGroupStart"
-                @dragGroup      = "onDragGroup"
-                @dragGroupEnd   = "onDragGroupEnd"
-
-                @resizeStart = "onResizeStart"
-                @resize      = "onResize"
-                @resizeEnd   = "onResizeEnd"
-
-                @resizeGroup = "onResizeGroup"
-                
-                
-                @rotateStart = "onRotateStart"
-                @rotate      = "onRotate"
-                @rotateEnd   = "onRotateEnd"
-                @rotateGroup = "onRotateGroup"
-
-                @roundStart  = "onRoundStart"
-                @round       = "onRound"
-                @roundEnd    = "onRoundEnd" 
-                
-                @clipStart   = "onClipStart"
-                @clip        = "onClip"
-                @clipEnd     = "onClipEnd" />                
-            </div> <!-- viewport -->
-        </VueInfiniteViewer>
-        
-        <VueSelecto v-if="!shiftPressed"
-            container             = ".viewer"
-            :selectableTargets    = '[".item"]'
-            :selectByClick        = "true"
-            :selectFromInside     = "true"
-            :continueSelect       = "false"
-            :toggleContinueSelect = "'shift'"
-            :hitRate              = "0"
-            :preventDefault       = "true"
-            @dragStart            = "onItemSelectionDragStart"
-            @select               = "onItemSelection" 
-            @selectEnd            = "onItemSelectionEnd" 
-            />
-        
-        <!-- Manage drag of inspector -->
-        <Moveable v-if='editable && showInspector'
-            ref               = "moveableInspector"
-            :target           = "['.object-inspector-container']"
-            :throttleDrag     = "1"
-            :draggable        = "true"
-            :origin           = "false"  
-            :hideDefaultLines = "true"
-            @dragStart        = "onDragStartInspector" 
-            @drag             = "onDragInspector" />        
-
-
-        <KeyboardHelp v-if="showKeyboard" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);  z-order: 1000;" />
-        
+                <KeyboardHelp v-if="showKeyboard" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);  z-order: 1000;" />                
             </div> <!-- editor-container -->    
+            
             <div class="inspector-container">
                 <ObjectInspector :schema = "getObjectToInspect()[1]"
                                  :object = "getObjectToInspect()[0]"
-                                 :title = "selectedItem?.id"
-                                 @property-changed="onPropertyChange" /> 
+                                 :title  = "getInspectorTitle()"
+                                 @property-changed = "onPropertyChange" /> 
             </div><!-- inspector-container -->
         </div><!-- editor-canvas -->
     </div><!-- editor-layout -->
-
-   
 </template>
 
 <script setup lang="ts">
@@ -240,7 +228,6 @@ import Command from './commands/Command';
 import DeleteCommand from './commands/DeleteCommand';
 import GroupCommand from './commands/GroupCommand';
 import HistoryManager from './commands/HistoryManager';
-import { LockCommand, UnlockCommand } from './commands/LockCommand';
 import MoveCommand from './commands/MoveCommand';
 import ResizeCommand from './commands/ResizeCommand';
 import RotateCommand from './commands/RotateCommand';
@@ -290,16 +277,16 @@ onMounted(() => {
     // Initialize rulers and infinite viewer
     hGuides.value.resize();    
     vGuides.value.resize();
-    
+        
     viewer.value.scrollCenter();
+
+    // Set the handlers to manage keyboard shortcuts
+    setupKeyboardHandlers();
 });
 
 onUpdated(() => {
     //console.log('DiagramEditor updated')
 })
-
-// Set the handlers to manage keyboard shortcuts
-setupKeyboardHandlers();
 
 
 // The component state
@@ -310,8 +297,6 @@ const zoomFactor    = ref(1);
 const viewer        = ref();
 const viewport      = ref<HTMLDivElement>();
 const moveable      = ref();
-const moveableInspector = ref();
-
 
 const hGuides       = ref();
 const vGuides       = ref();
@@ -323,8 +308,7 @@ const showGuides    = ref(true);               // Show or hide all the guides
 const showInspector = ref(true);               // Show or hide all the guides
 const showKeyboard  = ref(false);              // Show or hide all the guides
 
-const selectedItem  = computed(() => targets.value.length === 1 ? getItemFromElement(targets.value[0]) : null );
-
+const selectedItem       = computed(() => targets.value.length === 1 ? getItemFromElement(targets.value[0]) : null );
 const selectedItemActive = computed(() => targets.value.length > 0);
 
 const shiftPressed   = useKeyModifier('Shift')
@@ -345,8 +329,8 @@ const verticalGuidelines   = computed(() => showGuides.value ? (viewportSize ? [
 const elementGuidelines    = () => viewport.value ? Array.prototype.slice.call(viewport.value!.querySelectorAll(".item"), 0).filter(n => !n.classList.contains('target')) : [];
 
 
-const targets         = ref<HTMLDivElement[]>([]);
-const objectToInspect = ref<any | null>(null);
+const targets          = ref<HTMLDivElement[]>([]);
+const _objectToInspect = ref<any | null>(null);
 
 
 // Temporary variables
@@ -395,14 +379,31 @@ function onMouseLeave(item: Item, e: MouseEvent) {
 
 function selectConnection(connection: ItemConnection) {
     if(!connection) return;
-    selectNone();
-    nextTick(() => objectToInspect.value = connection );
     
+    selectNone();
+    setObjectToInspect(connection);
 }
 
-function selectItem(item: Item, e?: MouseEvent)  : void {
+function selectItem(item: Item | HTMLDivElement[], e?: MouseEvent)  : void {
 
-    const el = getTargetElement(item as Item);
+    // Passing directly an array of DOM elements
+    if(Array.isArray(item)) {
+        if(item.length === 0) {
+            selectNone(); 
+            return;
+        }
+        
+        console.log('selectItem() selection using array of DOM elements', item);
+        
+        updateInlineEditableText();
+    
+        targets.value = item;
+        setObjectToInspect(targets.value.length === 1 ? getItemFromElement(targets.value[0]) : null);
+        return;        
+    }
+
+    // Passing a single Item to select
+    const el = getElementFromItem(item as Item);
     if(!el) return;
 
     // Already selected?
@@ -410,53 +411,46 @@ function selectItem(item: Item, e?: MouseEvent)  : void {
 
     console.log('selectItem', item, e);
         
+    updateInlineEditableText();
+
+    
     if(shiftPressed.value === true) {
+        // Shift pressed? Add to selection another item
         targets.value.push(el);
-        objectToInspect.value = null;
+        setObjectToInspect(null);        
     } else {
+        // Shift NOT pressed: replace existing selection with a new item
         targets.value = [el];
-        objectToInspect.value = item;
+        setObjectToInspect(item);        
     }
 
-    console.log('### TARGETS', targets.value.length, targets.value);
-    
-
-    //selectNone();
-    nextTick(() => {
-        moveableInspector.value?.updateTarget();
-        if(e) nextTick(() => { moveable.value?.dragStart(e); });                
-    });
+    console.log('selectItem(): changing targets', targets.value.length, targets.value);
+   
+    nextTick(() => { if(e) nextTick(() => moveable.value?.dragStart(e)); });
 }
 
 function selectNone() : void {
-    const target = getTargetElement(selectedItem.value as Item);
-    if(target)  {
-        const elementToEdit = target.querySelector('.diagram-item-inline-edit') as HTMLElement;
-        if(elementToEdit) {
-
-            elementToEdit.removeAttribute('contenteditable');            
-            if(selectedItem.value)  selectedItem.value.title = elementToEdit.innerHTML; 
-            inlineEditing.value = false;
-        }                
-    }
+    updateInlineEditableText();
 
     targets.value = [];
-    objectToInspect.value = null;
-    console.log('### selectNone', targets.value);
-    
-    nextTick(() => { if(moveableInspector.value) moveableInspector.value.updateRect(); });
+    setObjectToInspect(null);    
+    console.log('### selectNone', targets.value);    
 }
 
-function setObjectToInspect(item: Item | ItemConnection) : void {
-    const el = getTargetElement(item as Item);
-    if(!el) return;
-    const elementToEdit = el.querySelector('.diagram-item-inline-edit') as HTMLElement;
-    if(elementToEdit) {
-        elementToEdit.setAttribute('contenteditable', 'true');
-        elementToEdit.focus();
-        inlineEditing.value = true;
-    }
+function updateInlineEditableText() {   
+    const target = getElementFromItem(selectedItem.value as Item);
+    if(!target) return;
+
+    const elementToEdit = target.querySelector('.diagram-item-inline-edit') as HTMLElement;
+    if(!elementToEdit) return;
+
+    console.log('updateInlineEditableText - updating text of current item');
+
+    elementToEdit.removeAttribute('contenteditable');            
+    if(selectedItem.value)  selectedItem.value.title = elementToEdit.innerHTML; 
+    inlineEditing.value = false;
 }
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Drag item
@@ -464,7 +458,7 @@ function setObjectToInspect(item: Item | ItemConnection) : void {
 function onDragStart(e: any) : void {
     if(!isItem(selectedItem.value)) return;
     
-    const target = getTargetElement(selectedItem.value);
+    const target = getElementFromItem(selectedItem.value);
     if(target && target.contentEditable === "true") {
         e.stopDrag();
         return;
@@ -703,12 +697,6 @@ function deleteItem() {
     }
 }
 
-/** Lock current selected item */
-function lockItem(item: Item) {
-    historyManager.value.execute(item.locked === true ? new UnlockCommand(item) : new LockCommand(item));
-}
-
-
 /** Undo last action done (is possible) */
 function undo() {  
     if(!historyManager.value.canUndo()) return;
@@ -744,42 +732,6 @@ function selectCurrentTool(tool: EditorTool) : void {
     }
 }
 
-/** Handle the clik in the overall canvas */
-function onCanvasClick(e: any): void {
-    console.log('onCanvasClick', e);
-
-    // Was just clicking the scrollbar for scrolling?
-    if(e.target?.classList?.contains('infinite-viewer-scroll-thumb')) return;
-
-    // // Current tool is 'select' => clicking the canvas unselect all
-    // if(currentTool.value === EditorTool.SELECT) {
-    //     console.log('Unselecting all', e.target);
-    //     selectNone();
-    //     return;
-    // }
-
-    // // Clicking in the canvas resets the current connection creation
-    // if(currentTool.value === EditorTool.CONNECTION) {
-    //     connectionInfo.startItem = null;
-    //     connectionInfo.endItem   = null;
-    //     return;
-    // }
-    
-
-    // // Clicking the canvas with other tools => create a new item of related type
-    // const toolDef  = getToolDefinition(currentTool.value);    
-    // const newItem  = deepCloneItem({
-    //     ...getItemBlueprint(toolDef.itemType!)[0],
-    //     id: getUniqueId(),
-    //     x: mouseCoords.value.x,
-    //     y: mouseCoords.value.y
-    // })
-    
-    // console.log('creating new item', toolDef, toolDef.itemType, newItem)
-    // historyManager.value.execute(new AddItemCommand(elements, newItem));
-    // emit('add-item', newItem);
-}
-
 /** Handle a click on the connection handles */
 function connectionHandleClick(item: Item   , point: ConnectionHandle) {
     console.log('connectionHandleClick', item, point);
@@ -799,7 +751,7 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
     ci.endItem  = item;
     ci.endPoint = point;
 
-    const newConnection = deepCloneItem(createConnection(
+    const newConnection = deepClone(createConnection(
         ci.startItem.id, 
         ci.endItem.id, 
         { from: { handle: ci.startPoint }, to: { handle: ci.endPoint } }
@@ -913,7 +865,7 @@ function setupKeyboardHandlers() {
 
 // Clipboard management
 // ---------------------------------------------------------------------------------------------------------------------
-function deepCloneItem(obj: any) : any {
+function deepClone(obj: any) : any {
     return JSON.parse(JSON.stringify(obj));
 }
 
@@ -939,7 +891,7 @@ function pasteItem() {
     if(!itemToPaste.value) return;
     console.log('Paste item', selectedItem.value);
 
-    const newItems = deepCloneItem(itemToPaste.value) as Item[];
+    const newItems = deepClone(itemToPaste.value) as Item[];
 
     for(const newItem of newItems) {
         newItem.id = getUniqueId(); 
@@ -947,16 +899,14 @@ function pasteItem() {
         newItem.y += 20;
         historyManager.value.execute(new AddItemCommand(elements, newItem));
     }
-
         
     itemToPaste.value = newItems;
     selectNone();
-    nextTick(() => newItems.map(item => selectItem(item)));
-        
+    nextTick(() => newItems.map(item => selectItem(item)));        
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
-function getTargetElement(item: Item) : HTMLDivElement | undefined{
+function getElementFromItem(item: Item) : HTMLDivElement | undefined{
     if(!item) return undefined;
     const el = viewport.value?.querySelector(`[data-item-id='${item.id}']`);
     if(el === undefined || el === null) return undefined;
@@ -974,7 +924,7 @@ function getItemFromElement(el: HTMLElement) : Item | undefined {
 }
 
 function inlineEdit(item: Item) {
-    const target = getTargetElement(item);
+    const target = getElementFromItem(item);
     if(!target) return;
 
     // Find the child element with the 'diagram-item-inline-edit' CSS class (if any)
@@ -986,95 +936,92 @@ function inlineEdit(item: Item) {
     }
 }
 
-function onDragStartInspector(e: any) : void {    
-    if(!e.inputEvent.target.className.includes('inspector-title-drag-handle')) {
-        e.stopDrag();
-        return;
-    }
-    console.log('onDragStartInspector', e);         
+function getInspectorTitle() : string {    
+    if(!_objectToInspect.value) return "Inspector";
+
+    const item = _objectToInspect.value as Item;
+    return `${item.component} (${item.id})`;
 }
-
-function onDragInspector(e: any) : void {
-    if(!e.inputEvent.target.className.includes('inspector-title-drag-handle')) {
-        e.stopDrag();
-        return;
-    }
-    console.log('onDragInspector', e);         
-
-    inspectorCoords.value.x = Math.floor(e.beforeTranslate[0]);
-    inspectorCoords.value.y = Math.floor(e.beforeTranslate[1]);
-    e.target.style.transform = e.transform;  
-}
-
 
 function getObjectToInspect() : [any, ObjectInspectorModel | null] {
-    if(objectToInspect.value === null) return [null, null];
+    if(!_objectToInspect.value) return [null, null];
 
-    return [objectToInspect.value,  getItemBlueprint(objectToInspect.value.component)[1]]
-}
-
-function checkToIgnoreTheEvent(e: any): boolean {
-    // Is the click from a toolbar or the inspector?   
-    // TODO:  this can be omitted if the toolbar/inspector are moved out from the canvas
-    if(e.inputEvent.target.closest('div.toolbars-container')) { e.stop(); return true; }
-    if(e.inputEvent.target.classList.contains('object-inspector-container') || e.inputEvent.target.closest('div.object-inspector-container')) { e.stop(); return true; };
-
-    return false;
-}
-
-function onItemSelectionDragStart(e: any) {
-    if(checkToIgnoreTheEvent(e)) return;
-
-    console.log('onItemSelectionDragStart', e.selected);
+    return [_objectToInspect.value,  getItemBlueprint(_objectToInspect.value.component)[1]]
 }
 
 
-function onItemSelection(e: any) {
-    if(checkToIgnoreTheEvent(e)) return;
+function setObjectToInspect(item: Item | ItemConnection | undefined | null) : void {
+    if(isItem(item)) {
+        const el = getElementFromItem(item as Item);
+        if(!el) return;
+        
+        const elementToEdit = el.querySelector('.diagram-item-inline-edit') as HTMLElement;
+        if(!elementToEdit) return;
 
-    console.log('onItemSelection', e.selected);
-    targets.value = e.selected;
+        elementToEdit.setAttribute('contenteditable', 'true');
+        elementToEdit.setAttribute('spellcheck',      'false');        
+        elementToEdit.focus();
+        inlineEditing.value = true;
+    }
+
+    nextTick(() => _objectToInspect.value = item );        
 }
 
-function onItemSelectionEnd(e: any) {
-    if(checkToIgnoreTheEvent(e)) return;    
-    console.log('onItemSelectionEnd', e);
+function onSelectionDragStart(e: any) {
+    console.log('onSelectionDragStart', e.selected);
+}
 
-    targets.value = e.selected;
-    objectToInspect.value = targets.value.length === 1 ? targets.value[0] : null
-    // NOTE: the end of selection is also triggered when the user 'click' on the canvas
+function onSelection(e: any) {
+    console.log('onSelection', e.selected);
+    if(currentTool.value == EditorTool.SELECT) selectItem(e.selected);    
+}
 
-    // Clicking in the canvas resets the current connection creation
-    if(currentTool.value === EditorTool.CONNECTION) {
-        connectionInfo.startItem = null;
-        connectionInfo.endItem   = null;
+function onSelectionEnd(e: any) {
+    console.log('onSelectionEnd', e);
+
+    if(currentTool.value == EditorTool.SELECT) {
+        selectItem(e.selected); 
         return;
     }
+
+    // Clicking in the canvas resets the current connection creation
+    if(currentTool.value === EditorTool.CONNECTION) return;
+
     
     // If the current tool is not the SELECTOR => Create new item based on current tool selection (shape, ...)
-    if(currentTool.value !== EditorTool.SELECT) {
-        // Clicking the canvas with other tools => create a new item of related type
-        const toolDef  = getToolDefinition(currentTool.value);   
+    // Clicking the canvas with other tools => create a new item of related type
+    const toolDef = getToolDefinition(currentTool.value);   
         
-        const newItem  = deepCloneItem({
-            ...getItemBlueprint(toolDef.itemType!)[0],
-            id: getUniqueId(),
-            x:  Math.floor(mouseCoords.value.x - e.rect.width  / zoomFactor.value),
-            y:  Math.floor(mouseCoords.value.y - e.rect.height / zoomFactor.value), 
-            w:  Math.floor(e.rect.width  / zoomFactor.value),
-            h:  Math.floor(e.rect.height / zoomFactor.value)
-        })
-        
-        console.log('creating new item', toolDef, toolDef.itemType, newItem)
-        historyManager.value.execute(new AddItemCommand(elements, newItem));
-        emit('add-item', newItem);
+    const newItem = deepClone({
+        ...getItemBlueprint(toolDef.itemType!)[0],
+        id: getUniqueId(),
+        x:  Math.floor(mouseCoords.value.x - e.rect.width  / zoomFactor.value),
+        y:  Math.floor(mouseCoords.value.y - e.rect.height / zoomFactor.value), 
+    })
+
+    if(e.rect.width > 10 && e.rect.height > 10) {
+        newItem.w = Math.floor(e.rect.width  / zoomFactor.value);
+        newItem.h = Math.floor(e.rect.height / zoomFactor.value);
     }
+    
+    console.log('creating new item', toolDef, toolDef.itemType, newItem)
+    historyManager.value.execute(new AddItemCommand(elements, newItem));
+
+    // After adding the new item, change to tool to selection and select the new created item
+    currentTool.value = EditorTool.SELECT;
+    nextTick(() => selectItem(newItem))
+    
+    emit('add-item', newItem);
 }
 </script>
 
 
 <style>
-.diagram-item-inline-edit { /* marker class */}
+.diagram-item-inline-edit,
+.diagram-item-inline-edit:focus,
+.diagram-item-inline-edit:focus-visible { 
+    outline: none;
+}
 </style>
 
 <style scoped>

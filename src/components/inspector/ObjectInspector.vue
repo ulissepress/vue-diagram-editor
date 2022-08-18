@@ -69,8 +69,7 @@ onUpdated(() => {
 });
 
 provide('object-inspector-schema', schema);
-    
-
+   
 const expanded   = ref(true);
 const currentTab = ref(0)
 

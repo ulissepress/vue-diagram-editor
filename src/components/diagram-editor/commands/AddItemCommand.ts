@@ -5,7 +5,7 @@ import Command from './Command';
 export default class AddItemCommand implements Command {
     
     constructor(private elements: DiagramElement[], private elementToAdd: Item) {
-        this.elementToAdd = { ... elementToAdd };
+        this.elementToAdd = elementToAdd;
     }
     
     do() : void  {
