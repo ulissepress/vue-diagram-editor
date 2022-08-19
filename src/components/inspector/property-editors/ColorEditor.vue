@@ -17,7 +17,7 @@ export interface TextEditorProps {
 }
 
 export interface TextEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
 }
 
 // Define props
@@ -28,9 +28,10 @@ const emit = defineEmits<TextEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 function onChange(newColor: string) {
+    const oldValue = getObjectValue(object, property.name);
 
     setObjectValue(object, property.name, newColor);
-    emit('property-changed', property, newColor)
+    emit('property-changed', property, oldValue, newColor)
 }
 </script>
 

@@ -14,9 +14,9 @@
                 <button class='toolbar-item' @click="deleteItem" :disabled="!selectedItemActive" title="Delete"><Icon icon="delete" size="20px"/></button>
                 
                 <div class='toolbar-item-separator'></div>
-                <button class='toolbar-item' @click="copyItem"   :disabled="!isItem(selectedItem)"  title="Copy"><Icon icon="content_copy"   size="18px"/></button>
-                <button class='toolbar-item' @click="cutItem"    :disabled="!isItem(selectedItem)"  title="Cut"><Icon icon="content_cut"     size="18px"/></button>
-                <button class='toolbar-item' @click="pasteItem"  :disabled="itemToPaste === null"   title="Paste"><Icon icon="content_paste" size="18px"/></button>
+                <button class='toolbar-item' @click="copyItem"   :disabled="targets.length === 0"  title="Copy"><Icon icon="content_copy"   size="18px"/></button>
+                <button class='toolbar-item' @click="cutItem"    :disabled="targets.length === 0"  title="Cut"><Icon icon="content_cut"     size="18px"/></button>
+                <button class='toolbar-item' @click="pasteItem"  :disabled="itemToPaste === null"  title="Paste"><Icon icon="content_paste" size="18px"/></button>
                 
                 <div class='toolbar-item-separator'></div>               
                 <button class='toolbar-item' @click="sendToBack" :disabled="!selectedItemActive" title="Send to back">
@@ -34,6 +34,8 @@
                 <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': '' }"><Icon icon="brush" size="18px"/></button>
                 <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard  ? '#4af': '', color: showKeyboard  ? 'white': '' }"><Icon icon="keyboard_hide" size="18px"/></button>
             </div>
+            <!-- <div class='toolbar-item-separator'></div>               
+            <div style="color: white;">EDIT: {{ inlineEditing }}</div> -->
         </div> <!-- editor-toolbars -->  
 
         <div class="editor-canvas">
@@ -222,6 +224,7 @@ import RawConnection from './blocks/RawConnection.vue';
 import { registerBasicBlocks } from './blocks/utils';
 import AddConnectionCommand from './commands/AddConnectionCommand';
 import AddItemCommand from './commands/AddItemCommand';
+import ChangePropertyCommand from './commands/ChangePropertyCommand';
 import ChangeZOrderCommand from './commands/ChangeZOrderCommand';
 import ClipCommand from './commands/ClipCommand';
 import Command from './commands/Command';
@@ -384,21 +387,28 @@ function selectConnection(connection: ItemConnection) {
     setObjectToInspect(connection);
 }
 
-function selectItem(item: Item | HTMLDivElement[], e?: MouseEvent)  : void {
+function selectItem(item: Item | Item[] | HTMLDivElement[], e?: MouseEvent)  : void {
 
-    // Passing directly an array of DOM elements
+    // Passing an array of items or DOM elements
     if(Array.isArray(item)) {
         if(item.length === 0) {
             selectNone(); 
             return;
         }
-        
-        console.log('selectItem() selection using array of DOM elements', item);
-        
+                
         updateInlineEditableText();
-    
-        targets.value = item;
-        setObjectToInspect(targets.value.length === 1 ? getItemFromElement(targets.value[0]) : null);
+
+        // Is an array of DOM elements ?
+        if(item[0] instanceof HTMLDivElement)
+        {
+            targets.value = item as HTMLDivElement[];
+            setObjectToInspect(targets.value.length === 1 ? getItemFromElement(targets.value[0]) : null);
+            return; 
+        }
+
+        // Is an array of Item
+        targets.value = item.map(i => getElementFromItem(i as Item)) as HTMLDivElement[];
+        setObjectToInspect(targets.value.length === 1 ? item[0] : null);
         return;        
     }
 
@@ -438,6 +448,8 @@ function selectNone() : void {
 }
 
 function updateInlineEditableText() {   
+    inlineEditing.value = false;
+
     const target = getElementFromItem(selectedItem.value as Item);
     if(!target) return;
 
@@ -448,7 +460,6 @@ function updateInlineEditableText() {
 
     elementToEdit.removeAttribute('contenteditable');            
     if(selectedItem.value)  selectedItem.value.title = elementToEdit.innerHTML; 
-    inlineEditing.value = false;
 }
 
 
@@ -765,10 +776,13 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
 }
 
 
-function onPropertyChange(p: ObjectProperty, newValue: any) {
-    //console.log('onPropertyChange', p, 'New value:', newValue);
-    // TODO: create a history command for this change so the action is undoable (for that we need the 'oldValue' as well)
-    // historyManager.value.execute(new PropertyChangeCommand(selectedItem.value, oldValue, newValue));
+function onPropertyChange(p: ObjectProperty, oldValue: any, newValue: any) {
+    if(oldValue === newValue) return;
+    
+    console.log('onPropertyChange', p, 'Old value:', oldValue, 'New value:', newValue);
+
+    
+    if(selectedItem.value) historyManager.value.execute(new ChangePropertyCommand(selectedItem.value, p.name, oldValue, newValue));
 
     nextTick(() => moveable.value?.updateRect());
 }
@@ -793,6 +807,7 @@ function setupKeyboardHandlers() {
             }
             
             e.preventDefault();
+            e.stopPropagation();
             handler(e);
         }, { eventName: 'keydown' })
     }
@@ -805,7 +820,7 @@ function setupKeyboardHandlers() {
     // Delete / backspace to delete selected item
     onKey(["Backspace", "Delete"], (e: KeyboardEvent) => { 
         console.log('Pressed delete', e);
-        if(selectedItem.value) deleteItem(); 
+        if(targets.value.length > 0) deleteItem(); 
     });
 
     // CMD+Z to undo, Shift+CMD+Z to redo
@@ -893,16 +908,19 @@ function pasteItem() {
 
     const newItems = deepClone(itemToPaste.value) as Item[];
 
+    const commands : Command[] = [];
     for(const newItem of newItems) {
         newItem.id = getUniqueId(); 
         newItem.x += 20;
         newItem.y += 20;
-        historyManager.value.execute(new AddItemCommand(elements, newItem));
+        commands.push(new AddItemCommand(elements, newItem));
     }
+    const g = new GroupCommand(commands);
+    historyManager.value.execute(g);
         
     itemToPaste.value = newItems;
     selectNone();
-    nextTick(() => newItems.map(item => selectItem(item)));        
+    nextTick(() => selectItem(newItems));        
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -951,19 +969,20 @@ function getObjectToInspect() : [any, ObjectInspectorModel | null] {
 
 
 function setObjectToInspect(item: Item | ItemConnection | undefined | null) : void {
-    if(isItem(item)) {
-        const el = getElementFromItem(item as Item);
-        if(!el) return;
+    // if(isItem(item)) {
+    //     const el = getElementFromItem(item as Item);
+    //     if(!el) return;
         
-        const elementToEdit = el.querySelector('.diagram-item-inline-edit') as HTMLElement;
-        if(!elementToEdit) return;
+    //     const elementToEdit = el.querySelector('.diagram-item-inline-edit') as HTMLElement;
+    //     if(!elementToEdit) return;
 
-        elementToEdit.setAttribute('contenteditable', 'true');
-        elementToEdit.setAttribute('spellcheck',      'false');        
-        elementToEdit.focus();
-        inlineEditing.value = true;
-    }
+    //     elementToEdit.setAttribute('contenteditable', 'true');
+    //     elementToEdit.setAttribute('spellcheck',      'false');        
+    //     elementToEdit.focus();
+    //     inlineEditing.value = true;
+    // }
 
+    _objectToInspect.value = null;
     nextTick(() => _objectToInspect.value = item );        
 }
 

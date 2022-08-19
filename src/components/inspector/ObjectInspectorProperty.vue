@@ -7,7 +7,7 @@
                        :is               = "editor" 
                        :object           = "object" 
                        :property         = "property" 
-                       @property-changed = "(p: any, v: any) => emit('property-changed', p, v)"  />
+                       @property-changed = "(p: any, oldValue: any, newValue: any) => emit('property-changed', p, oldValue, newValue)"  />
             <div v-else class="readonly-value" v-html="readonlyValue" />
         </div>
     </div>
@@ -30,7 +30,7 @@ export interface ObjectInspectorPropertyProps {
 }
 
 export interface ObjectInspectorPropertyEvents {
-    (e: 'property-changed', property: ObjectProperty, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
 }
 
 // Define props

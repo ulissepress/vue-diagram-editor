@@ -5,11 +5,11 @@
             <Icon v-show="!expanded" size='16px' icon="keyboard_arrow_right" /> 
             {{ section.title }}
         </div>
-        <ObjectInspectorProperty v-if="expanded" v-for="property in section.properties" 
-            :key          = "property.name" 
+        <ObjectInspectorProperty v-if="expanded" v-for="(property, index) in section.properties" 
+            :key          = "index"
             :property     = "property"
             :object       = "object" 
-            @property-changed = "(propertyChanged, newValue) => emit('property-changed', propertyChanged, newValue)" />
+            @property-changed = "(propertyChanged, oldValue, newValue) => emit('property-changed', propertyChanged, oldValue, newValue)" />
     </div>
 </template>
 
@@ -28,7 +28,7 @@ export interface ObjectInspectorSectionProps {
 }
 
 export interface ObjectInspectorSectionvents {
-    (e: 'property-changed', property: ObjectProperty, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
 }
 
 // Define props

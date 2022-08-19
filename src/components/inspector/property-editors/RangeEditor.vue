@@ -6,7 +6,7 @@
            :max   = "property.editorOptions?.max || 100" 
            @input = "onChange" />
 
-    <NumberEditor :object="object" :property="property" />
+    <NumberEditor :object="object" :property="property" @property-changed="onNumericValueChanged" />
 </template>
 
 <script setup lang="ts">
@@ -22,7 +22,7 @@ export interface RangeEditorProps {
 }
 
 export interface RangeEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
 }
 
 // Define props
@@ -38,10 +38,16 @@ function convertValue(value: string): number {
 }
 
 function onChange(e: any) {
-    let v = convertValue(e.target.value);
+    const oldValue = getObjectValue(object, property.name);
 
-    setObjectValue(object, property.name, v);
-    emit('property-changed', property, v)
+    let newValue = convertValue(e.target.value);
+
+    setObjectValue(object, property.name, newValue);
+    emit('property-changed', property, oldValue, newValue)
+}
+
+function onNumericValueChanged(property: ObjectProperty, oldValue: any, newValue: any) {
+   emit('property-changed', property, oldValue, newValue)
 }
 
 </script>

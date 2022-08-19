@@ -17,7 +17,7 @@ export interface SelectEditorProps {
 }
 
 export interface SelectEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
 }
 
 // Define props
@@ -28,8 +28,9 @@ const emit = defineEmits<SelectEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 function onChange(e: any) {
+    const oldValue = getObjectValue(object, property.name);
     setObjectValue(object, property.name, e.target.value);    
-    emit('property-changed', property, e.target.value)
+    emit('property-changed', property, oldValue, e.target.value)
 }
 </script>
 

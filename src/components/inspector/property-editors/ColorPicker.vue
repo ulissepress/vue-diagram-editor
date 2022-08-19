@@ -4,7 +4,11 @@
         <div v-if="showColorValue" class="color-value">{{ currentColor }}</div>
     </div>
     <Teleport to="body">
-        <Sketch ref="picker" v-if="open"  :style="getPickerStyle()" :modelValue="currentColor" @update:modelValue="currentColor=$event.hex8; $emit('color-changed', $event.hex8)" />
+        <Sketch v-if=   "open"
+                ref                = "picker" 
+                :style             = "getPickerStyle()" 
+                :modelValue        = "currentColor" 
+                @update:modelValue = "currentColor=$event.hex8; $emit('color-changed', $event.hex8)" />
     </Teleport>
 </template>
 
@@ -13,6 +17,7 @@
 import { Sketch } from '@ckpack/vue-color';
 import { onClickOutside } from '@vueuse/core';
 import { ref } from 'vue';
+
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
