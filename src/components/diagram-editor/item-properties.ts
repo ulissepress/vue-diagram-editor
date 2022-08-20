@@ -33,7 +33,7 @@ export const w$ : ObjectProperty = { name: "w", label: "Width",  type: PropertyT
 export const h$ : ObjectProperty = { name: "h", label: "Height", type: PropertyType.NUMBER, editorOptions: { min: 0 } };
 
 export const rotate$  : ObjectProperty = { name: "r",             label: "Rotation",  type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: -360, max: 360, step: 1 }};
-export const radius$  : ObjectProperty = { name: "borderRadius",  label: "Radius",    type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 0,    max: 100, step: 1 }};
+export const radius$  : ObjectProperty = { name: "borderRadius",  label: "Radius",    type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 0,    max: 200, step: 1 }};
 export const opacity$ : ObjectProperty = { name: "opacity",       label: "Opacity %", type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 0,    max: 100, step: 1 }};
 
 export const borderSection$ = {   // Border

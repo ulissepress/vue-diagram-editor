@@ -106,10 +106,11 @@
                                 <component :is="item.component" :item="item" />
 
                                 <!-- Item decorators (delete, locked, size info) -->
-                                <div class="decorator decorator-delete" v-if="!creatingConnection && editable && item.id === selectedItem?.id && (selectedItem as Item)?.locked !== true" :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete item">&times;</div>
-                                <div class="decorator decorator-locked" v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }" v-show="item.locked === true" title="locked">&#x1F512;</div>
-                                <div class="decorator decorator-size"   v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
-
+                                <div class="decorator decorator-delete"    v-if="isDecoratorActive(item)"       :style="{ zoom: 1 / zoomFactor }" @click.stop="deleteItem" title="delete">&times;</div>
+                                <div class="decorator decorator-duplicate" v-if="isDecoratorActive(item)"       :style="{ zoom: 1 / zoomFactor }" @click.stop="copyItem(); pasteItem()" title="duplicate">&plus;</div>
+                                <div class="decorator decorator-locked"    v-if="isDecoratorActive(item, true)" :style="{ zoom: 1 / zoomFactor }" title="locked">&#x1F512;</div>
+                                <div class="decorator decorator-size"      v-if="isDecoratorActive(item)"       :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
+ 
                                 <!-- Connection Handles - When the item is rotated, only the center handle is active -->
                                 <div class="connection-handle connection-handle-left"   v-if="isConnectionHandleActive(item)"       :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.LEFT)"></div>
                                 <div class="connection-handle connection-handle-right"  v-if="isConnectionHandleActive(item)"       :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.RIGHT)"></div>
@@ -376,6 +377,11 @@ function onMouseOver(item: Item, e: MouseEvent) {
 function onMouseLeave(item: Item, e: MouseEvent) {
     if(!creatingConnection.value === true) return;
     hoverItem.value = null;
+}
+
+
+function isDecoratorActive(item: Item, mustBeLocked: boolean = false) : boolean {
+    return editable && !creatingConnection.value && item.id === selectedItem.value?.id && item.locked === mustBeLocked;
 }
 
 /**
@@ -1032,10 +1038,13 @@ function onSelectionEnd(e: any) {
 
 
 <style>
-.diagram-item-inline-edit,
+.diagram-item-inline-edit {
+    outline: none;
+}
+
 .diagram-item-inline-edit:focus,
 .diagram-item-inline-edit:focus-visible { 
-    outline: none;
+    outline: 1px solid #4af;
 }
 </style>
 
@@ -1238,17 +1247,27 @@ function onSelectionEnd(e: any) {
     color: white;
     text-align: center;
     font-weight: normal;
-    line-height: 1;
+    line-height: 1.1;
 }
 
 .item .decorator-delete {
     top: 0px;
     right: -32px;
-    width: 24px;
-    height: 24px;
-    font-size: 24px;
+    width: 22px;
+    height: 22px;
+    font-size: 20px;
     cursor: pointer;
 }
+
+.item .decorator-duplicate {
+    top: 30px;
+    right: -32px;
+    width: 22px;
+    height: 22px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
 
 .item .decorator-locked {
     top: 0px;
@@ -1270,6 +1289,10 @@ function onSelectionEnd(e: any) {
     font-size: 14px;
     padding: 4px 8px;
     white-space: nowrap;
+    background: #dde1e4;
+    border: 0px;
+    color: #555;
+    line-height: 1;
 }
 
 .item.mouse-hover {

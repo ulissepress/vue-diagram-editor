@@ -1,8 +1,8 @@
-import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
+import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
-import { StyleValue } from "vue";
 import { ObjectInspectorModel } from '../inspector/types';
+import { StyleValue } from "vue";
 
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
@@ -33,7 +33,8 @@ export function getItemStyle(item: Item) : StyleValue {
         "height":           item.h + 'px',
         "zIndex":           item.z,
         "backgroundColor":  item.component ? "transparent" : item.backgroundColor,
-        "transform":        t
+        "transform":        t,
+        "borderRadius":     item.supportsRoundable ? (item.borderRadius> 0 ? item.borderRadius : 1) + 'px' : '0px',
     }
 
     if(item.clipType !== ClipType.NONE) {
