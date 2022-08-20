@@ -75,7 +75,7 @@
                             :to          = "getItemById(items, c.to.item)!"
                             :connection  = "c"
                             :style       = "{ zIndex: c.z }"
-                            :selected    = "editable && c.id === _objectToInspect?.id"
+                            :selected    = "editable && c.id === selectedConnection?.id"
                             @selected    = "selectConnection(c)" />
                                 
                         <!-- Use to render a connection line during a new connection creation -->
@@ -111,26 +111,25 @@
                                 <div class="decorator decorator-size"   v-if="!creatingConnection && editable && item.id === selectedItem?.id" :style="{ zoom: 1 / zoomFactor }">X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h}} &nbsp;{{ item.r !== 0 ? ' R: ' + item.r + '°': '' }}</div>
 
                                 <!-- Connection Handles - When the item is rotated, only the center handle is active -->
-                                <div class="connection-handle connection-handle-left"   v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.LEFT)"></div>
-                                <div class="connection-handle connection-handle-right"  v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.RIGHT)"></div>
-                                <div class="connection-handle connection-handle-top"    v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.TOP)"></div>
-                                <div class="connection-handle connection-handle-bottom" v-if="item.r === 0 && editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.BOTTOM)"></div>
-                                <div class="connection-handle connection-handle-center" v-if="editable && creatingConnection && item.hover === true" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.CENTER)"></div>
+                                <div class="connection-handle connection-handle-left"   v-if="isConnectionHandleActive(item)"       :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.LEFT)"></div>
+                                <div class="connection-handle connection-handle-right"  v-if="isConnectionHandleActive(item)"       :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.RIGHT)"></div>
+                                <div class="connection-handle connection-handle-top"    v-if="isConnectionHandleActive(item)"       :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.TOP)"></div>
+                                <div class="connection-handle connection-handle-bottom" v-if="isConnectionHandleActive(item)"       :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.BOTTOM)"></div>
+                                <div class="connection-handle connection-handle-center" v-if="isConnectionHandleActive(item, true)" :style="{ zoom: 1 / zoomFactor }" @click="connectionHandleClick(item, ConnectionHandle.CENTER)"></div>
                         </div> <!-- item -->
                         
                     <!-- Manage drag / resize / rotate / rounding of selected item -->
                     <Moveable v-if="editable"
-                        ref     = "moveable"
-                        :target = "targets"
-                        :zoom   = "1 / zoomFactor"
-                        :origin = "false"  
-
+                        ref              = "moveable"
+                        :target          = "targets"
+                        :zoom            = "1 / zoomFactor"
+                        :origin          = "false"  
                         :stopPropagation = "true"
                         
-                        :throttleDrag   = "1"
-                        :throttleResize = "1"
-                        :throttleRotate = "shiftPressed ? 45 : 1"
-                        :keepRatio      = "shiftPressed"
+                        :throttleDrag    = "1"
+                        :throttleResize  = "1"
+                        :throttleRotate  = "shiftPressed ? 45 : 1"
+                        :keepRatio       = "shiftPressed"
 
                         :snappable               = "showGuides"
                         :snapGap                 = "true"
@@ -312,7 +311,7 @@ const showInspector = ref(true);               // Show or hide all the guides
 const showKeyboard  = ref(false);              // Show or hide all the guides
 
 const selectedItem       = computed(() => targets.value.length === 1 ? getItemFromElement(targets.value[0]) : null );
-const selectedItemActive = computed(() => targets.value.length > 0);
+const selectedItemActive = computed(() => targets.value.length > 0 && targets.value.every(el => getItemFromElement(el)?.locked === false) );
 
 const shiftPressed   = useKeyModifier('Shift')
 const historyManager = ref(new HistoryManager());
@@ -331,9 +330,11 @@ const horizontalGuidelines = computed(() => showGuides.value ? (viewportSize ? [
 const verticalGuidelines   = computed(() => showGuides.value ? (viewportSize ? [0, viewportSize[0]/2, viewportSize[0], ...vGuideValues.value] : vGuideValues.value) : []);
 const elementGuidelines    = () => viewport.value ? Array.prototype.slice.call(viewport.value!.querySelectorAll(".item"), 0).filter(n => !n.classList.contains('target')) : [];
 
+const selectedConnection = ref<ItemConnection | null>(null);
+const targets            = ref<HTMLDivElement[]>([]);
+const objectToInspect    = ref<any | null>(null);
 
-const targets          = ref<HTMLDivElement[]>([]);
-const _objectToInspect = ref<any | null>(null);
+const hoverItem = ref<Item | null>(null);
 
 
 // Temporary variables
@@ -344,13 +345,11 @@ const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0, opa
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 
-const inspectorCoords = ref<Position>({ x: 0, y: 0 });
-
 function onMouseMove(e: any) { 
      if(!viewport.value) return;   
     //console.log('onMouseMove', e.srcElement, e.offsetX, e.offsetY, e);
 
-    // Mouse position
+    // Mouse position (it the viewport coordinates)
     const rect = viewport.value.getBoundingClientRect();
     mouseCoords.value.x = Math.floor((e.clientX - rect.left) / zoomFactor.value);
     mouseCoords.value.y = Math.floor((e.clientY - rect.top)  / zoomFactor.value);
@@ -371,23 +370,33 @@ let connectionInfo : {
 
 function onMouseOver(item: Item, e: MouseEvent) {
     if(!creatingConnection.value === true) return;
-    item.hover = true;
+    hoverItem.value = item;
 }
 
 function onMouseLeave(item: Item, e: MouseEvent) {
     if(!creatingConnection.value === true) return;
-    if('hover' in item) delete item.hover;
+    hoverItem.value = null;
+}
+
+/**
+ * Return TRUE when the diagram is editable, the user is creating a connection and the mouse is over the passed item
+ */
+function isConnectionHandleActive(item: Item, ignoreRotate?: boolean) : boolean {
+    const active = editable && creatingConnection && item.id === hoverItem.value?.id
+
+    return ignoreRotate ? active : active && (item.r === 0);
 }
 
 
-function selectConnection(connection: ItemConnection) {
-    if(!connection) return;
-    
+function selectConnection(connection: ItemConnection) {   
     selectNone();
+    selectedConnection.value = connection;
     setObjectToInspect(connection);
 }
 
 function selectItem(item: Item | Item[] | HTMLDivElement[], e?: MouseEvent)  : void {
+    
+    selectedConnection.value = null;
 
     // Passing an array of items or DOM elements
     if(Array.isArray(item)) {
@@ -443,6 +452,8 @@ function selectNone() : void {
     updateInlineEditableText();
 
     targets.value = [];
+    selectedConnection.value = null;
+
     setObjectToInspect(null);    
     console.log('### selectNone', targets.value);    
 }
@@ -714,7 +725,6 @@ function undo() {
     
     historyManager.value?.undo(); 
     selectNone();
-    nextTick(() => moveable.value?.updateTarget());
 }
 
 /** Redo last undoed action (is possible) */
@@ -722,7 +732,6 @@ function redo() {
     if(!historyManager.value.canRedo()) return;
 
     historyManager.value?.redo(); 
-    nextTick(() => moveable.value?.updateTarget());
 }
 
 /** Select the current tool to use (selection, connection, text, image, ...) */
@@ -955,35 +964,22 @@ function inlineEdit(item: Item) {
 }
 
 function getInspectorTitle() : string {    
-    if(!_objectToInspect.value) return "Inspector";
+    if(!objectToInspect.value) return "Inspector";
 
-    const item = _objectToInspect.value as Item;
+    const item = objectToInspect.value as Item;
     return `${item.component} (${item.id})`;
 }
 
 function getObjectToInspect() : [any, ObjectInspectorModel | null] {
-    if(!_objectToInspect.value) return [null, null];
+    if(!objectToInspect.value) return [null, null];
 
-    return [_objectToInspect.value,  getItemBlueprint(_objectToInspect.value.component)[1]]
+    return [objectToInspect.value,  getItemBlueprint(objectToInspect.value.component)[1]]
 }
 
 
 function setObjectToInspect(item: Item | ItemConnection | undefined | null) : void {
-    // if(isItem(item)) {
-    //     const el = getElementFromItem(item as Item);
-    //     if(!el) return;
-        
-    //     const elementToEdit = el.querySelector('.diagram-item-inline-edit') as HTMLElement;
-    //     if(!elementToEdit) return;
-
-    //     elementToEdit.setAttribute('contenteditable', 'true');
-    //     elementToEdit.setAttribute('spellcheck',      'false');        
-    //     elementToEdit.focus();
-    //     inlineEditing.value = true;
-    // }
-
-    _objectToInspect.value = null;
-    nextTick(() => _objectToInspect.value = item );        
+    objectToInspect.value = null;
+    nextTick(() => objectToInspect.value = item );        
 }
 
 function onSelectionDragStart(e: any) {
@@ -1256,7 +1252,7 @@ function onSelectionEnd(e: any) {
 
 .item .decorator-locked {
     top: 0px;
-    right: -20px;
+    right: -24px;
     width: auto;
     height: auto;
     font-size: 16px;
