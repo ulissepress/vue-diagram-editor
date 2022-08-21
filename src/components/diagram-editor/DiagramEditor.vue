@@ -707,6 +707,14 @@ function bringToFront() : void {
 
 /** Delete current selected item / connection */
 function deleteItem() {
+    
+    if(isConnection(selectedConnection.value)) {
+        historyManager.value.execute(new DeleteCommand(elements, selectedConnection.value));
+        selectNone();
+        return;
+    }
+
+
     // Are there any items selected (1 or more)
     if(targets.value.length > 0) {
         const commands: Command[] = [];
@@ -717,13 +725,7 @@ function deleteItem() {
         historyManager.value.execute(new GroupCommand(commands));
         selectNone();
     }
-
-    if(isConnection(selectedItem.value)) {
-        historyManager.value.execute(new DeleteCommand(elements, selectedItem.value));
-        emit('delete-connection', selectedItem.value);
-        selectNone();
-    }
-}
+} // func
 
 /** Undo last action done (is possible) */
 function undo() {  
@@ -835,7 +837,7 @@ function setupKeyboardHandlers() {
     // Delete / backspace to delete selected item
     onKey(["Backspace", "Delete"], (e: KeyboardEvent) => { 
         console.log('Pressed delete', e);
-        if(targets.value.length > 0) deleteItem(); 
+        if(targets.value.length > 0 || selectedConnection.value !== null) deleteItem(); 
     });
 
     // CMD+Z to undo, Shift+CMD+Z to redo

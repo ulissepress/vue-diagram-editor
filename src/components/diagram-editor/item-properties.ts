@@ -270,7 +270,9 @@ export const connectionModel: ObjectInspectorModel = {
                     properties: [ 
                         { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionType.LINE,  icon: "horizontal_rule" }, 
-                                     { name: ConnectionType.CURVE, icon: "moving" } ] 
+                                     { name: ConnectionType.ELBOW, icon: "turn_right" },
+                                     { name: ConnectionType.CURVE, icon: "moving" },
+                                     ] 
                         }},
                         { name: "style",  label: "Style",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 

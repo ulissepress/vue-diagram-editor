@@ -8,4 +8,6 @@
     - Supports multiple selected items (common properties)
     - Undo/Redo on property changes
 
+- Delete a connection with keyboard shortcut
+
 - ContentEditor for inline editing (https://tiptap.dev/)

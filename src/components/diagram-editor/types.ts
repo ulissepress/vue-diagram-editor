@@ -134,6 +134,7 @@ export enum ConnectionMarker {
 
 export enum ConnectionType {
     LINE  = "line",
+    ELBOW = "elbow",
     CURVE = "curve"
 }
 

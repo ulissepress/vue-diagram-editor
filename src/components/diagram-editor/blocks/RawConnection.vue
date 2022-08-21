@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { computed, CSSProperties, ref } from 'vue';
 import { getUniqueId } from '../helpers';
-import { ConnectionMarker, ConnectionStyle, ConnectionType, Rect } from '../types';
+import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, Rect } from '../types';
 
 export interface RawConnectionProps {
     x1: number, 
@@ -47,6 +47,10 @@ export interface RawConnectionProps {
 
     type?:      ConnectionType,         // line, curve, ...
     lineStyle?: ConnectionStyle,        // solid, dashed, ...
+
+    startHandle?: ConnectionHandle,     // top, bottom, left, right, center
+    endHandle?:   ConnectionHandle,
+
 
     startMarker?: ConnectionMarker,     // none, circle, square, arrow, ...
     endMarker?:   ConnectionMarker,
@@ -143,13 +147,81 @@ const linePath = computed<[string, boolean]>( () => {
     if(m2y <= m1y) { inverse = true; }
     if(m2x >= m1x && m2y <= m1y) { inverse = false; }
 
-     // Straight line
+    // Line connection
     if(props.type === ConnectionType.LINE) return [`M ${x1} ${y1} L ${x2} ${y2}`, inverse];
+
+    // Elbow connection
+    if(props.type === ConnectionType.ELBOW) return elbowPath(x1, y1, x2, y2, inverse, b);
     
-    // Curve line
+    // Curve connection
     const d = (x2 - x1) * 0.7;      // Curve tension: 0=direct line, 1=full curved. PS: 0.7 seems a good value
     return [`M ${x1} ${y1} C ${x1 + d} ${y1} ${x2 - d} ${y2} ${x2} ${y2}`, inverse]
 })
+
+
+function elbowPath(x1: number, y1: number, x2: number, y2: number, inverse: boolean, b: Rect): [string, boolean] {
+    const mx = (x1 + x2) / 2;
+    const my = (y1 + y2) / 2;
+
+    // The start handle is TOP / BOTTOM
+    if(props.startHandle === ConnectionHandle.TOP || props.startHandle === ConnectionHandle.BOTTOM || props.startHandle === ConnectionHandle.CENTER) {
+        if(props.endHandle === ConnectionHandle.LEFT  || props.endHandle === ConnectionHandle.RIGHT || props.endHandle === ConnectionHandle.CENTER) {
+
+            if(y2 < y1) {
+                console.log('bottom/top to left/right y2<y1', x1, y1, x2, y2, inverse);                    
+                return inverse ? [`M ${x2} ${0} L ${b.w} ${b.h} L ${0} ${b.h} `, !inverse]
+                                : [`M ${x1} ${y1} L ${0} ${0} L ${x2} ${y2} `, inverse];
+            }
+            
+            console.log('bottom/top to left/right NOT y2<y1', x1, y1, x2, y2, inverse);                    
+            return inverse ? [`M ${b.w} ${b.h} L ${b.w} ${0} L ${0} ${0} `, !inverse] 
+                            : [`M ${x1} ${y1} L ${x1} ${b.h} L ${x2} ${y2} ` , inverse];
+        } 
+        else if(props.endHandle === ConnectionHandle.TOP || props.endHandle === ConnectionHandle.BOTTOM) {
+            if(y2 < y1) {
+                console.log('bottom/top to top/bottom y2<y1', x1, y1, x2, y2, inverse);                    
+                return inverse ? [`M ${x2} ${0} L ${b.w} ${b.h/2} L ${0} ${b.h/2} L ${0} ${b.h} `, !inverse]
+                                : [`M ${x1} ${y1} L ${0} ${my} L ${b.w} ${my} L ${x2} ${y2} `, inverse];       
+            }
+            
+            console.log('bottom/top to top/bottom NOT y2<y1', x1, y1, x2, y2, inverse);                    
+            return inverse ? [`M ${b.w} ${b.h} L ${b.w} ${my} L ${0} ${my} L ${0} ${0} `, !inverse] 
+                            : [`M ${0} ${0} L ${0} ${my} L ${b.w} ${my} L ${x2} ${y2}`, inverse];                      
+        }
+        
+        //console.log(`bottom handle`, x1, y1, x2, y2, inverse);
+        return [`M ${x1} ${y1} L ${x1} ${b.h} L ${x2} ${y2} `, inverse];            
+    }
+    else 
+    {   // The start handle is LEFT / RIGHT
+        if(props.endHandle === ConnectionHandle.LEFT  || props.endHandle === ConnectionHandle.RIGHT || props.endHandle === ConnectionHandle.CENTER) {
+
+            if(y2 < y1) {
+                console.log('left-right to left/right y2<y1', x1, y1, x2, y2, inverse);                    
+                return inverse ? [`M ${x2} ${0} L ${mx} ${0} L ${mx} ${b.h} L ${0} ${b.h} `, !inverse]
+                                : [`M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${0} L ${x2} ${y2} `, inverse];
+            }
+            
+            console.log('left-right to left/right NOT y2<y1', x1, y1, x2, y2, inverse);                    
+            return inverse ? [`M ${b.w} ${b.h} L ${mx} ${b.h} L ${mx} ${0} L ${0} ${0} `, !inverse] 
+                            : [`M ${0} ${0} L ${mx} ${0} L ${mx} ${y2} L ${x2} ${y2} ` , inverse];
+        } 
+        else if(props.endHandle === ConnectionHandle.TOP || props.endHandle === ConnectionHandle.BOTTOM) {
+            if(y2 < y1) {
+                console.log('left-right to top/bottom y2<y1', x1, y1, x2, y2, inverse);                    
+                return inverse ? [`M ${x2} ${0} L ${0} ${0} L ${0} ${b.h}  `, !inverse]
+                                : [`M ${x1} ${y1} L ${b.w} ${b.h} L ${x2} ${y2} `, inverse];       
+            }
+            
+            console.log('left-right to top/bottom NOT y2<y1', x1, y1, x2, y2, inverse);                    
+            return inverse ? [`M ${b.w} ${b.h} L ${0} ${b.h} L ${0} ${0} `, !inverse] 
+                            : [`M ${0} ${0} L ${b.w} ${0} L ${x2} ${y2}`, inverse];                      
+        }
+    }
+    
+    console.log(`y2 <= mx`, inverse);
+    return [`M ${x1} ${y1} L ${mx} ${y1} L ${mx} 0 L ${x2} ${y2} `, inverse];
+}
 </script>
 
 

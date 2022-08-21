@@ -7,6 +7,9 @@
                    :thick     = "connection.thick" 
                    :color     = "connection.backgroundColor" 
 
+                   :startHandle = "connection.from.handle"
+                   :endHandle   = "connection.to.handle"
+
                    :startMarker = "connection.from.marker"
                    :endMarker   = "connection.to.marker"
                    
