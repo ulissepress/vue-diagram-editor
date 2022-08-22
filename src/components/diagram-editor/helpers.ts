@@ -1,4 +1,4 @@
-import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
+import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextDecoration, TextHAlign, TextTransform, TextVAlign } from "./types";
 import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
 import { ObjectInspectorModel } from '../inspector/types';
@@ -76,7 +76,7 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         supportsClippable: false,
 
         backgroundColor: '#bbbbbb',
-        textColor: '#000000',
+        textColor:       '#000000',
         fontSize: 14,
          
         textHAlign: TextHAlign.CENTER,
@@ -92,10 +92,19 @@ export function createItem(item?: DeepPartial<Item>) : Item {
             enabled: false,
             offsetX: 3,
             offsetY: 3,
-            blur: 5,
-            color: '#555555',
+            blur:    5,
+            color:   '#555555',
         },
         
+        textStyle: {
+            bold:          false,
+            italic:        false,
+            letterSpacing: 0,
+            lineHeight:    1,
+            decoration:    TextDecoration.NONE,
+            transform:     TextTransform.NONE
+        },
+
         locked: false,
 
         ...item
@@ -179,14 +188,15 @@ export function registerDefaultItemTypes() {
         clipType: ClipType.NONE,
         clipStyle: '',
 
+        fontSize: 14,
+
         supportsRoundable: false,
         supportsResizable: true,
         
 
         backgroundColor: "#00ff00",
         textColor: "#111111",
-        fontSize: 14,
-        
+                
         locked: false,
         
         textHAlign: TextHAlign.CENTER,
@@ -202,8 +212,17 @@ export function registerDefaultItemTypes() {
             enabled: false,
             offsetX: 3,
             offsetY: 3,
-            blur: 5,
-            color: '#555555',
+            blur:    5,
+            color: ' #555555',
+        },
+
+        textStyle: {
+            bold:          false,
+            italic:        false,
+            letterSpacing: 0,
+            lineHeight:    1,
+            decoration:    TextDecoration.NONE,
+            transform:     TextTransform.NONE
         }
     };
 

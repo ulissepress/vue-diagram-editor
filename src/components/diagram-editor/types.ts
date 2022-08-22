@@ -30,7 +30,7 @@ export interface DiagramElement {
     textColor:        string;   // The element text color (text inside the element, etc.)
     opacity:          number;   // Opacity (0=full transparent, 100=full opaque). Default = 100
 
-    fontSize:        number;    // The element text font size
+    fontSize:         number;   // The element text font size
     
     component:         string;  // The Vue component used to render this element
     componentOptions?: any;     // The Vue component options / config
@@ -58,6 +58,7 @@ export interface Item extends DiagramElement {
     border: ItemBorder;
     shadow: ItemShadow;        // Element shadow definition
 
+    textStyle: TextStyle;
 }
 
 export enum TextHAlign {
@@ -79,6 +80,30 @@ export enum ClipType {
     POLYGON = "polygon",
     ELLIPSE = "ellipse"
 }
+
+export enum TextDecoration {
+    NONE        = "none",
+    LINETHROUGH = "line-through",
+    OVERLINE    = "overline",
+    UNDERLINE   = "underline",  
+}
+
+export enum TextTransform {
+    NONE       = "none",
+    UPPERCASE  = "uppercase",
+    LOWERCASE  = "lowercase",
+    CAPITALIZE = "capitalize",  
+}
+
+export interface TextStyle {
+    bold:          boolean;
+    italic:        boolean;
+    letterSpacing: number;
+    lineHeight:    number;
+    decoration:    TextDecoration; 
+    transform:     TextTransform;
+}
+
 export interface ItemBorder {
     width: number;
     style: ConnectionStyle

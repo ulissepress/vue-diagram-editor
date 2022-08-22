@@ -4,8 +4,7 @@
             <div class="item" :style="{
                     backgroundColor: getObjectValue(object, property.name) === item.name ? '#4af'  : '#777',
                     color:           getObjectValue(object, property.name) === item.name ? 'white' : '#ddd',
-                    width:           item.text ? 'auto' : '20px',
-                    height:          item.text ? '16px' : '20px'
+                    width:           item.text ? 'auto' : '20px'                    
                   }" 
                   @click="getObjectValue(object, property.name) !== item.name && onChange(item)">
                     <div v-if="item.text" class="text">{{ item.text }}</div>
@@ -58,7 +57,7 @@ function onChange(item: { name: string, icon: string}) {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 18px;
+    height: 18px !important;
     padding: 1px;
 
     border: 1px solid transparent;

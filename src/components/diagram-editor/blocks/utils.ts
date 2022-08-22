@@ -1,4 +1,5 @@
-import { App } from "vue";
+import { App, CSSProperties } from "vue";
+
 import Connection from "./Connection.vue";
 import Ellipse from "./Ellipse.vue";
 import Icon from "./Icon.vue";
@@ -22,6 +23,19 @@ export function cssDropShadow(item: Item) : string {
     return item.shadow.enabled ? `drop-shadow(${item.shadow.offsetX}px ${item.shadow.offsetY}px ${item.shadow.blur}px ${item.shadow.color})` : '' 
 }
 
+export function cssTextStyle(item: Item) : CSSProperties {
+    let h: CSSProperties = {
+        fontSize:       item.fontSize + "px",
+        fontWeight:     item.textStyle.bold   ? 'bold'   : 'normal',
+        fontStyle:      item.textStyle.italic ? 'italic' : 'normal',
+        letterSpacing:  item.textStyle.letterSpacing + 'px',
+        lineHeight:     item.textStyle.lineHeight,
+        textDecoration: item.textStyle.decoration, 
+        textTransform:  item.textStyle.transform, 
+    };
+    
+    return h;
+}
 
 let basicBlocksRegistered = false
 export function registerBasicBlocks(app: App) {

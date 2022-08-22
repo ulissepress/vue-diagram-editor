@@ -3,8 +3,7 @@
         :src   = "item.url === '' ? imagePlaceholder : item.url"
         :style = "{ 
             color:        item.textColor, 
-            borderRadius: item.borderRadius + 'px',
-            fontSize:     item.fontSize + 'px',
+            borderRadius: item.borderRadius + 'px',            
             opacity:      item.opacity / 100,   
             objectFit:    item.fit,
             border:       cssBorder(item),

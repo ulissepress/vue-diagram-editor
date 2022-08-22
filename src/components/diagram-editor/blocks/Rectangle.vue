@@ -5,10 +5,10 @@
         backgroundColor: item.backgroundColor, 
         color:           item.textColor, 
         borderRadius:    item.borderRadius + 'px',
-        fontSize:        item.fontSize + 'px',
         opacity:         item.opacity / 100,
         border:          cssBorder(item),
-        boxShadow:       cssShadow(item) }" >
+        boxShadow:       cssShadow(item),
+        ...cssTextStyle(item) }">
         <div>
             <div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }" />
         </div> 
@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { Item } from '../types';
-import { cssBorder, cssShadow } from './utils';
+import { cssBorder, cssShadow, cssTextStyle } from './utils';
 
 const { item } = defineProps<{item: Item}>();
 

@@ -4,7 +4,7 @@
             alignItems:      item.textVAlign,
             backgroundColor: item.backgroundColor, 
             color:           item.textColor, 
-            fontSize:        item.fontSize + 'px',
+            ...cssTextStyle(item),
             opacity:         item.opacity / 100,
             border:          cssBorder(item),
             boxShadow:       cssShadow(item),
@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { Item } from '../types';
-import { cssBorder, cssShadow } from './utils';
+import { cssBorder, cssShadow, cssTextStyle } from './utils';
 
 const { item } = defineProps<{item: Item}>();
 

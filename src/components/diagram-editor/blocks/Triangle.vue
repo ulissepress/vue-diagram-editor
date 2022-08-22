@@ -24,7 +24,7 @@
             justifyContent: item.textHAlign,
             alignItems:     item.textVAlign,
             color:          item.textColor,
-            fontSize:       item.fontSize + 'px', 
+            ...cssTextStyle(item)
         }">{{ item.title }}</div>
     </div>
 </template>
@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { ConnectionStyle, Item } from '../types';
-import { cssDropShadow } from './utils';
+import { cssDropShadow, cssTextStyle } from './utils';
 
 const { item } = defineProps<{item: Item}>();
 

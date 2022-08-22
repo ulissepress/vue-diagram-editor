@@ -1,4 +1,4 @@
-import { ClipType, ConnectionMarker, ConnectionStyle, ConnectionType, TextHAlign, TextVAlign } from './types';
+import { ClipType, ConnectionMarker, ConnectionStyle, ConnectionType, TextDecoration, TextHAlign, TextTransform, TextVAlign } from './types';
 import { InspectorTab, PropertyType } from '../inspector/types';
 import { ObjectInspectorModel, ObjectProperty } from './../inspector/types';
 
@@ -36,6 +36,34 @@ export const rotate$  : ObjectProperty = { name: "r",             label: "Rotati
 export const radius$  : ObjectProperty = { name: "borderRadius",  label: "Radius",    type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 0,    max: 200, step: 1 }};
 export const opacity$ : ObjectProperty = { name: "opacity",       label: "Opacity %", type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 0,    max: 100, step: 1 }};
 
+
+export const textStyleSection$ = {   // TextStyle
+    name: "text_style",
+    title: "Text Style",
+    properties: [
+        fontSize$,
+        { name: "textStyle.letterSpacing", label: "H Spacing",   type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 0, max: 100, step: 1   } },
+        { name: "textStyle.lineHeight",    label: "V Spacing",   type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 0, max: 10,  step: 0.1 } },
+        { name: "textStyle.bold",          label: "Bold",        type: PropertyType.BOOLEAN },
+        { name: "textStyle.italic",        label: "Italic",      type: PropertyType.BOOLEAN },
+        { name: "textStyle.decoration",    label: "Decoration",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+            items: [ { name: TextDecoration.NONE,        text: "None"            }, 
+                     { name: TextDecoration.UNDERLINE,   icon: "format_underline" },
+                     { name: TextDecoration.OVERLINE,    icon: "format_overline"  },
+                     { name: TextDecoration.LINETHROUGH, icon: "strikethrough_s"  },
+                   ] 
+        }},
+        { name: "textStyle.transform",   label: "Transform",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+            items: [ { name: TextTransform.NONE,       text: "None"       }, 
+                     { name: TextTransform.UPPERCASE,  text: "UPPER"  },
+                     { name: TextTransform.LOWERCASE,  text: "lower"  },
+                     { name: TextTransform.CAPITALIZE, text: "Capitalize" },
+                   ] 
+        }},        
+
+    ] 
+}
+
 export const borderSection$ = {   // Border
     name: "border",
     title: "Border",
@@ -50,7 +78,6 @@ export const borderSection$ = {   // Border
         radius$,
     ] 
 }
-
 
 export const shadowSection$ = {   // Shadow
     name: "shadow",
@@ -129,8 +156,9 @@ export const shapeModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
-                },         
+                    properties: [title$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
+                },        
+                textStyleSection$, 
                 borderSection$,
                 shadowSection$,
                 {   // Position & size
@@ -153,8 +181,9 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
-                },         
+                    properties: [title$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
+                },      
+                textStyleSection$,   
                 borderWithoutRadiusSection$,  
                 shadowSection$,
                 {   // Position & size
@@ -241,8 +270,9 @@ export const textModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, fontSize$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$ ]
-                },         
+                    properties: [title$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$ ]
+                },     
+                textStyleSection$,    
                 borderSection$,  
                 shadowSection$,
                 {   // Position & size
