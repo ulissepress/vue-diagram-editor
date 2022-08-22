@@ -2,8 +2,9 @@
     <input class  = "editor-slider" 
            type   = "range"  
            :value = "getObjectValue(object, property.name)" 
-           :min   = "property.editorOptions?.min || 0"
-           :max   = "property.editorOptions?.max || 100" 
+           :min   = "property.editorOptions?.min  || 0"
+           :max   = "property.editorOptions?.max  || 100" 
+           :step  = "property.editorOptions?.step || 1" 
            @input = "onChange" />
 
     <NumberEditor :object="object" :property="property" @property-changed="onNumericValueChanged" />
