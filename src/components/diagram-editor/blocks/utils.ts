@@ -25,6 +25,7 @@ export function cssDropShadow(item: Item) : string {
 
 export function cssTextStyle(item: Item) : CSSProperties {
     let h: CSSProperties = {
+        fontFamily:     item.textStyle.fontFamily,
         fontSize:       item.fontSize + "px",
         fontWeight:     item.textStyle.bold   ? 'bold'   : 'normal',
         fontStyle:      item.textStyle.italic ? 'italic' : 'normal',

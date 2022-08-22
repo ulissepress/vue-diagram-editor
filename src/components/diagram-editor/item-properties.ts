@@ -39,9 +39,11 @@ export const opacity$ : ObjectProperty = { name: "opacity",       label: "Opacit
 
 export const textStyleSection$ = {   // TextStyle
     name: "text_style",
-    title: "Text Style",
+    title: "Text",
     properties: [
-        fontSize$,
+        { name: "textStyle.fontFamily", label: "Font", type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: ['Arial', 'Arial Black', 'Brush Script MT', 'Comic Sans MS', 'Courier New', 'Cursive', 'Garamond', 'Helvetica', 'Impact', 'Luminari', 'Monaco', 'Palatino', 'System-UI', 'Times New Roman', 'Verdana'].sort() }},
+        { name: "fontSize",             label: "Size", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 4, max: 200, step: 1 } },
+        textHAlign$, textVAlign$, 
         { name: "textStyle.letterSpacing", label: "H Spacing",   type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 0, max: 100, step: 1   } },
         { name: "textStyle.lineHeight",    label: "V Spacing",   type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 0, max: 10,  step: 0.1 } },
         { name: "textStyle.bold",          label: "Bold",        type: PropertyType.BOOLEAN },
@@ -155,8 +157,8 @@ export const shapeModel: ObjectInspectorModel = {
             sections: [        
                 {   // Style
                     name: "style",
-                    title: "Text and style",
-                    properties: [title$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
+                    title: "General",
+                    properties: [title$, separator$, backColor$, textColor$, opacity$, locked$]
                 },        
                 textStyleSection$, 
                 borderSection$,
@@ -181,7 +183,7 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$]
+                    properties: [title$, separator$, backColor$, textColor$, opacity$, locked$]
                 },      
                 textStyleSection$,   
                 borderWithoutRadiusSection$,  
@@ -270,7 +272,7 @@ export const textModel: ObjectInspectorModel = {
                 {   // Style
                     name: "style",
                     title: "Text and style",
-                    properties: [title$, textHAlign$, textVAlign$, separator$, backColor$, textColor$, opacity$, locked$ ]
+                    properties: [title$, separator$, backColor$, textColor$, opacity$, locked$ ]
                 },     
                 textStyleSection$,    
                 borderSection$,  

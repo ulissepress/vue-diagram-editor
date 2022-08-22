@@ -97,6 +97,7 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         },
         
         textStyle: {
+            fontFamily:    'Arial',
             bold:          false,
             italic:        false,
             letterSpacing: 0,
@@ -217,6 +218,7 @@ export function registerDefaultItemTypes() {
         },
 
         textStyle: {
+            fontFamily:    'Arial',
             bold:          false,
             italic:        false,
             letterSpacing: 0,

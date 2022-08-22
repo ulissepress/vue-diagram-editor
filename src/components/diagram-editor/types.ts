@@ -96,6 +96,7 @@ export enum TextTransform {
 }
 
 export interface TextStyle {
+    fontFamily:    string;
     bold:          boolean;
     italic:        boolean;
     letterSpacing: number;
