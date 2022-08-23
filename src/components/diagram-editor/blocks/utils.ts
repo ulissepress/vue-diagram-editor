@@ -1,10 +1,10 @@
 import { App, CSSProperties } from "vue";
+import { DiagramElement, Item } from "../types";
 
 import Connection from "./Connection.vue";
 import Ellipse from "./Ellipse.vue";
 import Icon from "./Icon.vue";
 import Image from "./Image.vue";
-import { Item } from "../types";
 import Line from "./Line.vue";
 import Rectangle from "./Rectangle.vue";
 import Star from "./Star.vue";
@@ -23,7 +23,7 @@ export function cssDropShadow(item: Item) : string {
     return item.shadow.enabled ? `drop-shadow(${item.shadow.offsetX}px ${item.shadow.offsetY}px ${item.shadow.blur}px ${item.shadow.color})` : '' 
 }
 
-export function cssTextStyle(item: Item) : CSSProperties {
+export function cssTextStyle(item: DiagramElement) : CSSProperties {
     let h: CSSProperties = {
         fontFamily:     item.textStyle.fontFamily,
         fontSize:       item.fontSize + "px",

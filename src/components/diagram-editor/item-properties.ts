@@ -297,15 +297,17 @@ export const connectionModel: ObjectInspectorModel = {
             title: "Connection",
             sections: [        
                 {   // Style
-                    name: "connection_type",
-                    title: "Type",
+                    name: "connection_style",
+                    title: "Style",
                     properties: [ 
-                        { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                        { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR },
+                        { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorOptions: { 
                             items: [ { name: ConnectionType.LINE,  icon: "horizontal_rule" }, 
                                      { name: ConnectionType.ELBOW, icon: "turn_right" },
                                      { name: ConnectionType.CURVE, icon: "moving" },
                                      ] 
                         }},
+                        { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
                         { name: "style",  label: "Style",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
                                      { name: ConnectionStyle.DASHED, text: "Dashed" },
@@ -327,13 +329,33 @@ export const connectionModel: ObjectInspectorModel = {
                     ]
                 },
                 {   // Style
-                    name: "connection_style",
-                    title: "Style",
+                    name: "connection_text",
+                    title: "Text",
                     properties: [ 
-                       { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR },
-                        { name: "thick", label: "Thick", type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
+                        title$,
+                        { name: "textColor",               label: "Color",       type: PropertyType.COLOR },
+                        { name: "textStyle.fontFamily",    label: "Font",        type: PropertyType.SELECT, editorFullsize: true, editorOptions: { items: ['Arial', 'Arial Black', 'Brush Script MT', 'Comic Sans MS', 'Courier New', 'Cursive', 'Garamond', 'Helvetica', 'Impact', 'Luminari', 'Monaco', 'Palatino', 'System-UI', 'Times New Roman', 'Verdana'].sort() }},
+                        { name: "fontSize",                label: "Size",        type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 4, max: 200, step: 1 } },
+                        { name: "textStyle.letterSpacing", label: "H Spacing",   type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 0, max: 100, step: 1   } },
+                        { name: "textStyle.lineHeight",    label: "V Spacing",   type: PropertyType.RANGE,  editorFullsize: true, editorOptions: { min: 0, max: 10,  step: 0.1 } },
+                        { name: "textStyle.bold",          label: "Bold",        type: PropertyType.BOOLEAN },
+                        { name: "textStyle.italic",        label: "Italic",      type: PropertyType.BOOLEAN },
+                        { name: "textStyle.decoration",    label: "Decoration",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                            items: [ { name: TextDecoration.NONE,        text: "None"            }, 
+                                     { name: TextDecoration.UNDERLINE,   icon: "format_underline" },
+                                     { name: TextDecoration.OVERLINE,    icon: "format_overline"  },
+                                     { name: TextDecoration.LINETHROUGH, icon: "strikethrough_s"  },
+                                   ] 
+                        }},
+                        { name: "textStyle.transform",   label: "Transform",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
+                            items: [ { name: TextTransform.NONE,       text: "None"       }, 
+                                     { name: TextTransform.UPPERCASE,  text: "UPPER"  },
+                                     { name: TextTransform.LOWERCASE,  text: "lower"  },
+                                     { name: TextTransform.CAPITALIZE, text: "Capitalize" },
+                                   ] 
+                        }},       
                     ]
-                },            
+                },     
             ] // sections
         } // tab
     ] // tabs

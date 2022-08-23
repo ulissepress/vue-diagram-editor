@@ -1,4 +1,4 @@
-import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextDecoration, TextHAlign, TextTransform, TextVAlign } from "./types";
+import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextDecoration, TextHAlign, TextTransform, TextVAlign, isItem } from "./types";
 import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
 import { ObjectInspectorModel } from '../inspector/types';
@@ -134,7 +134,20 @@ export function createConnection(fromID: string, toID: string, c?: DeepPartial<I
         style: c?.style || ConnectionStyle.SOLID,
         thick: c?.thick || 1,
 
-        backgroundColor: c?.backgroundColor || "#2c2c2c",        
+        backgroundColor: c?.backgroundColor || "#2c2c2c",    
+        fontSize: 14,
+        
+        textColor: '#333333',
+        textStyle: {
+            fontFamily:    'Arial',
+            bold:          false,
+            italic:        false,
+            letterSpacing: 0,
+            lineHeight:    1,
+            decoration:    TextDecoration.NONE,
+            transform:     TextTransform.NONE
+        }
+        
     } as ItemConnection
 }
 
@@ -366,3 +379,8 @@ export function getHandlePosition(item: Item, cp: ConnectionHandle): Position {
     else if(cp === ConnectionHandle.BOTTOM) return { x: item.x + item.w / 2, y: item.y + item.h     };
     else /*  ConnectionHandle.CENTER */     return { x: item.x + item.w / 2, y: item.y + item.h / 2 };    
 }
+
+
+export function isLineItem(item: Item | undefined | null) : boolean {
+    return isItem(item) && item.component === 'Line';
+} 

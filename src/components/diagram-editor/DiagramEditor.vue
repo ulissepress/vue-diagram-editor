@@ -74,7 +74,6 @@
                             :from        = "getItemById(items, c.from.item)!"
                             :to          = "getItemById(items, c.to.item)!"
                             :connection  = "c"
-                            :style       = "{ zIndex: c.z }"
                             :selected    = "editable && c.id === selectedConnection?.id"
                             @selected    = "selectConnection(c)" />
                                 
@@ -132,7 +131,7 @@
                         :throttleRotate  = "shiftPressed ? 45 : 1"
                         :keepRatio       = "shiftPressed"
 
-                        :renderDirections="selectedItem?.component === 'Line' ? ['ne', 'sw'] : true"
+                        :renderDirections="isLineItem(selectedItem) ? ['ne', 'sw'] : true"
 
                         :snappable               = "showGuides"
                         :snapGap                 = "true"
@@ -241,7 +240,7 @@ import Icon from './components/Icon.vue';
 import KeyboardHelp from './components/KeyboardHelp.vue';
 import ToolsToolbar from './components/ToolsToolbar.vue';
 import ZoomToolbar from './components/ZoomToolbar.vue';
-import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBlueprint, getItemById, getItemStyle, getUniqueId, registerDefaultItemTypes } from './helpers';
+import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBlueprint, getItemById, getItemStyle, getUniqueId, isLineItem, registerDefaultItemTypes } from './helpers';
 import { ClipType, ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
 export type Item = _Item & { hover?: boolean }

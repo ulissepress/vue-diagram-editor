@@ -34,6 +34,9 @@ export interface DiagramElement {
     
     component:         string;  // The Vue component used to render this element
     componentOptions?: any;     // The Vue component options / config
+
+    textStyle: TextStyle;
+
 }
 
 export interface Item extends DiagramElement {
@@ -58,7 +61,6 @@ export interface Item extends DiagramElement {
     border: ItemBorder;
     shadow: ItemShadow;        // Element shadow definition
 
-    textStyle: TextStyle;
 }
 
 export enum TextHAlign {

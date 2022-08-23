@@ -8,6 +8,6 @@
     - Supports multiple selected items (common properties)
     - Undo/Redo on property changes
 
-- Delete a connection with keyboard shortcut
+- Select multiple connections using shift key
 
 - ContentEditor for inline editing (https://tiptap.dev/)
