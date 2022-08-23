@@ -132,6 +132,8 @@
                         :throttleRotate  = "shiftPressed ? 45 : 1"
                         :keepRatio       = "shiftPressed"
 
+                        :renderDirections="selectedItem?.component === 'Line' ? ['ne', 'sw'] : true"
+
                         :snappable               = "showGuides"
                         :snapGap                 = "true"
                         :snapThreshold           = "5" 
