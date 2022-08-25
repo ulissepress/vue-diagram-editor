@@ -6,7 +6,6 @@
     
 - Object Inspector 
     - Supports multiple selected items (common properties)
-    - Undo/Redo on property changes
 
 - Select multiple connections using shift key
 
