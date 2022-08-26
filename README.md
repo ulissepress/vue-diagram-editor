@@ -10,3 +10,11 @@
 - Select multiple connections using shift key
 
 - ContentEditor for inline editing (https://tiptap.dev/)
+
+- Copy/Paste item/connection style
+
+- Import/Export JSON
+
+- onPropertyChange with/without history command (ex: changing opacity property)
+
+- History command limit (max 1000 undo/redo levels)

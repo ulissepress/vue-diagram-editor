@@ -214,7 +214,7 @@ export const imageModel: ObjectInspectorModel = {
                         separator$,
                         { 
                             name: "clipType",  label: "Crop",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: {
-                            items: [ { name: ClipType.NONE,    icon: "image"     }, 
+                            items: [ { name: ClipType.NONE,    text: "None"     }, 
                                      { name: ClipType.RECT,    icon: "rectangle" },
                                      { name: ClipType.POLYGON, icon: "timeline"  },
                                      { name: ClipType.ELLIPSE, icon: "circle"    } ] 
@@ -300,8 +300,7 @@ export const connectionModel: ObjectInspectorModel = {
                     name: "connection_style",
                     title: "Style",
                     properties: [ 
-                        { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR },
-                        { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorOptions: { 
+                        { name: "type",  label: "Type",  type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionType.LINE,  icon: "horizontal_rule" }, 
                                      { name: ConnectionType.ELBOW, icon: "turn_right" },
                                      { name: ConnectionType.CURVE, icon: "moving" },
@@ -326,6 +325,8 @@ export const connectionModel: ObjectInspectorModel = {
                                      { name: ConnectionMarker.CIRCLE, icon: "circle:filled" },
                                      { name: ConnectionMarker.ARROW,  icon: "east"  } ] 
                         }},
+                        separator$,
+                        { name: "backgroundColor",  label: "Color", type: PropertyType.COLOR, editorFullsize: true },
                     ]
                 },
                 {   // Style

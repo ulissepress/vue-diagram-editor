@@ -34,6 +34,8 @@
                 <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': '' }"><Icon icon="brush" size="18px"/></button>
                 <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard  ? '#4af': '', color: showKeyboard  ? 'white': '' }"><Icon icon="keyboard_hide" size="18px"/></button>
             </div>
+            <div style="flex: 1" />
+            <div v-if='!readonly' class='toolbar-item' :style="{ width: 'auto', fontSize: '12px', marginRight:'8px', backgroundColor: viewMode ? '#4af': '' }" @click="selectNone(); viewMode = !viewMode">View Mode</div>
             <!-- <div class='toolbar-item-separator'></div>               
             <div style="color: white;">EDIT: {{ inlineEditing }}</div> -->
         </div> <!-- editor-toolbars -->  
@@ -249,7 +251,7 @@ export type Item = _Item & { hover?: boolean }
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
     elements:               DiagramElement[],
-    editable?:              boolean,
+    readonly?:              boolean,
     viewportSize?:          [number, number];
     customWidgets?:         boolean,
     customWidgetsCatalog?:  any[];     // TODO:  to be defined as widget metadata
@@ -264,8 +266,8 @@ export interface DiagramEditorEvents {
 }
 
 // Define props
-const { elements, editable, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
-    editable: true,
+const { elements, readonly, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
+    readonly: false,
     customWidgets: false
 });
 
@@ -292,6 +294,8 @@ onUpdated(() => {
     //console.log('DiagramEditor updated')
 })
 
+const editable = computed(() => !readonly && !viewMode.value);
+
 
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
@@ -305,7 +309,7 @@ const moveable      = ref();
 const hGuides       = ref();
 const vGuides       = ref();
 const showRulers    = ref(true);
-const guidesVisible = computed(() => showRulers.value && editable);
+const guidesVisible = computed(() => showRulers.value && !readonly && !viewMode.value);
 const hGuideValues  = ref<number[]>([]);       // Horizontal guides added by the user
 const vGuideValues  = ref<number[]>([]);       // Vertical guides added by the user
 const showGuides    = ref(true);               // Show or hide all the guides
@@ -319,7 +323,7 @@ const shiftPressed   = useKeyModifier('Shift')
 const historyManager = ref(new HistoryManager());
 const currentTool    = ref(EditorTool.SELECT);
 
-const creatingConnection = computed<boolean>(() => currentTool.value === EditorTool.CONNECTION && editable);
+const creatingConnection = computed(() => currentTool.value === EditorTool.CONNECTION && editable.value);
 
 const items       = computed(() => elements.filter(e => isItem(e)) as Item[]);
 const connections = computed(() => elements.filter(e => isConnection(e)) as ItemConnection[]);
@@ -337,6 +341,8 @@ const targets            = ref<HTMLDivElement[]>([]);
 const objectToInspect    = ref<any | null>(null);
 
 const hoverItem = ref<Item | null>(null);
+
+const viewMode = ref(false);
 
 
 // Temporary variables
@@ -382,14 +388,14 @@ function onMouseLeave(item: Item, e: MouseEvent) {
 
 
 function isDecoratorActive(item: Item, mustBeLocked: boolean = false) : boolean {
-    return editable && !creatingConnection.value && item.id === selectedItem.value?.id && item.locked === mustBeLocked;
+    return editable.value && !creatingConnection.value && item.id === selectedItem.value?.id && item.locked === mustBeLocked;
 }
 
 /**
  * Return TRUE when the diagram is editable, the user is creating a connection and the mouse is over the passed item
  */
 function isConnectionHandleActive(item: Item, ignoreRotate?: boolean) : boolean {
-    const active = editable && creatingConnection && item.id === hoverItem.value?.id
+    const active = editable.value && creatingConnection && item.id === hoverItem.value?.id
 
     return ignoreRotate ? active : active && (item.r === 0);
 }
@@ -1071,6 +1077,7 @@ function onSelectionEnd(e: any) {
     max-height: 30px;
     min-height: 30px;
     display: flex;
+    align-items: center;
 }
 
 .editor-canvas {
