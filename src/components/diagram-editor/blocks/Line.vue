@@ -29,18 +29,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUpdated } from 'vue';
+import { computed } from 'vue';
 import { ConnectionMarker, ConnectionStyle, LineItem } from '../types';
 
 const { item } = defineProps<{item: LineItem}>();
-
-onMounted(() => {
-   console.log('Line mounted', item)   
-});
-
-onUpdated(() => {
-   console.log('Line updated', item)   
-});
 
 const viewBox = computed(() => {    
     return `0 0 ${item.w} ${item.h}`;

@@ -42,7 +42,7 @@ const emit = defineEmits<ObjectInspectorPropertyEvents>();
 
 
 onUpdated(() => {
-    console.log('ObjectInspectorProperty: onUpdated');
+    console.log('$$$$$ ObjectInspectorProperty updated');
 });
 
 const editor = computed(() => getEditorForProperty(property.type || PropertyType.TEXT))

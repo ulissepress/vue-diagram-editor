@@ -43,7 +43,7 @@ interface ToolbarEvents {
 const emit = defineEmits<ToolbarEvents>();
 
 onMounted(()=> console.log('Toolbar mounted', selectedTool))
-onUpdated(()=> console.log('Toolbar updated', selectedTool))
+onUpdated(()=> console.log('$$$$$ Toolbar updated', selectedTool))
 
 
 const toolList = computed(() => {

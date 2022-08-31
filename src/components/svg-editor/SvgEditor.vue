@@ -40,7 +40,7 @@ const mousePressed = ref(false)
 const hoverPoint   = ref<Point | null>(null);
 const draggedPoint = ref<Point | null>(null);
 
-// onUpdated(() => console.log('updating...'))
+// onUpdated(() => console.log('$$$$$ SvgEditor updated'))
 
 // function computedPath() {
 //     let path = '';

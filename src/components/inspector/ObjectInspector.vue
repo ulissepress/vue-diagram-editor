@@ -65,7 +65,7 @@ onBeforeMount(() => {
 });
 
 onUpdated(() => {
-    console.log('ObjectInspector.vue: onUpdated');
+    console.log('$$$$$  ObjectInspector updated');
 });
 
 provide('object-inspector-schema', schema);

@@ -57,17 +57,15 @@
                     :useMouseDrag   = "shiftPressed"
                     :useWheelScroll = "true"
                     :zoom           = "zoomFactor"  
-                    :zoomOffsetX    = "mouseCoords.x"
-                    :zoomOffsetY    = "mouseCoords.y"
-
+                    
                     @wheel          = "onScroll" 
                     @scroll         = "onScroll"              
                     @mousemove      = "onMouseMove">
                     
-                    <div ref="viewport" 
-                        :class="{ 'viewport': true, 'viewport-area': viewportSize }" 
-                        :style="{ width:  viewportSize ? viewportSize[0] + 'px' : '100%', 
-                                  height: viewportSize ? viewportSize[1] + 'px' : '100%' }">
+                    <div ref    = "viewport" 
+                         :class = "{ 'viewport': true, 'viewport-area': viewportSize }" 
+                         :style = "{ width:  viewportSize ? viewportSize[0] + 'px' : '100%', 
+                                     height: viewportSize ? viewportSize[1] + 'px' : '100%' }">
                         
                         <!-- Render Connections (default component='Connection') -->
                         <component v-for = "(c, i) in connections"
@@ -291,7 +289,7 @@ onMounted(() => {
 });
 
 onUpdated(() => {
-    //console.log('DiagramEditor updated')
+    console.log('$$$$$ DiagramEditor updated', Date.now())
 })
 
 const editable = computed(() => !readonly && !viewMode.value);
@@ -353,7 +351,7 @@ const origin: Frame = { x: 0, y: 0, w: 0, h: 0, z: 0, r: 0, borderRadius: 0, opa
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 
-function onMouseMove(e: any) { 
+function onMouseMove(e: any) {     
      if(!viewport.value) return;   
     //console.log('onMouseMove', e.srcElement, e.offsetX, e.offsetY, e);
 

@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, CSSProperties, ref } from 'vue';
+import { computed, CSSProperties, onUpdated, ref } from 'vue';
 import { getUniqueId } from '../helpers';
 import { ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, Rect } from '../types';
 
@@ -82,6 +82,11 @@ const props = withDefaults(defineProps<RawConnectionProps>(), {
     color:       '#000',
     selected:    false
 });
+
+onUpdated(() => {
+    console.log('$$$$$ RawConnection updated', Date.now())
+})
+
 
 const cid = ref(getUniqueId())
 

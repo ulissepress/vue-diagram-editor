@@ -22,7 +22,7 @@ const { object, tab } = defineProps<ObjectInspectorTabProps>();
 
 
 onUpdated(() => {
-    console.log('ObjectInspectorTab: onUpdated');
+    console.log('$$$$$ ObjectInspectorTab updated');
 });
 
 </script>

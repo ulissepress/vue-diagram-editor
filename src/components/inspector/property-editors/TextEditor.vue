@@ -31,7 +31,7 @@ const { object, property } = defineProps<TextEditorProps>();
 const emit = defineEmits<TextEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 onUpdated(() => {
-    console.log('TextEditor: onUpdated');
+    console.log('$$$$$  TextEditor: onUpdated');
 });
 
 function onChange(e: any) {
