@@ -187,7 +187,7 @@
                 
                 <VueSelecto v-if="!shiftPressed && editable"
                     container             = ".viewer"
-                    :selectableTargets    = '[".item"]'
+                    :selectableTargets    = '[".item:not(.locked)"]'
                     :selectByClick        = "true"
                     :selectFromInside     = "true"
                     :continueSelect       = "false"

@@ -1,6 +1,6 @@
 <template>
-    <div style="width: 100%; height: 60%; padding-top: 16px; margin: 0 auto; ">
-        <pre>{{ elements.map(e => { return e.id + ' / ' + e.x + ' / '+ e.y + ' / '+ e.w + ' / '+ e.h }  ) }}</pre>
+    <div style="width: 100%; height: 90%; padding-top: 16px; margin: 0 auto; ">
+        <!-- <pre>{{ elements.map(e => { return e.id + ' / ' + e.x + ' / '+ e.y + ' / '+ e.w + ' / '+ e.h }  ) }}</pre> -->
         <DiagramEditor :elements      = "elements"
                        :readonly      = "false" 
                        :customWidgets = "true" />
