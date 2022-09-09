@@ -9,7 +9,7 @@
             :key          = "index"
             :property     = "property"
             :object       = "object" 
-            @property-changed = "(propertyChanged, oldValue, newValue) => emit('property-changed', propertyChanged, oldValue, newValue)" />
+            @property-changed = "(propertyChanged, oldValue, newValue, emitCommand) => emit('property-changed', propertyChanged, oldValue, newValue, emitCommand)" />
     </div>
 </template>
 
@@ -28,7 +28,7 @@ export interface ObjectInspectorSectionProps {
 }
 
 export interface ObjectInspectorSectionvents {
-    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props

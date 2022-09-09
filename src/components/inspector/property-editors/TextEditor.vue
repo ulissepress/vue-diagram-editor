@@ -21,7 +21,7 @@ export interface TextEditorProps {
 }
 
 export interface TextEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props
@@ -36,8 +36,11 @@ onUpdated(() => {
 
 function onChange(e: any) {
     const oldValue = getObjectValue(object, property.name);
-    setObjectValue(object, property.name, e.target.value);
-    emit('property-changed', property, oldValue, e.target.value)
+    const newValue = e.target.value;
+    if(oldValue === newValue) return;
+
+    setObjectValue(object, property.name, newValue);
+    emit('property-changed', property, oldValue, newValue, true)
 }
 </script>
 

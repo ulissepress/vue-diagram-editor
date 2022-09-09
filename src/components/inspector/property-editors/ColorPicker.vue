@@ -4,11 +4,11 @@
         <div v-if="showColorValue" class="color-value">{{ currentColor }}</div>
     </div>
     <Teleport to="body">
-        <Sketch v-if=   "open"
-                ref                = "picker" 
+        <Sketch v-if = "open"
+                ref                = "picker"
                 :style             = "getPickerStyle()" 
                 :modelValue        = "currentColor" 
-                @update:modelValue = "currentColor=$event.hex8; $emit('color-changed', $event.hex8)" />
+                @update:modelValue = "onChange($event, false)" />
     </Teleport>
 </template>
 
@@ -28,7 +28,7 @@ export interface ColorPickerProps {
 }
 
 export interface ColorPickerEvents {
-    (e: 'color-changed', color: string): void
+    (e: 'color-changed', color: string, emitCommand: boolean): void
 }
 
 // Define props
@@ -44,7 +44,9 @@ const pickerPosition = ref({ x: 0, y: 0 })
 
 // Close the picker when clicking oujtside of it
 const picker = ref(null)
-onClickOutside(picker, () => open.value = false)
+onClickOutside(picker, () => {
+    open.value = false
+})
 
 
 function openPicker(e: MouseEvent) {
@@ -71,6 +73,13 @@ function getPickerStyle() {
         left: left + 'px',
         zOrder: 10000
     }
+}
+
+function onChange(e: any, emitCommand: boolean) {
+    console.log('%%%%%%%%%%%%%%%% colorPicker.onChange', e, emitCommand);
+    if(!e.hex8) return;
+    currentColor.value = e.hex8; 
+    emit('color-changed', e.hex8, emitCommand);
 }
 
 </script>

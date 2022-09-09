@@ -16,7 +16,7 @@ export interface NumberEditorProps {
 }
 
 export interface NumberEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props
@@ -30,7 +30,7 @@ function toggle(e: any) {
     let v = getObjectValue(object, property.name) === true;
     
     setObjectValue(object, property.name, !v);    
-    emit('property-changed', property, v, !v)
+    emit('property-changed', property, v, !v, true)
 }
 
 

@@ -28,7 +28,7 @@ export interface IconListEditorProps {
 }
 
 export interface IconListEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props
@@ -40,8 +40,11 @@ const emit = defineEmits<IconListEditorEvents>();
 
 function onChange(item: { name: string, icon: string}) {
     const oldValue = getObjectValue(object, property.name);
-    setObjectValue(object, property.name, item.name);    
-    emit('property-changed', property, oldValue, item.name)
+    const newValue = item.name;
+    if(oldValue === newValue) return;
+
+    setObjectValue(object, property.name, newValue);    
+    emit('property-changed', property, oldValue, newValue, true)
 }
 </script>
 

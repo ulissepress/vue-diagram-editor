@@ -18,7 +18,7 @@ export interface NumberEditorProps {
 }
 
 export interface NumberEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props
@@ -36,11 +36,11 @@ function convertValue(value: string): number {
 
 function onChange(e: any) {
     const oldValue = getObjectValue(object, property.name);
+    const newValue = convertValue(e.target.value);
+    if(oldValue === newValue) return;
 
-    let v = convertValue(e.target.value);
-
-    setObjectValue(object, property.name, v);    
-    emit('property-changed', property, oldValue, v)
+    setObjectValue(object, property.name, newValue);    
+    emit('property-changed', property, oldValue, newValue, true)
 }
 
 function toMinMax(v: number): number {

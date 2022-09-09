@@ -798,13 +798,12 @@ function connectionHandleClick(item: Item   , point: ConnectionHandle) {
 }
 
 
-function onPropertyChange(p: ObjectProperty, oldValue: any, newValue: any) {
-    if(oldValue === newValue) return;
+function onPropertyChange(p: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean) {
+    if(oldValue === newValue && !emitCommand) return;
     
-    console.log('onPropertyChange', p, 'Old value:', oldValue, 'New value:', newValue);
-
+    if(emitCommand) console.log('onPropertyChange', p, 'Old value:', oldValue, 'New value:', newValue, "emitCommand:", emitCommand);
     
-    if(selectedItem.value) historyManager.value.execute(new ChangePropertyCommand(selectedItem.value, p.name, oldValue, newValue));
+    if(selectedItem.value && emitCommand) historyManager.value.execute(new ChangePropertyCommand(selectedItem.value, p.name, oldValue, newValue));
 
     nextTick(() => moveable.value?.updateRect());
 }

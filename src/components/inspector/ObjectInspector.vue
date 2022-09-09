@@ -25,7 +25,7 @@
                 :key              = "section.name" 
                 :section          = "section" 
                 :object           = "object"
-                @property-changed = "(changedProperty, oldValue, newValue) => emit('property-changed', changedProperty, oldValue, newValue)" />
+                @property-changed = "(changedProperty, oldValue, newValue, emitCommand) => emit('property-changed', changedProperty, oldValue, newValue, emitCommand)" />
         </template>
     </div>
 </template>
@@ -49,7 +49,7 @@ export interface ObjectInspectorProps {
 
 export interface ObjectInspectorEvents {
     (e: 'drag', event: any): void
-    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props
