@@ -6,22 +6,23 @@
          :stroke           = "props.color" 
          :stroke-width     = "props.thick">
 
-        <marker v-if="startMarker && startMarker !== ConnectionMarker.NONE" :id="cid + '_marker_start'" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="1.2" markerHeight="1.2" orient="auto-start-reverse" markerUnits="strokeWidth">
+        <marker v-if="startMarker && startMarker !== ConnectionMarker.NONE" :id="cid + '_marker_start'" viewBox="0 0 10 10" refX="10" refY="5" :markerWidth="markerSize" :markerHeight="markerSize" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
             <circle v-if="startMarker === ConnectionMarker.CIRCLE" cx="5" cy="5" r="5"               :fill="props.color" stroke="none" />
             <path   v-if="startMarker === ConnectionMarker.SQUARE" d="M 0 0 L 10 0 L 10 10 L 0 10 z" :fill="props.color" stroke="none" />
             <path   v-if="startMarker === ConnectionMarker.ARROW"  d="M 0 0 L 10 5 L 0 10 z"         :fill="props.color" stroke="none" />
         </marker>        
-        <marker v-if="endMarker && endMarker != ConnectionMarker.NONE" :id="cid + '_marker_end'" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="1.2" markerHeight="1.2" orient="auto-start-reverse" markerUnits="strokeWidth">
+        <marker v-if="endMarker && endMarker != ConnectionMarker.NONE" :id="cid + '_marker_end'"        viewBox="0 0 10 10" refX="10" refY="5" :markerWidth="markerSize" :markerHeight="markerSize" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
             <circle v-if="endMarker === ConnectionMarker.CIRCLE" cx="5" cy="5" r="5"               :fill="props.color" stroke="none" />
             <path   v-if="endMarker === ConnectionMarker.SQUARE" d="M 0 0 L 10 0 L 10 10 L 0 10 z" :fill="props.color" stroke="none" />
             <path   v-if="endMarker === ConnectionMarker.ARROW"  d="M 0 0 L 10 5 L 0 10 z"         :fill="props.color" stroke="none" />
         </marker>
 
         <!-- Real connection -->
-        <path :d            = "linePath[0]" 
-              class         = "realpath" 
-              :marker-start = "linePath[1] ? `url(#${cid}_marker_end)`   : `url(#${cid}_marker_start)`"  
-              :marker-end   = "linePath[1] ? `url(#${cid}_marker_start)` : `url(#${cid}_marker_end)`" />
+        <path :d              = "linePath[0]" 
+              class           = "realpath" 
+              :marker-start   = "linePath[1] ? `url(#${cid}_marker_end)`   : `url(#${cid}_marker_start)`"  
+              :marker-end     = "linePath[1] ? `url(#${cid}_marker_start)` : `url(#${cid}_marker_end)`" 
+              :stroke-width   = "props.thick" />
 
         <!-- Ticker (invisible) connection for catching user clicks -->
         <path :d              = "linePath[0]"
@@ -125,6 +126,7 @@ const dashArray = computed(() => {
     return '0';  // ConnectionStyle.SOLID
 });
 
+const markerSize = computed(() => Math.max(10, props.thick * 3.5));
 
 const viewBox = computed(() => {
     let b = boundingBox.value;
@@ -175,23 +177,23 @@ function elbowPath(x1: number, y1: number, x2: number, y2: number, inverse: bool
             if(y2 < y1) {
                 console.log('bottom/top to left/right y2<y1', x1, y1, x2, y2, inverse);                    
                 return inverse ? [`M ${x2} ${0} L ${b.w} ${b.h} L ${0} ${b.h} `, !inverse]
-                                : [`M ${x1} ${y1} L ${0} ${0} L ${x2} ${y2} `, inverse];
+                               : [`M ${x1} ${y1} L ${0} ${0} L ${x2} ${y2} `, inverse];
             }
             
             console.log('bottom/top to left/right NOT y2<y1', x1, y1, x2, y2, inverse);                    
             return inverse ? [`M ${b.w} ${b.h} L ${b.w} ${0} L ${0} ${0} `, !inverse] 
-                            : [`M ${x1} ${y1} L ${x1} ${b.h} L ${x2} ${y2} ` , inverse];
+                           : [`M ${x1} ${y1} L ${x1} ${b.h} L ${x2} ${y2} ` , inverse];
         } 
         else if(props.endHandle === ConnectionHandle.TOP || props.endHandle === ConnectionHandle.BOTTOM) {
             if(y2 < y1) {
                 console.log('bottom/top to top/bottom y2<y1', x1, y1, x2, y2, inverse);                    
                 return inverse ? [`M ${x2} ${0} L ${b.w} ${b.h/2} L ${0} ${b.h/2} L ${0} ${b.h} `, !inverse]
-                                : [`M ${x1} ${y1} L ${0} ${my} L ${b.w} ${my} L ${x2} ${y2} `, inverse];       
+                               : [`M ${x1} ${y1} L ${0} ${my} L ${b.w} ${my} L ${x2} ${y2} `, inverse];       
             }
             
             console.log('bottom/top to top/bottom NOT y2<y1', x1, y1, x2, y2, inverse);                    
             return inverse ? [`M ${b.w} ${b.h} L ${b.w} ${my} L ${0} ${my} L ${0} ${0} `, !inverse] 
-                            : [`M ${0} ${0} L ${0} ${my} L ${b.w} ${my} L ${x2} ${y2}`, inverse];                      
+                           : [`M ${0} ${0} L ${0} ${my} L ${b.w} ${my} L ${x2} ${y2}`, inverse];                      
         }
         
         //console.log(`bottom handle`, x1, y1, x2, y2, inverse);
@@ -204,23 +206,23 @@ function elbowPath(x1: number, y1: number, x2: number, y2: number, inverse: bool
             if(y2 < y1) {
                 console.log('left-right to left/right y2<y1', x1, y1, x2, y2, inverse);                    
                 return inverse ? [`M ${x2} ${0} L ${mx} ${0} L ${mx} ${b.h} L ${0} ${b.h} `, !inverse]
-                                : [`M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${0} L ${x2} ${y2} `, inverse];
+                               : [`M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${0} L ${x2} ${y2} `, inverse];
             }
             
             console.log('left-right to left/right NOT y2<y1', x1, y1, x2, y2, inverse);                    
             return inverse ? [`M ${b.w} ${b.h} L ${mx} ${b.h} L ${mx} ${0} L ${0} ${0} `, !inverse] 
-                            : [`M ${0} ${0} L ${mx} ${0} L ${mx} ${y2} L ${x2} ${y2} ` , inverse];
+                           : [`M ${0} ${0} L ${mx} ${0} L ${mx} ${y2} L ${x2} ${y2} ` , inverse];
         } 
         else if(props.endHandle === ConnectionHandle.TOP || props.endHandle === ConnectionHandle.BOTTOM) {
             if(y2 < y1) {
                 console.log('left-right to top/bottom y2<y1', x1, y1, x2, y2, inverse);                    
                 return inverse ? [`M ${x2} ${0} L ${0} ${0} L ${0} ${b.h}  `, !inverse]
-                                : [`M ${x1} ${y1} L ${b.w} ${b.h} L ${x2} ${y2} `, inverse];       
+                               : [`M ${x1} ${y1} L ${b.w} ${b.h} L ${x2} ${y2} `, inverse];       
             }
             
             console.log('left-right to top/bottom NOT y2<y1', x1, y1, x2, y2, inverse);                    
             return inverse ? [`M ${b.w} ${b.h} L ${0} ${b.h} L ${0} ${0} `, !inverse] 
-                            : [`M ${0} ${0} L ${b.w} ${0} L ${x2} ${y2}`, inverse];                      
+                           : [`M ${0} ${0} L ${b.w} ${0} L ${x2} ${y2}`, inverse];                      
         }
     }
     
@@ -246,11 +248,13 @@ function elbowPath(x1: number, y1: number, x2: number, y2: number, inverse: bool
 
 .realpath {
     pointer-events: none;
+    z-index: 1;
 }
 .ghostpath {
     pointer-events: all;
     cursor: pointer; 
     stroke: #4af;
+    z-index: 0;
 }
 
 </style>
