@@ -32,7 +32,7 @@ function onChange(newColor: string) {
     if(newColor === oldValue) return;
 
     setObjectValue(object, property.name, newColor);
-    emit('property-changed', property, oldValue, newColor, true)
+    emit('property-changed', property, oldValue, newColor, false)   // TODO:  manage correctly the emitCommand option
 }
 </script>
 
