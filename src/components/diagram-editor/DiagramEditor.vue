@@ -214,7 +214,7 @@
 
 <script setup lang="ts">
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
-import { computed, getCurrentInstance, nextTick, onMounted, onUpdated, ref } from "vue";
+import { computed, getCurrentInstance, nextTick, onMounted, onUpdated, provide, ref } from "vue";
 import Guides from "vue3-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
 import Moveable from 'vue3-moveable';
@@ -292,7 +292,13 @@ onUpdated(() => {
     console.log('$$$$$ DiagramEditor updated', Date.now())
 })
 
+
 const editable = computed(() => !readonly && !viewMode.value);
+
+// The component provides this context to all children, like all block components
+provide('diagram-editor-context', {
+    editable: editable.value
+});
 
 
 // The component state

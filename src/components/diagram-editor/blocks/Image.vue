@@ -24,8 +24,8 @@
 <script setup lang="ts">
 
 import { computed } from 'vue';
-import imagePlaceholder from '../image-placeholder.png';
 import { ImageItem } from '../types';
+import imagePlaceholder from './image-placeholder.png';
 import { cssBorder, cssShadow } from './utils';
 
 const { item } = defineProps<{item: ImageItem}>();
