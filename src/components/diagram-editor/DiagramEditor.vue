@@ -2,40 +2,53 @@
     <div class="editor-layout">
         <div class="editor-toolbars">
             <!-- Editor Toolbar -->
-            <ToolsToolbar v-if='editable'  :customWidgets = "customWidgets === true" :selectedTool  = "currentTool"  @toolSelected  = "selectCurrentTool" />
+            <ToolsToolbar v-if='editable'  :selectedTool="currentTool"  @toolSelected  = "selectCurrentTool" />
+            
+            <div class='toolbar-separator'></div>
+            
+            <!-- Custom Widgets -->           
+            <VDropdown v-if="customWidgets" :distance="6">
+                <button class='toolbar-item' v-tooltip="'Widgets'"><Icon icon="view_in_ar" size="20px"/></button>                
+                <template #popper>
+                    <WidgetBrowser 
+                        :widgets         = "customWidgetsCatalog || []" 
+                        @widget-selected = "(widget: WidgetDefinition) => { selectedCustomWidget = widget; selectCurrentTool(EditorTool.WIDGET)}" />
+                </template>
+            </VDropdown>
+
             <div class='toolbar-separator'></div>
             <ZoomToolbar :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
             <div class='toolbar-separator'></div>
             <div v-if="editable" class="toolbar">
-                <button class='toolbar-item' @click="undo" :disabled="!historyManager.canUndo()" title="Undo"><Icon icon="undo" size="20px"/></button>
-                <button class='toolbar-item' @click="redo" :disabled="!historyManager.canRedo()" title="Redo"><Icon icon="redo" size="20px"/></button>
+                <button class='toolbar-item' @click="undo" :disabled="!historyManager.canUndo()" v-tooltip="'Undo'"><Icon icon="undo" size="20px"/></button>
+                <button class='toolbar-item' @click="redo" :disabled="!historyManager.canRedo()" v-tooltip="'Redo'"><Icon icon="redo" size="20px"/></button>
                 
                 <div class='toolbar-item-separator'></div>
-                <button class='toolbar-item' @click="deleteItem" :disabled="!selectedItemActive" title="Delete"><Icon icon="delete" size="20px"/></button>
+                <button class='toolbar-item' @click="deleteItem" :disabled="!selectedItemActive" v-tooltip="'Delete'"><Icon icon="delete" size="20px"/></button>
                 
                 <div class='toolbar-item-separator'></div>
-                <button class='toolbar-item' @click="copyItem"   :disabled="targets.length === 0"  title="Copy"><Icon icon="content_copy"   size="18px"/></button>
-                <button class='toolbar-item' @click="cutItem"    :disabled="targets.length === 0"  title="Cut"><Icon icon="content_cut"     size="18px"/></button>
-                <button class='toolbar-item' @click="pasteItem"  :disabled="itemToPaste === null"  title="Paste"><Icon icon="content_paste" size="18px"/></button>
+                <button class='toolbar-item' @click="copyItem"   :disabled="targets.length === 0"  v-tooltip="'Copy'"><Icon icon="content_copy"   size="18px"/></button>
+                <button class='toolbar-item' @click="cutItem"    :disabled="targets.length === 0"  v-tooltip="'Cut'"><Icon icon="content_cut"     size="18px"/></button>
+                <button class='toolbar-item' @click="pasteItem"  :disabled="itemToPaste === null"  v-tooltip="'Paste'"><Icon icon="content_paste" size="18px"/></button>
                 
                 <div class='toolbar-item-separator'></div>               
-                <button class='toolbar-item' @click="sendToBack" :disabled="!selectedItemActive" title="Send to back">
+                <button class='toolbar-item' @click="sendToBack" :disabled="!selectedItemActive" v-tooltip="'Send to back'">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" :style="{ transform: 'scale(1.1)', opacity: selectedItemActive ? 1 : 0.3, fill: '#fafafa' }">
                         <path d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"  /></svg>
                 </button>
-                <button class='toolbar-item' @click="bringToFront" :disabled="!selectedItemActive" title="Bring to front">
+                <button class='toolbar-item' @click="bringToFront" :disabled="!selectedItemActive" v-tooltip="'Bring to front'">
                     <svg xmlns="http://www.w3.org/2000/svg" :style="{transform: 'scale(1.1)', opacity: selectedItemActive ? 1 : 0.3, stroke: '#fafafa', fill: 'none'}" viewBox="0 0 24 24"><path d="M0 0H24V24H0z"/><path d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"/></svg>
                 </button>
             </div>   
             <div class='toolbar-item-separator'></div>               
             <div v-if="editable" class="toolbar">
-                <button class='toolbar-item' @click="showRulers    = !showRulers"    title="Show / Hide rulers"               :style="{ backgroundColor: showRulers    ? '#4af': '', color: showRulers    ? 'white': '' }"><Icon icon="straighten" size="18px"/></button>
-                <button class='toolbar-item' @click="showGuides    = !showGuides"    title="Show / Hide alignment guidelines" :style="{ backgroundColor: showGuides    ? '#4af': '', color: showGuides    ? 'white': '' }"><Icon icon="border_style" size="18px"/></button>
-                <button class='toolbar-item' @click="showInspector = !showInspector" title="Show / Hide inspector"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': '' }"><Icon icon="brush" size="18px"/></button>
-                <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  title="Show / Hide keyboards shortcuts"  :style="{ backgroundColor: showKeyboard  ? '#4af': '', color: showKeyboard  ? 'white': '' }"><Icon icon="keyboard_hide" size="18px"/></button>
+                <button class='toolbar-item' @click="showRulers    = !showRulers"    v-tooltip="'Show / Hide rulers'"               :style="{ backgroundColor: showRulers    ? '#4af': '', color: showRulers    ? 'white': '' }"><Icon icon="straighten" size="18px"/></button>
+                <button class='toolbar-item' @click="showGuides    = !showGuides"    v-tooltip="'Show / Hide alignment guidelines'" :style="{ backgroundColor: showGuides    ? '#4af': '', color: showGuides    ? 'white': '' }"><Icon icon="border_style" size="18px"/></button>
+                <button class='toolbar-item' @click="showInspector = !showInspector" v-tooltip="'Show / Hide inspector'"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': '' }"><Icon icon="brush" size="18px"/></button>
+                <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  v-tooltip="'Show / Hide keyboards shortcuts'"  :style="{ backgroundColor: showKeyboard  ? '#4af': '', color: showKeyboard  ? 'white': '' }"><Icon icon="keyboard_hide" size="18px"/></button>
             </div>
             <div style="flex: 1" />
-            <div v-if='!readonly' class='toolbar-item' :style="{ width: 'auto', fontSize: '12px', marginRight:'8px', backgroundColor: viewMode ? '#4af': '' }" @click="selectNone(); viewMode = !viewMode">View Mode</div>
+            <div v-if='!readonly' class='toolbar-item' :style="{ width: 'auto', fontSize: '12px', marginRight:'8px', backgroundColor: viewMode ? '#4af': '' }" @click="selectNone(); viewMode = !viewMode"  v-tooltip="'Switch between edit/view mode'" >View Mode</div>
             <!-- <div class='toolbar-item-separator'></div>               
             <div style="color: white;">EDIT: {{ inlineEditing }}</div> -->
         </div> <!-- editor-toolbars -->  
@@ -214,6 +227,8 @@
 
 <script setup lang="ts">
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
+import FloatingVue from 'floating-vue';
+import 'floating-vue/dist/style.css';
 import { computed, getCurrentInstance, nextTick, onMounted, onUpdated, provide, ref } from "vue";
 import Guides from "vue3-guides";
 import { VueInfiniteViewer } from "vue3-infinite-viewer";
@@ -239,10 +254,13 @@ import RoundCommand from './commands/RoundCommand';
 import Icon from './components/Icon.vue';
 import KeyboardHelp from './components/KeyboardHelp.vue';
 import ToolsToolbar from './components/ToolsToolbar.vue';
+import WidgetBrowser from './components/WidgetBrowser.vue';
 import ZoomToolbar from './components/ZoomToolbar.vue';
 import { createConnection, findMaxZ, findMinZ, getHandlePosition, getItemBlueprint, getItemById, getItemStyle, getUniqueId, isLineItem, registerDefaultItemTypes } from './helpers';
-import { ClipType, ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position } from './types';
+import { ClipType, ConnectionHandle, ConnectionType, DiagramElement, EditorTool, Frame, getToolDefinition, isConnection, isItem, Item as _Item, ItemConnection, Position, WidgetDefinition } from './types';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
+
+
 export type Item = _Item & { hover?: boolean }
 
 // The component props and events
@@ -252,7 +270,7 @@ export interface DiagramEditorProps {
     readonly?:              boolean,
     viewportSize?:          [number, number];
     customWidgets?:         boolean,
-    customWidgetsCatalog?:  any[];     // TODO:  to be defined as widget metadata
+    customWidgetsCatalog?:  WidgetDefinition[];     // TODO:  to be defined as widget metadata
 }
 
 export interface DiagramEditorEvents {
@@ -262,6 +280,10 @@ export interface DiagramEditorEvents {
     (e: 'add-connection',    connection: ItemConnection): void
     (e: 'delete-connection', connection: ItemConnection): void
 }
+
+export interface EditorContext {
+    isEditable: () => boolean    
+};
 
 // Define props
 const { elements, readonly, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
@@ -274,10 +296,15 @@ const { elements, readonly, viewportSize } = withDefaults(defineProps<DiagramEdi
 const emit = defineEmits<DiagramEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
-onMounted(() => {
-    registerBasicBlocks(getCurrentInstance()!.appContext.app);
-    registerDefaultItemTypes();
+// Initialization code
+const vueApp = getCurrentInstance()!.appContext.app;
+registerBasicBlocks(vueApp);
+registerDefaultItemTypes();
 
+// Initialize FloatingVue component
+vueApp.use(FloatingVue)
+
+onMounted(() => {
     // Initialize rulers and infinite viewer
     hGuides.value.resize();    
     vGuides.value.resize();
@@ -296,9 +323,10 @@ onUpdated(() => {
 const editable = computed(() => !readonly && !viewMode.value);
 
 // The component provides this context to all children, like all block components
-provide('diagram-editor-context', {
-    editable: editable.value
-});
+const editorContext: EditorContext = {
+    isEditable: () => editable.value
+};
+provide('diagram-editor-context', editorContext);
 
 
 // The component state
@@ -347,6 +375,8 @@ const objectToInspect    = ref<any | null>(null);
 const hoverItem = ref<Item | null>(null);
 
 const viewMode = ref(false);
+
+const selectedCustomWidget = ref<WidgetDefinition | null>(null);
 
 
 // Temporary variables
@@ -991,7 +1021,9 @@ function getInspectorTitle() : string {
 function getObjectToInspect() : [any, ObjectInspectorModel | null] {
     if(!objectToInspect.value) return [null, null];
 
-    return [objectToInspect.value,  getItemBlueprint(objectToInspect.value.component)[1]]
+    const bp = getItemBlueprint(objectToInspect.value.component, objectToInspect.value.widget)
+  
+    return [objectToInspect.value, bp[1]];
 }
 
 
@@ -1020,24 +1052,46 @@ function onSelectionEnd(e: any) {
     // Clicking in the canvas resets the current connection creation
     if(currentTool.value === EditorTool.CONNECTION) return;
 
-    
-    // If the current tool is not the SELECTOR => Create new item based on current tool selection (shape, ...)
-    // Clicking the canvas with other tools => create a new item of related type
-    const toolDef = getToolDefinition(currentTool.value);   
-        
-    const newItem = deepClone({
-        ...getItemBlueprint(toolDef.itemType!)[0],
-        id: getUniqueId(),
-        x:  Math.floor(mouseCoords.value.x - e.rect.width  / zoomFactor.value),
-        y:  Math.floor(mouseCoords.value.y - e.rect.height / zoomFactor.value), 
-    })
+    let newItem: Item = {} as Item;
 
-    if(e.rect.width > 10 && e.rect.height > 10) {
-        newItem.w = Math.floor(e.rect.width  / zoomFactor.value);
-        newItem.h = Math.floor(e.rect.height / zoomFactor.value);
+    // Check if the user selected a custom widget
+    if(selectedCustomWidget.value !== null) {
+        newItem = deepClone({
+            ...getItemBlueprint("Widget", selectedCustomWidget.value)[0],
+            id: getUniqueId(),
+            x:  Math.floor(mouseCoords.value.x - e.rect.width  / zoomFactor.value),
+            y:  Math.floor(mouseCoords.value.y - e.rect.height / zoomFactor.value), 
+
+            widget: deepClone(selectedCustomWidget.value)
+        })
+
+        if(selectedCustomWidget.value.canBeResized === true && e.rect.width > 10 && e.rect.height > 10) {
+            newItem.w = Math.floor(e.rect.width  / zoomFactor.value);
+            newItem.h = Math.floor(e.rect.height / zoomFactor.value);
+        }
+        
+        console.log('creating new item (custom widget)', newItem);
+    }
+    else {
+        // If the current tool is not the SELECTOR => Create new item based on current tool selection (shape, ...)
+        // Clicking the canvas with other tools => create a new item of related type
+        const toolDef = getToolDefinition(currentTool.value);   
+            
+        newItem = deepClone({
+            ...getItemBlueprint(toolDef.itemType!)[0],
+            id: getUniqueId(),
+            x:  Math.floor(mouseCoords.value.x - e.rect.width  / zoomFactor.value),
+            y:  Math.floor(mouseCoords.value.y - e.rect.height / zoomFactor.value),
+        })
+
+        if(e.rect.width > 10 && e.rect.height > 10) {
+            newItem.w = Math.floor(e.rect.width  / zoomFactor.value);
+            newItem.h = Math.floor(e.rect.height / zoomFactor.value);
+        }
+        
+        console.log('creating new item', toolDef, toolDef.itemType, newItem)
     }
     
-    console.log('creating new item', toolDef, toolDef.itemType, newItem)
     historyManager.value.execute(new AddItemCommand(elements, newItem));
 
     // After adding the new item, change to tool to selection and select the new created item

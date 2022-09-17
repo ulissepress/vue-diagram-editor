@@ -10,6 +10,7 @@ import Rectangle from "./Rectangle.vue";
 import Star from "./Star.vue";
 import Text from "./Text.vue";
 import Triangle from "./Triangle.vue";
+import Widget from "./Widget.vue";
 
 export function cssBorder(item: Item) : string {
     return item.border.width + 'px ' + item.border.style + ' ' + item.border.color
@@ -53,5 +54,6 @@ export function registerBasicBlocks(app: App) {
     app.component('Icon',      Icon);
     
     app.component('Connection',  Connection);
+    app.component('Widget',      Widget);
     
 } 

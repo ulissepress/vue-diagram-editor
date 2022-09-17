@@ -372,7 +372,7 @@ export const lineModel: ObjectInspectorModel = {
                     name: "style",
                     title: "Style",
                     properties: [ 
-                        { name: "thick", label: "Thick", type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},                        
+                        { name: "thick", label: "Thick", type: PropertyType.RANGE,     editorFullsize: true, editorOptions: { min: 1, max: 10, step: 1 }},
                         { name: "style", label: "Style", type: PropertyType.ICON_LIST, editorFullsize: true, editorOptions: { 
                             items: [ { name: ConnectionStyle.SOLID,  text: "Solid"  }, 
                                      { name: ConnectionStyle.DASHED, text: "Dashed" },
@@ -433,4 +433,33 @@ export const iconModel: ObjectInspectorModel = {
             ] // sections
         } // tab
     ] // tabs
+}
+
+export function getWidgetModel(widgetComponent: string, customProps: ObjectProperty[]) : ObjectInspectorModel {
+    return {
+        tabs: [ 
+        {
+            title: "Widget",
+            sections: [        
+                {
+                    name: 'widget_config',
+                    title: "Configuration",
+                    properties: customProps
+                },
+                {   // Style
+                    name: "style",
+                    title: "Style",
+                    properties: [ opacity$, locked$ ]
+                },
+                shadowSection$,
+                {   // Position & size
+                    name: "pos_size",
+                    title: "Position and size",
+                    properties: [x$, y$, w$, h$, rotate$] 
+                }, 
+
+            ] // sections
+        } // tab
+        ] // tabs
+    }
 }

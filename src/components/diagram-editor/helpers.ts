@@ -1,7 +1,7 @@
-import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextDecoration, TextHAlign, TextTransform, TextVAlign, isItem } from "./types";
-import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
+import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextDecoration, TextHAlign, TextTransform, TextVAlign, WidgetDefinition, WidgetItem, isItem } from "./types";
+import { ObjectInspectorModel, ObjectProperty } from '../inspector/types';
+import { connectionModel, getWidgetModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
-import { ObjectInspectorModel } from '../inspector/types';
 import { StyleValue } from "vue";
 
 type DeepPartial<T> = T extends object ? {
@@ -168,17 +168,38 @@ export function findMaxZ(items: Item[]): number {
 }
 
 
-// Shape medata definitions
+// Shape metadata definitions
 const registry: Record<string, [Item, ObjectInspectorModel]> = {};
 
 export function registerItemType<T extends Item>(item: T, model: ObjectInspectorModel) {
     registry[item.component] = [item, model];
 }
 
-export function getItemBlueprint(type: string): [Item, ObjectInspectorModel] {
-    if(!registry[type]) throw new Error("No item type registered with name: " + type);
-    return registry[type];
+
+// Widgets custom properties registry
+const widgetRegistry: Record<string, [any, ObjectProperty[]]> = {};
+
+export function registerWidgetType<T>(widgetComponent: string, widgetBlueprint: T, customProps: ObjectProperty[]) : void {
+    widgetRegistry[widgetComponent] = [widgetBlueprint, customProps];
 }
+
+
+export function getItemBlueprint(type: string, widget?: WidgetDefinition): [Item, ObjectInspectorModel] {
+    if(!registry[type]) throw new Error("No item type registered with name: " + type);
+
+    // Search ObjectInspectorModel in the dedicated widget registry
+    if(type === 'Widget' && widget) {        
+        let [widgetBlueprint, widgetCustomProps] = widgetRegistry[widget.component];        
+        return [{ ...registry[type][0], ...widgetBlueprint}, getWidgetModel(widget.component, widgetCustomProps)];
+    }
+
+    return registry[type];    
+}
+
+export function getWidgetItemBlueprint(): WidgetItem {
+    return registry['Widget'][0] as WidgetItem;
+}
+
 
 let alreadyRegistered = false;
 export function registerDefaultItemTypes() {
@@ -366,6 +387,19 @@ export function registerDefaultItemTypes() {
         w: 60,
         h: 60,        
     }, iconModel)
+
+    // ----------------------------------------------------------------------
+    type = "Widget"
+    registerItemType<WidgetItem>({
+        ...defaults,
+        
+        component: type,
+        supportsRoundable: false,
+        backgroundColor: 'transparent',    
+        w: 300,
+        h: 150,
+        widget: {} as WidgetDefinition   // Dummy value, will be filled at runtime        
+    }, {} as ObjectInspectorModel)       // ObjectInspectorModel is ignored as for custom widget the model will be managed in the dedicated registry
 } // func
 
 

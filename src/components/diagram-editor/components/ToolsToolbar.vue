@@ -1,8 +1,8 @@
 <template>
     <div class="toolbar">
-        <div v-for = "t in toolList" 
+        <div v-for = "t in toolDefinitions" v-tooltip.bottom="t.title"
             :key   = "t.type" 
-            :title = "t.title"
+            
             @click = "t.type !== 'separator' && onToolSelected(t.type, selectedTool)"
             :class = "{
                 'tool'     : t.type !== 'separator', 
@@ -15,7 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from '@vue/reactivity';
 import { onMounted, onUpdated } from 'vue';
 import { EditorTool, toolDefinitions } from '../types';
 import Icon from './Icon.vue';
@@ -29,12 +28,11 @@ interface Tool {
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 interface ToolbarProps {
-    selectedTool: EditorTool,
-    customWidgets: boolean,
+    selectedTool: EditorTool
 }
 
 
-const { selectedTool, customWidgets } = defineProps<ToolbarProps>();
+const { selectedTool } = defineProps<ToolbarProps>();
 
 interface ToolbarEvents {
     (e: 'toolSelected', toolType: EditorTool): void    
@@ -44,11 +42,6 @@ const emit = defineEmits<ToolbarEvents>();
 
 onMounted(()=> console.log('Toolbar mounted', selectedTool))
 onUpdated(()=> console.log('$$$$$ Toolbar updated', selectedTool))
-
-
-const toolList = computed(() => {
-    return customWidgets ? toolDefinitions : toolDefinitions.filter(t => t.type !== EditorTool.WIDGET);
-})
 
 
 function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {    

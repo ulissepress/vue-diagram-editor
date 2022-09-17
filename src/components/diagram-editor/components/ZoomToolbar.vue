@@ -1,9 +1,9 @@
 <template>
     <div class="toolbar">
-        <div class="btn" @click="zoomOut" title="Zoom Out"><Icon icon="zoom_out" size="20px"/></div>
-        <div class="zoom-info" title="Current Zoom">{{ zoomManager.getZoomFactor() * 100 }}%</div>         
-        <div class="btn" @click="zoomIn" title="Zoom In"><Icon icon="zoom_in" size="20px"/></div>
-        <div class="btn" @click="zoomReset" title="Zoom Reset"><Icon icon="center_focus_weak" size="20px"/></div>
+        <div class="btn" @click="zoomOut" v-tooltip="'Zoom Out'"><Icon icon="zoom_out" size="20px"/></div>
+        <div class="zoom-info" v-tooltip="'Current Zoom'">{{ zoomManager.getZoomFactor() * 100 }}%</div>         
+        <div class="btn" @click="zoomIn" v-tooltip="'Zoom In'"><Icon icon="zoom_in" size="20px"/></div>
+        <div class="btn" @click="zoomReset" v-tooltip="'Zoom Reset'"><Icon icon="center_focus_weak" size="20px"/></div>
     </div>
 </template>
 

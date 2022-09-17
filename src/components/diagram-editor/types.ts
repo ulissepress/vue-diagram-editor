@@ -208,8 +208,6 @@ export const toolDefinitions: ToolDefinition[] = [
     { type: EditorTool.TRIANGLE,   title: 'Triangle',   icon: 'change_history',  itemType: "Triangle"  },
     { type: EditorTool.STAR,       title: 'Star',       icon: 'grade',           itemType: "Star"      },
     { type: EditorTool.ICON,       title: 'Icon',       icon: 'portrait',        itemType: "Icon"      },
-    { type: 'separator' },
-    { type: EditorTool.WIDGET,     title: 'Widgets',    icon: 'view_in_ar' },
 ];
 
 export function getToolDefinition(toolType: EditorTool) : ToolDefinition {
@@ -259,11 +257,14 @@ export interface IconItem extends Item {
     filled: boolean;
 }
 
+export interface WidgetItem extends Item {
+    widget: WidgetDefinition
+}
+
 export interface WidgetDefinition {
-    type:      string;          // The widget type. Example: 'my_shape
-    label:     string;          // The widget label. Example: 'My Shape'
-    descr:     string;          // The widget description. Example: 'A shape with rounded borders'
-    thumbnail: string;          // The widget thumbnail. Example: 'my_shape.png'
+    title:     string;          // The widget title. Example: 'My Shape'
+    icon:      string;          // The widget icon
+    category?: string;          // The widget category. Example: 'Event' or 'Actions'
   
     component:         string;  // The Vue component used to render this widget
     componentOptions?: any;     // The default Vue component options used to instantiate this widget

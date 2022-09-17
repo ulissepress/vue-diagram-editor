@@ -1,6 +1,6 @@
 <template>
     <div class="object-inspector">
-        <div class="inspector-title inspector-title-drag-handle">
+        <div class="inspector-title">
             <div class="inspector-title-drag-handle">{{ title || 'Inspector' }}</div>
             <div style="flex-grow: 1; pointer-events: none; "></div>
             <div @click="expanded = !expanded" style="cursor: pointer;">
@@ -81,12 +81,6 @@ function getTabSections() {
     return schema.tabs[currentTab.value].sections;
 }
 </script>
-
-<style>
-.inspector-title-drag-handle {
-    cursor: move;
-}
-</style>
 
 <style  scoped>
 .object-inspector {
