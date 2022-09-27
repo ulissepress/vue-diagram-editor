@@ -274,3 +274,12 @@ export interface WidgetDefinition {
 
 
 
+// Model definition for a diagram (multipage editors)
+export interface DiagramModel {
+    pages: DiagramPage[];
+}
+
+export interface DiagramPage {
+    title: string;
+    elements: DiagramElement[];
+}
