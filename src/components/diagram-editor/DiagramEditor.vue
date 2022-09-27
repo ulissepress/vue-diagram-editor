@@ -1069,6 +1069,8 @@ function onSelectionEnd(e: any) {
             newItem.w = Math.floor(e.rect.width  / zoomFactor.value);
             newItem.h = Math.floor(e.rect.height / zoomFactor.value);
         }
+
+        selectedCustomWidget.value = null; 
         
         console.log('creating new item (custom widget)', newItem);
     }
