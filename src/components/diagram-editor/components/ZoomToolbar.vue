@@ -80,7 +80,7 @@ function zoomOut() {
 
 .btn:hover {
     background-color: #efefef;
-    color: #4af;
+    color: var(--diagram-primary-color);
 }
 .zoom-info {
     width: 40px;

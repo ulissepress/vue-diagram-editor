@@ -44,11 +44,11 @@ onUpdated(() => {
 }
 
 .inspector-tab:hover:not(.tab-selected) {
-    color: #4af;    
+    color: var(--diagram-primary-color);
 }
 
 .tab-selected {
-    color: #4af;
+    color: var(--diagram-primary-color);
     font-weight: bold;
     
 }

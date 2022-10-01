@@ -2,7 +2,7 @@
     <div class="editor">
         <template v-for="item in property.editorOptions.items" :key="item.name">
             <div class="item" :style="{
-                    backgroundColor: getObjectValue(object, property.name) === item.name ? '#4af'  : '#777',
+                    backgroundColor: getObjectValue(object, property.name) === item.name ? editorContext?.theme.primaryColor  : '#777',
                     color:           getObjectValue(object, property.name) === item.name ? 'white' : '#ddd',
                     width:           item.text ? 'auto' : '20px'                    
                   }" 
@@ -15,7 +15,9 @@
 </template>
 
 <script setup lang="ts">
+import { inject } from "vue";
 import Icon from "../../diagram-editor/components/Icon.vue";
+import { EditorContext } from "../../diagram-editor/DiagramEditor.vue";
 import { ObjectProperty } from "../types";
 import { getObjectValue, setObjectValue } from "./utils";
 
@@ -38,9 +40,12 @@ const { object, property } = defineProps<IconListEditorProps>();
 const emit = defineEmits<IconListEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
+const editorContext = inject<EditorContext>('diagram-editor-context');
+
 function onChange(item: { name: string, icon: string}) {
     const oldValue = getObjectValue(object, property.name);
     const newValue = item.name;
+    
     if(oldValue === newValue) return;
 
     setObjectValue(object, property.name, newValue);    
@@ -69,7 +74,7 @@ function onChange(item: { name: string, icon: string}) {
 }
 
 .item:hover {
-    border: 1px solid #4af;
+    border: 1px solid var(--diagram-primary-color);
 }
 .text {
     width: auto;

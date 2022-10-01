@@ -42,13 +42,13 @@
             </div>   
             <div class='toolbar-item-separator'></div>               
             <div v-if="editable" class="toolbar">
-                <button class='toolbar-item' @click="showRulers    = !showRulers"    v-tooltip="'Show / Hide rulers'"               :style="{ backgroundColor: showRulers    ? '#4af': '', color: showRulers    ? 'white': '' }"><Icon icon="straighten" size="18px"/></button>
-                <button class='toolbar-item' @click="showGuides    = !showGuides"    v-tooltip="'Show / Hide alignment guidelines'" :style="{ backgroundColor: showGuides    ? '#4af': '', color: showGuides    ? 'white': '' }"><Icon icon="border_style" size="18px"/></button>
-                <button class='toolbar-item' @click="showInspector = !showInspector" v-tooltip="'Show / Hide inspector'"            :style="{ backgroundColor: showInspector ? '#4af': '', color: showInspector ? 'white': '' }"><Icon icon="brush" size="18px"/></button>
-                <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  v-tooltip="'Show / Hide keyboards shortcuts'"  :style="{ backgroundColor: showKeyboard  ? '#4af': '', color: showKeyboard  ? 'white': '' }"><Icon icon="keyboard_hide" size="18px"/></button>
+                <button class='toolbar-item' @click="showRulers    = !showRulers"    v-tooltip="'Show / Hide rulers'"               :style="{ backgroundColor: showRulers    ? editorTheme.primaryColor: '', color: showRulers    ? 'white': '' }"><Icon icon="straighten" size="18px"/></button>
+                <button class='toolbar-item' @click="showGuides    = !showGuides"    v-tooltip="'Show / Hide alignment guidelines'" :style="{ backgroundColor: showGuides    ? editorTheme.primaryColor: '', color: showGuides    ? 'white': '' }"><Icon icon="border_style" size="18px"/></button>
+                <button class='toolbar-item' @click="showInspector = !showInspector" v-tooltip="'Show / Hide inspector'"            :style="{ backgroundColor: showInspector ? editorTheme.primaryColor: '', color: showInspector ? 'white': '' }"><Icon icon="brush" size="18px"/></button>
+                <button class='toolbar-item' @click="showKeyboard  = !showKeyboard"  v-tooltip="'Show / Hide keyboards shortcuts'"  :style="{ backgroundColor: showKeyboard  ? editorTheme.primaryColor: '', color: showKeyboard  ? 'white': '' }"><Icon icon="keyboard_hide" size="18px"/></button>
             </div>
             <div style="flex: 1" />
-            <div v-if='!readonly' class='toolbar-item' :style="{ width: 'auto', fontSize: '12px', marginRight:'8px', backgroundColor: viewMode ? '#4af': '' }" @click="selectNone(); viewMode = !viewMode"  v-tooltip="'Switch between edit/view mode'" >View Mode</div>
+            <div v-if='!readonly' class='toolbar-item' :style="{ width: 'auto', fontSize: '12px', marginRight:'8px', backgroundColor: viewMode ? editorTheme.primaryColor: '' }" @click="selectNone(); viewMode = !viewMode"  v-tooltip="'Switch between edit/view mode'" >View Mode</div>
             <!-- <div class='toolbar-item-separator'></div>               
             <div style="color: white;">EDIT: {{ inlineEditing }}</div> -->
         </div> <!-- editor-toolbars -->  
@@ -281,8 +281,14 @@ export interface DiagramEditorEvents {
     (e: 'delete-connection', connection: ItemConnection): void
 }
 
+export interface EditorTheme {
+    primaryColor: string;
+}
+
+
 export interface EditorContext {
-    isEditable: () => boolean    
+    isEditable: () => boolean,
+    theme: EditorTheme
 };
 
 // Define props
@@ -297,6 +303,12 @@ const emit = defineEmits<DiagramEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
 // Initialization code
+
+// Editor Theme
+const editorTheme: EditorTheme = {
+    primaryColor: '#4af'
+}
+
 const vueApp = getCurrentInstance()!.appContext.app;
 registerBasicBlocks(vueApp);
 registerDefaultItemTypes();
@@ -324,7 +336,8 @@ const editable = computed(() => !readonly && !viewMode.value);
 
 // The component provides this context to all children, like all block components
 const editorContext: EditorContext = {
-    isEditable: () => editable.value
+    isEditable: () => editable.value,
+    theme: editorTheme
 };
 provide('diagram-editor-context', editorContext);
 
@@ -1106,18 +1119,17 @@ function onSelectionEnd(e: any) {
 
 
 <style>
-.diagram-item-inline-edit {
-    outline: none;
-}
-
+.diagram-item-inline-edit,
 .diagram-item-inline-edit:focus,
 .diagram-item-inline-edit:focus-visible { 
-    outline: 1px solid #4af;
+    outline: none;
 }
 </style>
 
 <style scoped>
 .editor-layout {
+    --diagram-primary-color: v-bind(editorTheme.primaryColor);
+
     position: relative;
     border: 1px solid #ccc;
     width: 100%;
@@ -1279,7 +1291,7 @@ function onSelectionEnd(e: any) {
 
 .toolbar-item:hover {
     background-color: #efefef;
-    color: #4af;
+    color: var(--diagram-primary-color)
 }
 
 .item {
@@ -1310,9 +1322,9 @@ function onSelectionEnd(e: any) {
 
 .item .decorator {
     position: absolute;
-    border: 1px solid #4af;
+    border: 1px solid var(--diagram-primary-color);
     border-radius: 4px;
-    background-color: #4af;
+    background-color: var(--diagram-primary-color);
     color: white;
     text-align: center;
     font-weight: normal;
@@ -1365,7 +1377,7 @@ function onSelectionEnd(e: any) {
 }
 
 .item.mouse-hover {
-    border: 2px solid #4af;
+    border: 2px solid var(--diagram-primary-color);
 }
 
 .item  {
@@ -1387,7 +1399,7 @@ function onSelectionEnd(e: any) {
 } 
 
 .item .connection-handle:hover {
-    background-color: #4af;
+    background-color: var(--diagram-primary-color);
 } 
 
 

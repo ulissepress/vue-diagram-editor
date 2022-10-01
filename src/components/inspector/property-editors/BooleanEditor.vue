@@ -1,10 +1,12 @@
 <template>
-    <Icon v-if="getObjectValue(object, property.name) === true" class="checker" @click="toggle" icon="check_box" color="#4af" />
+    <Icon v-if="getObjectValue(object, property.name) === true" class="checker" @click="toggle" icon="check_box" :color="editorContext?.theme.primaryColor" />
     <Icon v-else icon="check_box_outline_blank" class="checker" @click="toggle" color="#ddd" />
 </template>
 
 <script setup lang="ts">
+import { inject } from 'vue';
 import Icon from '../../diagram-editor/components/Icon.vue';
+import { EditorContext } from '../../diagram-editor/DiagramEditor.vue';
 import { ObjectProperty } from "../types";
 import { getObjectValue, setObjectValue } from "./utils";
 
@@ -25,6 +27,8 @@ const { object, property } = defineProps<NumberEditorProps>();
 // Define events
 const emit = defineEmits<NumberEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
+
+const editorContext = inject<EditorContext>('diagram-editor-context');
 
 function toggle(e: any) {
     let v = getObjectValue(object, property.name) === true;

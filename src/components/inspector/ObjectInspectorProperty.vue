@@ -77,14 +77,14 @@ const readonlyValue = computed(() => {
 {
     background-color: #626262;
     color: #f5f5f5;
-    border: 1px solid #4af !important;
+    border: 1px solid var(--diagram-primary-color) !important;
     outline: 0px !important;    
 }
 
 .property-container input:hover,
 .property-container select:hover
 {
-    border: 1px solid #4af !important;
+    border: 1px solid var(--diagram-primary-color) !important;
 }
 
 </style>

@@ -80,11 +80,11 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
 
 .tool:hover {
     background-color: #efefef;
-    color: #4af;
+    color: var(--diagram-primary-color);
 }
 
 .tool.selected {
-    background-color: #4af;
+    background-color: var(--diagram-primary-color);
     color: white;
 }
 
