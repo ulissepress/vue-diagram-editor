@@ -1,8 +1,8 @@
-import { connectionModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
-import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, ImageItem, Item, ItemConnection, LineItem, Position, TextHAlign, TextVAlign } from "./types";
+import { ClipType, ConnectionHandle, ConnectionMarker, ConnectionStyle, ConnectionType, IconItem, ImageItem, Item, ItemConnection, LineItem, Position, TextDecoration, TextHAlign, TextTransform, TextVAlign, WidgetDefinition, WidgetItem, isItem } from "./types";
+import { ObjectInspectorModel, ObjectProperty } from '../inspector/types';
+import { connectionModel, getWidgetModel, iconModel, imageModel, lineModel, shapeModel, shapeWithoutRadiusModel, textModel } from './item-properties';
 
 import { StyleValue } from "vue";
-import { ObjectInspectorModel } from '../inspector/types';
 
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
@@ -33,7 +33,8 @@ export function getItemStyle(item: Item) : StyleValue {
         "height":           item.h + 'px',
         "zIndex":           item.z,
         "backgroundColor":  item.component ? "transparent" : item.backgroundColor,
-        "transform":        t
+        "transform":        t,
+        "borderRadius":     item.supportsRoundable ? (item.borderRadius> 0 ? item.borderRadius : 1) + 'px' : '0px',
     }
 
     if(item.clipType !== ClipType.NONE) {
@@ -75,7 +76,7 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         supportsClippable: false,
 
         backgroundColor: '#bbbbbb',
-        textColor: '#000000',
+        textColor:       '#000000',
         fontSize: 14,
          
         textHAlign: TextHAlign.CENTER,
@@ -84,10 +85,27 @@ export function createItem(item?: DeepPartial<Item>) : Item {
         border: {
             width: 0,
             style: ConnectionStyle.SOLID,
-            color: '#333333',
+            color: '#2c2c2c',
         },
         
-        shadow: false,
+        shadow: {
+            enabled: false,
+            offsetX: 3,
+            offsetY: 3,
+            blur:    5,
+            color:   '#555555',
+        },
+        
+        textStyle: {
+            fontFamily:    'Arial',
+            bold:          false,
+            italic:        false,
+            letterSpacing: 0,
+            lineHeight:    1,
+            decoration:    TextDecoration.NONE,
+            transform:     TextTransform.NONE
+        },
+
         locked: false,
 
         ...item
@@ -116,7 +134,20 @@ export function createConnection(fromID: string, toID: string, c?: DeepPartial<I
         style: c?.style || ConnectionStyle.SOLID,
         thick: c?.thick || 1,
 
-        backgroundColor: c?.backgroundColor || "#333",        
+        backgroundColor: c?.backgroundColor || "#2c2c2c",    
+        fontSize: 14,
+        
+        textColor: '#333333',
+        textStyle: {
+            fontFamily:    'Arial',
+            bold:          false,
+            italic:        false,
+            letterSpacing: 0,
+            lineHeight:    1,
+            decoration:    TextDecoration.NONE,
+            transform:     TextTransform.NONE
+        }
+        
     } as ItemConnection
 }
 
@@ -137,17 +168,38 @@ export function findMaxZ(items: Item[]): number {
 }
 
 
-// Shape medata definitions
+// Shape metadata definitions
 const registry: Record<string, [Item, ObjectInspectorModel]> = {};
 
 export function registerItemType<T extends Item>(item: T, model: ObjectInspectorModel) {
     registry[item.component] = [item, model];
 }
 
-export function getItemBlueprint(type: string): [Item, ObjectInspectorModel] {
-    if(!registry[type]) throw new Error("No item type registered with name: " + type);
-    return registry[type];
+
+// Widgets custom properties registry
+const widgetRegistry: Record<string, [any, ObjectProperty[]]> = {};
+
+export function registerWidgetType<T>(widgetComponent: string, widgetBlueprint: T, customProps: ObjectProperty[]) : void {
+    widgetRegistry[widgetComponent] = [widgetBlueprint, customProps];
 }
+
+
+export function getItemBlueprint(type: string, widget?: WidgetDefinition): [Item, ObjectInspectorModel] {
+    if(!registry[type]) throw new Error("No item type registered with name: " + type);
+
+    // Search ObjectInspectorModel in the dedicated widget registry
+    if(type === 'Widget' && widget) {        
+        let [widgetBlueprint, widgetCustomProps] = widgetRegistry[widget.component];        
+        return [{ ...registry[type][0], ...widgetBlueprint}, getWidgetModel(widget.component, widgetCustomProps)];
+    }
+
+    return registry[type];    
+}
+
+export function getWidgetItemBlueprint(): WidgetItem {
+    return registry['Widget'][0] as WidgetItem;
+}
+
 
 let alreadyRegistered = false;
 export function registerDefaultItemTypes() {
@@ -171,14 +223,15 @@ export function registerDefaultItemTypes() {
         clipType: ClipType.NONE,
         clipStyle: '',
 
+        fontSize: 14,
+
         supportsRoundable: false,
         supportsResizable: true,
         
 
         backgroundColor: "#00ff00",
         textColor: "#111111",
-        fontSize: 14,
-        
+                
         locked: false,
         
         textHAlign: TextHAlign.CENTER,
@@ -187,10 +240,26 @@ export function registerDefaultItemTypes() {
         border: {
             width: 0,
             style: ConnectionStyle.SOLID,
-            color: '#333333',
+            color: '#2c2c2c',
         },
 
-        shadow: false,
+        shadow: {
+            enabled: false,
+            offsetX: 3,
+            offsetY: 3,
+            blur:    5,
+            color: ' #555555',
+        },
+
+        textStyle: {
+            fontFamily:    'Arial',
+            bold:          false,
+            italic:        false,
+            letterSpacing: 0,
+            lineHeight:    1,
+            decoration:    TextDecoration.NONE,
+            transform:     TextTransform.NONE
+        }
     };
 
 
@@ -209,7 +278,7 @@ export function registerDefaultItemTypes() {
         ...defaults,
         title: "Hello World",
         backgroundColor: "transparent",
-        textColor: "#333333",
+        textColor: "#2c2c2c",
 
         component: type,
     }, textModel);
@@ -224,6 +293,8 @@ export function registerDefaultItemTypes() {
         backgroundColor: "#111111",
         
         style: ConnectionStyle.SOLID,
+        startMarker: ConnectionMarker.NONE,
+        endMarker: ConnectionMarker.NONE,
         thick: 2,
     }, lineModel);
 
@@ -269,7 +340,7 @@ export function registerDefaultItemTypes() {
         w: 70,
         h: 70,
         backgroundColor: '#ff0000',
-        textColor: "#333333",
+        textColor: "#2c2c2c",
     }, shapeWithoutRadiusModel);
 
     // ----------------------------------------------------------------------
@@ -302,7 +373,7 @@ export function registerDefaultItemTypes() {
 
     // ----------------------------------------------------------------------
     type = "Icon"
-    registerItemType({
+    registerItemType<IconItem>({
         ...defaults,
         
         component: type,
@@ -310,11 +381,25 @@ export function registerDefaultItemTypes() {
         supportsRoundable: true,
 
         backgroundColor: 'transparent',
-        textColor: "#333333",
+        textColor: "#2c2c2c",
         fontSize: 60,
+        filled: false,
         w: 60,
         h: 60,        
     }, iconModel)
+
+    // ----------------------------------------------------------------------
+    type = "Widget"
+    registerItemType<WidgetItem>({
+        ...defaults,
+        
+        component: type,
+        supportsRoundable: false,
+        backgroundColor: 'transparent',    
+        w: 300,
+        h: 150,
+        widget: {} as WidgetDefinition   // Dummy value, will be filled at runtime        
+    }, {} as ObjectInspectorModel)       // ObjectInspectorModel is ignored as for custom widget the model will be managed in the dedicated registry
 } // func
 
 
@@ -328,3 +413,8 @@ export function getHandlePosition(item: Item, cp: ConnectionHandle): Position {
     else if(cp === ConnectionHandle.BOTTOM) return { x: item.x + item.w / 2, y: item.y + item.h     };
     else /*  ConnectionHandle.CENTER */     return { x: item.x + item.w / 2, y: item.y + item.h / 2 };    
 }
+
+
+export function isLineItem(item: Item | undefined | null) : boolean {
+    return isItem(item) && item.component === 'Line';
+} 

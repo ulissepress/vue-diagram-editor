@@ -11,8 +11,8 @@
             :stroke-dasharray = "dashArray"            
             stroke-linecap    = "round" 
             stroke-linejoin   = "round"
-
-            :style="{ 'filter': item.shadow ? 'drop-shadow(2px 2px 5px #aaa)' : '' }"
+                        
+            :style="{ 'filter': cssDropShadow(item) }"
 
             :fill             = "item.backgroundColor"             
             :width            = "item.w" 
@@ -23,7 +23,7 @@
             justifyContent: item.textHAlign,
             alignItems:     item.textVAlign,
             color:          item.textColor,
-            fontSize:       item.fontSize + 'px', 
+            ...cssTextStyle(item), 
         }">{{ item.title }}</div>
     </div>
 </template>
@@ -31,6 +31,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { ConnectionStyle, Item } from '../types';
+import { cssDropShadow, cssTextStyle } from './utils';
 
 const { item } = defineProps<{item: Item}>();
 const dashArray = computed(() => {

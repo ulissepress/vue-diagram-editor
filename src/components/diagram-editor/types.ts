@@ -30,11 +30,13 @@ export interface DiagramElement {
     textColor:        string;   // The element text color (text inside the element, etc.)
     opacity:          number;   // Opacity (0=full transparent, 100=full opaque). Default = 100
 
-    fontSize:        number;    // The element text font size
-    shadow:          boolean;   // Show/hide element shadow  
+    fontSize:         number;   // The element text font size
     
     component:         string;  // The Vue component used to render this element
     componentOptions?: any;     // The Vue component options / config
+
+    textStyle: TextStyle;
+
 }
 
 export interface Item extends DiagramElement {
@@ -57,6 +59,8 @@ export interface Item extends DiagramElement {
     textVAlign: TextVAlign;
 
     border: ItemBorder;
+    shadow: ItemShadow;        // Element shadow definition
+
 }
 
 export enum TextHAlign {
@@ -78,11 +82,52 @@ export enum ClipType {
     POLYGON = "polygon",
     ELLIPSE = "ellipse"
 }
+
+export enum TextDecoration {
+    NONE        = "none",
+    LINETHROUGH = "line-through",
+    OVERLINE    = "overline",
+    UNDERLINE   = "underline",  
+}
+
+export enum TextTransform {
+    NONE       = "none",
+    UPPERCASE  = "uppercase",
+    LOWERCASE  = "lowercase",
+    CAPITALIZE = "capitalize",  
+}
+
+export interface TextStyle {
+    fontFamily:    string;
+    bold:          boolean;
+    italic:        boolean;
+    letterSpacing: number;
+    lineHeight:    number;
+    decoration:    TextDecoration; 
+    transform:     TextTransform;
+}
+
 export interface ItemBorder {
     width: number;
     style: ConnectionStyle
     color: string;
 }
+
+export interface ItemShadow {
+    enabled: boolean;
+    offsetX: number;
+    offsetY: number;
+    blur:    number;
+    color:   string;
+}
+
+export interface ItemBackround {
+    type:      "color" | "gradient-linear" | "gradient-radial";
+    starColor: string;        // The start color of the gradient
+    endColor:  string;        // The start color of the gradient
+    direction: number;        // The grandient direction (in degrees: 0-359)
+}
+
 
 export interface ConnectionPoint {
     item:   string;                   // The item ID which this connection point is referring to
@@ -117,6 +162,7 @@ export enum ConnectionMarker {
 
 export enum ConnectionType {
     LINE  = "line",
+    ELBOW = "elbow",
     CURVE = "curve"
 }
 
@@ -151,7 +197,7 @@ export interface ToolDefinition {
 export const toolDefinitions: ToolDefinition[] = [
     { type: EditorTool.SELECT,     title: 'Select',     icon: 'ads_click' },    
     { type: 'separator' },    
-    { type: EditorTool.CONNECTION, title: 'Connection', icon: 'share',           itemType: "Connection"},
+    { type: EditorTool.CONNECTION, title: 'Connection', icon: 'share',          itemType: "Connection"},
     { type: 'separator' },    
     { type: EditorTool.TEXT,       title: 'Text',       icon: 'text_fields',     itemType: "Text"      },
     { type: EditorTool.IMAGE,      title: 'Image',      icon: 'image',           itemType: "Image"     },
@@ -162,8 +208,6 @@ export const toolDefinitions: ToolDefinition[] = [
     { type: EditorTool.TRIANGLE,   title: 'Triangle',   icon: 'change_history',  itemType: "Triangle"  },
     { type: EditorTool.STAR,       title: 'Star',       icon: 'grade',           itemType: "Star"      },
     { type: EditorTool.ICON,       title: 'Icon',       icon: 'portrait',        itemType: "Icon"      },
-    { type: 'separator' },
-    { type: EditorTool.WIDGET,     title: 'Widgets',    icon: 'view_in_ar' },
 ];
 
 export function getToolDefinition(toolType: EditorTool) : ToolDefinition {
@@ -185,6 +229,8 @@ export function isConnection(e: DiagramElement | undefined | null) : e is ItemCo
 export interface LineItem extends Item {
     thick: number;
     style: ConnectionStyle;
+    startMarker: ConnectionMarker,
+    endMarker: ConnectionMarker,
 }
 
 
@@ -207,12 +253,18 @@ export interface ImageItem extends Item {
     }
 }
 
+export interface IconItem extends Item {
+    filled: boolean;
+}
+
+export interface WidgetItem extends Item {
+    widget: WidgetDefinition
+}
 
 export interface WidgetDefinition {
-    type:      string;          // The widget type. Example: 'my_shape
-    label:     string;          // The widget label. Example: 'My Shape'
-    descr:     string;          // The widget description. Example: 'A shape with rounded borders'
-    thumbnail: string;          // The widget thumbnail. Example: 'my_shape.png'
+    title:     string;          // The widget title. Example: 'My Shape'
+    icon:      string;          // The widget icon
+    category?: string;          // The widget category. Example: 'Event' or 'Actions'
   
     component:         string;  // The Vue component used to render this widget
     componentOptions?: any;     // The default Vue component options used to instantiate this widget
@@ -222,3 +274,15 @@ export interface WidgetDefinition {
 
 
 
+// Model definition for a diagram (multipage editors)
+export interface DiagramModel {
+    id: number;                     // The unique diagram ID
+    title: string;                  // The diagram title
+    private: boolean;               // TRUE if the diagram is for private usage
+    pages: DiagramPage[];           // A diagram can contain 1 or more pages (1 page is like a slide in a powerpoint file)
+}
+
+export interface DiagramPage {
+    title: string;                  // The diagram page title
+    elements: DiagramElement[];     // The diagram page elements (items and connections)
+}

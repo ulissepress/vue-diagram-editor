@@ -3,12 +3,11 @@
         :src   = "item.url === '' ? imagePlaceholder : item.url"
         :style = "{ 
             color:        item.textColor, 
-            border:       item.border.width + 'px ' + item.border.style + ' ' + item.border.color,
-            borderRadius: item.borderRadius + 'px',
-            fontSize:     item.fontSize + 'px',
+            borderRadius: item.borderRadius + 'px',            
             opacity:      item.opacity / 100,   
             objectFit:    item.fit,
-            boxShadow:    item.shadow ? '3px 3px 5px #aaa' : 'none', 
+            border:       cssBorder(item),
+            boxShadow:    cssShadow(item),
             filter:       cssFilter,
             transform:    cssTransform,
         }"/>
@@ -25,8 +24,9 @@
 <script setup lang="ts">
 
 import { computed } from 'vue';
-import imagePlaceholder from '../image-placeholder.png';
 import { ImageItem } from '../types';
+import imagePlaceholder from './image-placeholder.png';
+import { cssBorder, cssShadow } from './utils';
 
 const { item } = defineProps<{item: ImageItem}>();
 

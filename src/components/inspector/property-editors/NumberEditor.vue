@@ -1,9 +1,9 @@
 <template>
     <input class="editor" type="text" 
            :value="getObjectValue(object, property.name)"
-           @keypress    = "onKeyPress"
+           @keydown     = "onKeyDown"
            @keyup.enter = "onChange"
-           @change="onChange" />
+           @change      = "onChange" />
 </template>
 
 <script setup lang="ts">
@@ -18,7 +18,7 @@ export interface NumberEditorProps {
 }
 
 export interface NumberEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props
@@ -28,16 +28,45 @@ const { object, property } = defineProps<NumberEditorProps>();
 const emit = defineEmits<NumberEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
-function onChange(e: any) {
-    let v = parseFloat(e.target.value);
+function convertValue(value: string): number {
+    let v = parseFloat(value);
     if(isNaN(v)) v = 0;
-
-    setObjectValue(object, property.name, v);    
-    emit('property-changed', property, v)
+    return v;
 }
 
-function onKeyPress(e: any) {
-    if(!e.key.match(/[0-9\-\.]/)) e.preventDefault();        
+function onChange(e: any) {
+    const oldValue = getObjectValue(object, property.name);
+    const newValue = convertValue(e.target.value);
+    if(oldValue === newValue) return;
+
+    setObjectValue(object, property.name, newValue);    
+    emit('property-changed', property, oldValue, newValue, true)
+}
+
+function toMinMax(v: number): number {
+    if(!property.editorOptions) return v;
+
+    const min = property.editorOptions.min; 
+    const max = property.editorOptions.max; 
+
+    if(min !== undefined && v < min) v = min;
+    if(max !== undefined && v > max) v = max;
+    
+    return v;
+}
+
+function onKeyDown(e: any) {
+    if(e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+
+    let v = convertValue(e.target.value);
+
+    const delta = e.shiftKey ? 10 : 1;
+
+    if(e.key === 'ArrowDown') { v = toMinMax(v - delta); e.preventDefault(); }
+    if(e.key === 'ArrowUp')   { v = toMinMax(v + delta); e.preventDefault(); }
+
+    e.target.value = v;
+    onChange(e);
 }
 
 </script>

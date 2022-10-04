@@ -5,17 +5,17 @@
             <Icon v-show="!expanded" size='16px' icon="keyboard_arrow_right" /> 
             {{ section.title }}
         </div>
-        <ObjectInspectorProperty v-if="expanded" v-for="property in section.properties" 
-            :key      = "property.name" 
-            :property = "property"
-            :object   = "object" 
-            @property-changed = "(propertyChanged, newValue) => emit('property-changed', propertyChanged, newValue)" />
+        <ObjectInspectorProperty v-if="expanded" v-for="(property, index) in section.properties" 
+            :key          = "index"
+            :property     = "property"
+            :object       = "object" 
+            @property-changed = "(propertyChanged, oldValue, newValue, emitCommand) => emit('property-changed', propertyChanged, oldValue, newValue, emitCommand)" />
     </div>
 </template>
 
 
 <script setup lang="ts">
-import { onUpdated, ref } from "vue";
+import { ref } from "vue";
 import Icon from "../diagram-editor/components/Icon.vue";
 import ObjectInspectorProperty from "./ObjectInspectorProperty.vue";
 import { InspectorSection, ObjectProperty } from "./types";
@@ -28,7 +28,7 @@ export interface ObjectInspectorSectionProps {
 }
 
 export interface ObjectInspectorSectionvents {
-    (e: 'property-changed', property: ObjectProperty, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props
@@ -37,10 +37,6 @@ const { object, section } = defineProps<ObjectInspectorSectionProps>();
 // Define events
 const emit = defineEmits<ObjectInspectorSectionvents>();
 // ------------------------------------------------------------------------------------------------------------------------
-
-onUpdated(() => {
-    console.log('ObjectInspectorSection: onUpdated');
-});
 
 const expanded = ref(true);
 
@@ -51,19 +47,19 @@ const expanded = ref(true);
 .section-container {
     width: 100%;
     height: auto;
-    margin-bottom: 12px;
+    margin-bottom: 4px;
     user-select: none;
 }
 
 .section-title {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     user-select: none;
     background-color: #515151;
     color: #dbdbdb;
     text-align: left;
-    padding: 4px;
+    padding: 2px;
     cursor: pointer;
     margin-bottom: 4px;
     font-size: 10px;

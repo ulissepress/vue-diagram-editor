@@ -1,20 +1,23 @@
 <template>
     <div class="shape" :style="{
-            justifyContent:  item.textHAlign,
-            alignItems:      item.textVAlign,
-            backgroundColor: item.backgroundColor, 
-            color:           item.textColor, 
-            borderRadius:    item.borderRadius + 'px',
-            border:          item.border.width + 'px ' + item.border.style + ' ' + item.border.color,
-            fontSize:        item.fontSize + 'px',
-            opacity:         item.opacity / 100,
-            boxShadow:       item.shadow ? '3px 3px 5px #aaa' : 'none',
-        }" ><div><div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }"/></div> 
-        </div>
+        justifyContent:  item.textHAlign,
+        alignItems:      item.textVAlign,
+        backgroundColor: item.backgroundColor, 
+        color:           item.textColor, 
+        borderRadius:    item.borderRadius + 'px',
+        opacity:         item.opacity / 100,
+        border:          cssBorder(item),
+        boxShadow:       cssShadow(item),
+        ...cssTextStyle(item) }">
+        <div>
+            <div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }" />
+        </div> 
+    </div>
 </template>
 
 <script setup lang="ts">
 import { Item } from '../types';
+import { cssBorder, cssShadow, cssTextStyle } from './utils';
 
 const { item } = defineProps<{item: Item}>();
 

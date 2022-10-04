@@ -1,21 +1,20 @@
 <template>
     <div class="toolbar">
-        <div v-for = "t in toolList" 
+        <div v-for = "t in toolDefinitions" v-tooltip.bottom="t.title"
             :key   = "t.type" 
-            :title = "t.title"
+            
             @click = "t.type !== 'separator' && onToolSelected(t.type, selectedTool)"
             :class = "{
                 'tool'     : t.type !== 'separator', 
                 'selected' : selectedTool == t.type,
                 'separator': t.type === 'separator', 
             }">
-                <Icon v-if="t.type !== 'separator'" :icon="t.icon || ''" />
+                <Icon v-if="t.type !== 'separator'" :icon="t.icon || ''" size="20px"/>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from '@vue/reactivity';
 import { onMounted, onUpdated } from 'vue';
 import { EditorTool, toolDefinitions } from '../types';
 import Icon from './Icon.vue';
@@ -29,12 +28,11 @@ interface Tool {
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 interface ToolbarProps {
-    selectedTool: EditorTool,
-    customWidgets: boolean,
+    selectedTool: EditorTool
 }
 
 
-const { selectedTool, customWidgets } = defineProps<ToolbarProps>();
+const { selectedTool } = defineProps<ToolbarProps>();
 
 interface ToolbarEvents {
     (e: 'toolSelected', toolType: EditorTool): void    
@@ -43,12 +41,7 @@ interface ToolbarEvents {
 const emit = defineEmits<ToolbarEvents>();
 
 onMounted(()=> console.log('Toolbar mounted', selectedTool))
-onUpdated(()=> console.log('Toolbar updated', selectedTool))
-
-
-const toolList = computed(() => {
-    return customWidgets ? toolDefinitions : toolDefinitions.filter(t => t.type !== EditorTool.WIDGET);
-})
+onUpdated(()=> console.log('$$$$$ Toolbar updated', selectedTool))
 
 
 function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {    
@@ -61,7 +54,7 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
 
 <style scoped>
 .toolbar {
-    background-color: #fefefe;
+    background-color: #2c2c2c;
     border: 1px solid #ccc;
     display: flex;
     flex-direction: row;
@@ -69,15 +62,15 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
     align-items: center;
     gap: 0px;
     user-select: none;
-    box-shadow: 2px 2px 5px #ccc;
+    margin-left: 8px;
 }
 
 .tool {
-    width: auto;
+    width: 18px;
     height: auto;
     padding: 4px;
 
-    color: #676767; 
+    color: #fafafa; 
     display: flex;
     justify-content: center;
     align-items: center; 
@@ -87,10 +80,11 @@ function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
 
 .tool:hover {
     background-color: #efefef;
+    color: var(--diagram-primary-color);
 }
 
 .tool.selected {
-    background-color: #4af;
+    background-color: var(--diagram-primary-color);
     color: white;
 }
 

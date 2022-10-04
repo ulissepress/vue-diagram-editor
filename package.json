@@ -8,11 +8,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vueuse/core": "^8.6.0",
-    "vue": "^3.2.25",
+    "@ckpack/vue-color": "^1.2.0",
+    "@vueuse/core": "^8.9.4",
+    "floating-vue": "^2.0.0-beta.20",
+    "vue": "^3.2.38",
     "vue3-guides": "^0.1.1",
-    "vue3-infinite-viewer": "^0.4.2",
-    "vue3-moveable": "^0.8.0"
+    "vue3-infinite-viewer": "^0.5.0",
+    "vue3-moveable": "^0.10.4",
+    "vue3-selecto": "^1.5.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",

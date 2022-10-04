@@ -44,9 +44,9 @@ if(!isMac) for(let k of shortcuts) k[0] = k[0].replace('CMD', 'CTRL')
 
 <style scoped>
 .container {
-    background-color: #333;
+    background-color: #2c2c2c;
     
-    color: #333;
+    color: #2c2c2c;
     width: 700px;
     height: auto;
     max-height: 80%;
@@ -62,7 +62,7 @@ if(!isMac) for(let k of shortcuts) k[0] = k[0].replace('CMD', 'CTRL')
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 16px;
-    color: #4af;
+    color: var(--diagram-primary-color);
 }
 
 .key {
@@ -78,7 +78,7 @@ if(!isMac) for(let k of shortcuts) k[0] = k[0].replace('CMD', 'CTRL')
     min-width: 200px;
     font-family: 'Courier New', Courier, monospace;
     font-size: 16px;
-    color: #ccc;
+    color: #fafafa;
 }
 
 .key-help {

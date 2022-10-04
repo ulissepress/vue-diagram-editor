@@ -1,28 +1,20 @@
 <template>
-    <input class  = "editor-slider" 
-           type   = "range"  
-           :value = "getObjectValue(object, property.name)" 
-           :min   = "property.editorOptions?.min || 0"
-           :max   = "property.editorOptions?.max || 100" 
-           @input = "onChange" />
+    <input class   = "editor-slider" 
+           type    = "range"  
+           :value  = "getObjectValue(object, property.name)" 
+           :min    = "property.editorOptions?.min  || 0"
+           :max    = "property.editorOptions?.max  || 100" 
+           :step   = "property.editorOptions?.step || 1" 
+           @input  = "onChange($event, false)" 
+           @change = "onChange($event, true)" />
 
-    <input class        = "editor-input"  
-           type         = "text" 
-           maxlength    = "6"
-           :value       = "getObjectValue(object, property.name)"
-           @keypress    = "onKeyPress"
-           @keyup.enter = "onChange"
-           @change      = "onChange" />
-
+    <NumberEditor :object="object" :property="property" @property-changed="onNumericValueChanged" />
 </template>
 
-<script lang="ts">
-export default { inheritAttrs: false }
-</script>
-
 <script setup lang="ts">
+import { onMounted, ref } from "vue";
 import { ObjectProperty } from "../types";
-
+import NumberEditor from './NumberEditor.vue';
 import { getObjectValue, setObjectValue } from "./utils";
 
 // The component props and events
@@ -33,7 +25,7 @@ export interface RangeEditorProps {
 }
 
 export interface RangeEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props
@@ -43,30 +35,39 @@ const { object, property } = defineProps<RangeEditorProps>();
 const emit = defineEmits<RangeEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
-function onChange(e: any) {
-    let v = parseFloat(e.target.value);
-    if(isNaN(v)) v = 0;
+const originalValue = ref(0);
+onMounted(() => {
+    originalValue.value = getObjectValue(object, property.name)
+})
 
-    setObjectValue(object, property.name, v);
-    emit('property-changed', property, v)
+function convertValue(value: string): number {
+    let v = parseFloat(value);
+    return isNaN(v) ? 0 : v;
 }
 
-function onKeyPress(e: any) {
-    if(!e.key.match(/[0-9\-\.]/)) e.preventDefault();        
+function onChange(e: any, emitCommand: boolean) {
+    let newValue = convertValue(e.target.value);
+    
+    setObjectValue(object, property.name, newValue);
+    emit('property-changed', property, originalValue.value, newValue, emitCommand)
+
+    // Update the value baseline if a command is emitted
+    if(emitCommand) originalValue.value = getObjectValue(object, property.name);
 }
+
+function onNumericValueChanged(property: ObjectProperty, oldValue: any, newValue: any) {
+    if(oldValue === newValue) return;
+        
+    emit('property-changed', property, oldValue, newValue, true)
+    // Update the value baseline (as a command has been emitted)
+    originalValue.value = newValue;                 
+}
+
 </script>
 
 <style scoped>
 .editor-slider {
     width: calc(100% - 60px);
 }
-
-.editor-input {
-    width: 40px;
-    height: 12px;
-    margin-top: 4px;
-}
-
-
 
 </style>

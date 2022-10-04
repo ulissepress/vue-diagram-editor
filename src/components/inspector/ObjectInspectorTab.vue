@@ -22,7 +22,7 @@ const { object, tab } = defineProps<ObjectInspectorTabProps>();
 
 
 onUpdated(() => {
-    console.log('ObjectInspectorTab: onUpdated');
+    console.log('$$$$$ ObjectInspectorTab updated');
 });
 
 </script>
@@ -35,7 +35,7 @@ onUpdated(() => {
     color: #aaa;    
     
     text-align: center;
-    font-size: 12px;
+    font-size: 11px;
     padding: 4px;
     text-transform: uppercase;
     cursor: pointer;
@@ -44,11 +44,11 @@ onUpdated(() => {
 }
 
 .inspector-tab:hover:not(.tab-selected) {
-    color: #4af;    
+    color: var(--diagram-primary-color);
 }
 
 .tab-selected {
-    color: #4af;
+    color: var(--diagram-primary-color);
     font-weight: bold;
     
 }

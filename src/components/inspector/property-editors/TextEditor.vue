@@ -1,5 +1,10 @@
 <template>
-    <input class="editor" type="text" :value="getObjectValue(object, property.name)" @input="onChange" />
+    <input  class        = "editor" 
+            type         = "text" 
+            :value       = "getObjectValue(object, property.name)" 
+            @keyup.enter = "onChange" 
+            @blur        = "onChange" 
+            @change      = "onChange" />
 </template>
 
 <script setup lang="ts">
@@ -16,7 +21,7 @@ export interface TextEditorProps {
 }
 
 export interface TextEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, newValue: any): void
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props
@@ -26,12 +31,16 @@ const { object, property } = defineProps<TextEditorProps>();
 const emit = defineEmits<TextEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 onUpdated(() => {
-    console.log('TextEditor: onUpdated');
+    console.log('$$$$$  TextEditor: onUpdated');
 });
 
 function onChange(e: any) {
-    setObjectValue(object, property.name, e.target.value);
-    emit('property-changed', property, e.target.value)
+    const oldValue = getObjectValue(object, property.name);
+    const newValue = e.target.value;
+    if(oldValue === newValue) return;
+
+    setObjectValue(object, property.name, newValue);
+    emit('property-changed', property, oldValue, newValue, true)
 }
 </script>
 

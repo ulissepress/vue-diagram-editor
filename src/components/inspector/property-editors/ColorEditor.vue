@@ -1,42 +1,44 @@
 <template>
-    <input type="color" :value="getObjectValue(object, property.name)" @input="onChange" />&nbsp;
-    <input type="text"  :value="getObjectValue(object, property.name)" @input="onChange" class="color-text" />
+    &nbsp;<ColorPicker :color="getObjectValue(object, property.name)" @color-changed="onChange" :show-color-value="false" />    
 </template>
 
 <script setup lang="ts">
 import { ObjectProperty } from "../types";
 
+import ColorPicker from './ColorPicker.vue';
+
 import { getObjectValue, setObjectValue } from "./utils";
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
-export interface TextEditorProps {
+export interface ColorEditorProps {
     object?: any;
     property: ObjectProperty;
 }
 
-export interface TextEditorEvents {
-    (e: 'property-changed', property: ObjectProperty, newValue: any): void
+export interface ColorEditorEvents {
+    (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
 // Define props
-const { object, property } = defineProps<TextEditorProps>();
+const { object, property } = defineProps<ColorEditorProps>();
 
 // Define events
-const emit = defineEmits<TextEditorEvents>();
+const emit = defineEmits<ColorEditorEvents>();
 // ------------------------------------------------------------------------------------------------------------------------
 
-function onChange(e: any) {
-    let v = e.target.value;
-    if(v === '') v = "transparent";
+function onChange(newColor: string) {
+    const oldValue = getObjectValue(object, property.name);
+    if(newColor === oldValue) return;
 
-    setObjectValue(object, property.name, v);
-    emit('property-changed', property, v)
+    setObjectValue(object, property.name, newColor);
+    emit('property-changed', property, oldValue, newColor, false)   // TODO:  manage correctly the emitCommand option
 }
 </script>
 
 <style scoped>
 input[type="color"] {
+    appearance: none;
 	-webkit-appearance: none;    
 	border: none;
 	width: 14px;

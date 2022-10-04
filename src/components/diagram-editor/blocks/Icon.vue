@@ -1,17 +1,18 @@
 <template>
-    <span class="material-symbols-outlined" :style="{
+    <span :class="{'material-icons': item.filled, 'material-icons-outlined': !item.filled}" :style="{
             color:           item.textColor,            
             fontSize:        item.h + 'px',
             borderRadius:    item.borderRadius + 'px',
             opacity:         item.opacity / 100,
-            textShadow:      item.shadow ? '3px 3px 5px #aaa' : 'none',
+            textShadow:      cssShadow(item),
             }" >{{ item.title }}</span>
 </template>
 
 <script setup lang="ts">
-import { Item } from '../types';
+import { IconItem } from '../types';
+import { cssShadow } from './utils';
 
-const { item } = defineProps<{item: Item}>();
+const { item } = defineProps<{item: IconItem}>();
 
 </script>
 

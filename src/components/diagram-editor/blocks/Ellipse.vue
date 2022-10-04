@@ -4,16 +4,17 @@
             alignItems:      item.textVAlign,
             backgroundColor: item.backgroundColor, 
             color:           item.textColor, 
-            border:          item.border.width + 'px ' + item.border.style + ' ' + item.border.color,
-            fontSize:        item.fontSize + 'px',
+            ...cssTextStyle(item),
             opacity:         item.opacity / 100,
-            boxShadow:       item.shadow ? '3px 3px 5px #aaa' : 'none',
+            border:          cssBorder(item),
+            boxShadow:       cssShadow(item),
         }" ><div><div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }"/></div> 
     </div>
 </template>
 
 <script setup lang="ts">
 import { Item } from '../types';
+import { cssBorder, cssShadow, cssTextStyle } from './utils';
 
 const { item } = defineProps<{item: Item}>();
 

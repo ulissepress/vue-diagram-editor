@@ -37,6 +37,7 @@ export interface InspectorTab {
     sections: InspectorSection[];   // Sections in this tab
 }
 
-export interface ObjectInspectorModel {
+export interface ObjectInspectorModel {    
     tabs: InspectorTab[];           // Tabs in the object inspector
+    singleColumn?: boolean;         // If true, the inspector will be displayed in a single column. Default: false
 }
