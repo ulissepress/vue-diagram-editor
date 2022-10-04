@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance, reactive, ref } from 'vue';
+import { getCurrentInstance, reactive, ref } from 'vue';
 import DiagramEditor from './components/diagram-editor/DiagramEditor.vue';
 import { createConnection, createItem, registerWidgetType } from './components/diagram-editor/helpers';
 import { ConnectionStyle, ConnectionType, DiagramElement, WidgetDefinition } from './components/diagram-editor/types';
@@ -71,15 +71,15 @@ let elements: DiagramElement[] = reactive([
     createConnection('a2', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DASHED, backgroundColor: "#ff0000", thick: 5 }),
 ]);
 
-const polygonPath = computed( () => {
-    let path = '';
-    for(let i = 0; i < points.length; i++) {
-        if(i === 0) path = `M ${points[0].x} ${points[0].y} `;
-        else path += `L ${points[i].x} ${points[i].y} `;
-    }
+// const polygonPath = computed( () => {
+//     let path = '';
+//     for(let i = 0; i < points.length; i++) {
+//         if(i === 0) path = `M ${points[0].x} ${points[0].y} `;
+//         else path += `L ${points[i].x} ${points[i].y} `;
+//     }
 
-    return path;
-})
+//     return path;
+// })
 
 </script>
 
