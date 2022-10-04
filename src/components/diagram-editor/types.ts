@@ -276,10 +276,13 @@ export interface WidgetDefinition {
 
 // Model definition for a diagram (multipage editors)
 export interface DiagramModel {
-    pages: DiagramPage[];
+    id: number;                     // The unique diagram ID
+    title: string;                  // The diagram title
+    private: boolean;               // TRUE if the diagram is for private usage
+    pages: DiagramPage[];           // A diagram can contain 1 or more pages (1 page is like a slide in a powerpoint file)
 }
 
 export interface DiagramPage {
-    title: string;
-    elements: DiagramElement[];
+    title: string;                  // The diagram page title
+    elements: DiagramElement[];     // The diagram page elements (items and connections)
 }
