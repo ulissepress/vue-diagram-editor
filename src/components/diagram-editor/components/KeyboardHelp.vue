@@ -62,7 +62,7 @@ if(!isMac) for(let k of shortcuts) k[0] = k[0].replace('CMD', 'CTRL')
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 16px;
-    color: #4af;
+    color: var(--diagram-primary-color);
 }
 
 .key {

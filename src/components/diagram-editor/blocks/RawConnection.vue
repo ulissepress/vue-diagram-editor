@@ -253,7 +253,7 @@ function elbowPath(x1: number, y1: number, x2: number, y2: number, inverse: bool
 .ghostpath {
     pointer-events: all;
     cursor: pointer; 
-    stroke: #4af;
+    stroke: var(--diagram-primary-color);
     z-index: 0;
 }
 

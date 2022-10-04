@@ -416,7 +416,7 @@ export const iconModel: ObjectInspectorModel = {
                     title: "Icon and Style",
                     properties: [ 
                         { name: "title", label: "Icon", type: PropertyType.TEXT,  editorFullsize: true },
-                        { name: "_1",    label: "",     type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (obj: any, prop: ObjectProperty, value: any) => `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: #4af;'>See available icons</a>` },
+                        { name: "_1",    label: "",     type: PropertyType.TEXT,  editorFullsize: true, readonly: true, formatValue: (obj: any, prop: ObjectProperty, value: any) => `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: white;'>See available icons</a>` },
                         separator$,
                         { name: "textColor", label: "Color",  type: PropertyType.COLOR, editorRightAlign: true },
                         { name: "filled",    label: "Filled", type: PropertyType.BOOLEAN },
