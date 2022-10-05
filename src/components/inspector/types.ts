@@ -11,7 +11,7 @@ export enum PropertyType {
 }
 
 export interface ObjectProperty {
-    name:   string;         // Property name. Example: 'width'
+    name:   string;         // Property name. Example: 'width', 'font.color'
     label?: string;         // Property label. Example: 'Width' (if not provided, name is used)
 
     type?:   PropertyType;   // Property type. Default: PropertyType.TEXT
