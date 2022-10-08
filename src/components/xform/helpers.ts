@@ -1,7 +1,7 @@
 import { BooleanValue, FormulaValue, NumberValue, StringValue } from './types';
 
 export function isFormulaValue(v: any): v is FormulaValue {
-    return typeof(v) !== 'object' && ('$' in v);
+    return typeof(v) === 'object' && ('$' in v);
 }
 
 export function isServerFormula(v: any): boolean {
@@ -41,9 +41,9 @@ export function isEmpty(v: any) : boolean {
 } 
 
 
-export function resolveStringValue(v: StringValue): string {
+export function resolveStringValue(v: StringValue, ctx: any = {}): string {
     if(isFormulaValue(v)) {
-        let r: any = evaluateFormula(v.$);
+        let r: any = evaluateFormula(v.$, ctx);
         return isString(r) ? r : ('' + r);
     }
     else {
@@ -51,9 +51,9 @@ export function resolveStringValue(v: StringValue): string {
     }
 }
 
-export function resolveNumberValue(v: NumberValue): number {
+export function resolveNumberValue(v: NumberValue, ctx: any = {}): number {
     if(isFormulaValue(v)) {
-        let r: any = evaluateFormula(v.$);
+        let r: any = evaluateFormula(v.$, ctx);
         if(isNumber(r)) return r;
         
         try { return parseFloat(r); } catch(err: any) { return 0; }
@@ -63,9 +63,9 @@ export function resolveNumberValue(v: NumberValue): number {
     }
 }
 
-export function resolveBooleanValue(v: BooleanValue): boolean {
+export function resolveBooleanValue(v: BooleanValue, ctx: any = {}): boolean {
     if(isFormulaValue(v)) {
-        let r: any = evaluateFormula(v.$);
+        let r: any = evaluateFormula(v.$, ctx);
         return isBoolean(r) ? r : ('' + r) === 'true';
     }
     else {

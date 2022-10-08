@@ -1,7 +1,16 @@
 <template>
-    <div style="width: 100%; height: 90%; padding-top: 16px; margin: 0 auto; ">
+    <div style="width: 95%; height: 90%; margin: 0 auto; ">
+      
+        <div style="display: flex; width: 100%; height: 100%;">
+            <pre>{{ formModel }}</pre> 
+            <XForm v-model="formModel" :schema="formSchema" />
+        </div>
+        
+       
+       
         <!-- <pre>{{ elements.map(e => { return e.id + ' / ' + e.x + ' / '+ e.y + ' / '+ e.w + ' / '+ e.h }  ) }}</pre> -->
-        <DiagramEditor :elements             = "elements"
+        <DiagramEditor v-if="showDiagramEditor"
+                       :elements             = "elements"
                        :readonly             = "false" 
                        :customWidgets        = "true"
                        :customWidgetsCatalog = "widgets" />
@@ -21,14 +30,85 @@
 
 <script setup lang="ts">
 import { getCurrentInstance, reactive, ref } from 'vue';
-import DiagramEditor from './components/diagram-editor/DiagramEditor.vue';
 import { createConnection, createItem, registerWidgetType } from './components/diagram-editor/helpers';
 import { ConnectionStyle, ConnectionType, DiagramElement, WidgetDefinition } from './components/diagram-editor/types';
 
 import YouTubeWidget, { YoutubeWidgetItem } from './components/custom-widgets/YouTubeWidget.vue';
 import { PropertyType } from './components/inspector/types';
 
-const editable = ref(true);
+
+import { FieldWidth, FormField } from './components/xform/types';
+import XForm from './components/xform/XForm.vue';
+import XFormUtils from './components/xform/XFormUtils';
+
+const showDiagramEditor = ref(false);
+
+const formModel = ref({
+    customer: 'Mario Rossi',
+    address: {
+        city: 'Catania',
+        street: 'Piazza Roma, 14',
+        zip: 95100
+    }
+});
+
+const sectionAfields: FormField[] = [
+    XFormUtils.createField("customer", {
+        label:    "Customer Name", 
+        helpText: "Put here the customer code", 
+        width:    FieldWidth.LARGE 
+    }),
+    XFormUtils.createField("address.city", {
+        label:    { $: "'Address of ' + context.model.customer"}, 
+        helpText: "The customer address", 
+        width:    FieldWidth.SMALL 
+    }),
+    XFormUtils.createField("field_a3", {
+        label:    "Field A3", 
+        helpText: { $: "new Date()" } , 
+        width:    FieldWidth.MEDIUM, 
+        visible:  { $: "context.model.address.city !== 'XXX'" }
+    }),
+
+    XFormUtils.createField("field_a4", {
+        label:    "Field A4", 
+        helpText: { $: "'Customer name is ' + context.model?.customer?.length + ' chars'" } , 
+        width:    FieldWidth.MEDIUM,
+    }),
+];
+
+const sectionBfields: FormField[] = [
+    XFormUtils.createField("field_b1", { width: FieldWidth.XLARGE }),
+    XFormUtils.createField("field_b2", { width: FieldWidth.MEDIUM }),
+    XFormUtils.createField("field_b3", { width: FieldWidth.SMALL  }),
+    XFormUtils.createField("field_b4", { width: FieldWidth.SMALL  }),
+    XFormUtils.createField("field_b5", { width: FieldWidth.XLARGE }),
+]
+
+const sectionCfields: FormField[] = [
+    XFormUtils.createField("field_c1"),
+    XFormUtils.createField("field_c2"),
+    XFormUtils.createField("field_c3"),
+    XFormUtils.createField("field_c4"),
+]
+
+const tab1 = XFormUtils.createTab({ 
+    title: 'Customer Data',
+    sections: [
+        XFormUtils.createSection({ title: "Section A", fields: sectionAfields }),
+        XFormUtils.createSection({ title: "Section B", fields: sectionBfields }),
+        XFormUtils.createSection({ title: "Section C", fields: sectionCfields }),
+    ]
+});
+
+const tab2 = XFormUtils.createTab({ title: { $: " context.model.customer + ' Details'"}});
+
+const formSchema = XFormUtils.createForm({
+    name:  "my_form",
+    title: "Edit Customer",
+    tabs:  [tab1, tab2, XFormUtils.createTab(), XFormUtils.createTab()]
+}); 
+
 
 // const points = reactive([
 //     { id: 'a', x: 100, y: 50  },
