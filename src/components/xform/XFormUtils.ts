@@ -34,8 +34,7 @@ export default new class XFormUtils {
     createField(name: string, field?: Partial<FormField>) : FormField  {
 
         const toBool = (v: BooleanValue | undefined | null, defaultValue: boolean) : BooleanValue => {
-            if(v === undefined || v === null) return defaultValue;
-            return v;
+            return (v === undefined || v === null) ? defaultValue : v;
         }
         
         return {
@@ -46,6 +45,8 @@ export default new class XFormUtils {
             helpText:       field?.helpText         || '',
             prefixIcon:     field?.prefixIcon       || '',
             suffixIcon:     field?.suffixIcon       || '',
+
+            // NOTE: the '||' operator does not work properly for boolean values
             visible:        toBool(field?.visible,  true),
             disabled:       toBool(field?.disabled, false),
             multipleValues: toBool(field?.multipleValues, false),
