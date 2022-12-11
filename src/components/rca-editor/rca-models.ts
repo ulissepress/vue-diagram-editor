@@ -15,12 +15,19 @@ export enum RCA_NodeType {
 }
 
 export interface RCA_Node {
-    id:    string;              // An unique UUID generated for each node
-    title: string;              // The node title
-    type:  RCA_NodeType;        // The node type
+    id:     string;              // An unique UUID generated for each node
+    title:  string;              // The node title
+    type?:  RCA_NodeType;        // The node type
 
-    data: Record<string, any>;  // The data associated with this node
+    data?:   Record<string, any>;  // The data associated with this node
 
-    children?: RCA_Node[];      // The ordered list of children for this node. Can be unedefined, i.e., no children for this node
+    children?: RCA_Node[];        // The ordered list of children for this node. Can be unedefined, i.e., no children for this node
+
+    x: number;
+    y: number;
+    depth: number;
+    maxY: number;
 }
+
+
 

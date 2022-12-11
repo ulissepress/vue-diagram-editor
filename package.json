@@ -10,6 +10,7 @@
   "dependencies": {
     "@ckpack/vue-color": "^1.2.0",
     "@vueuse/core": "^8.9.4",
+    "d3-hierarchy": "^3.1.2",
     "floating-vue": "^2.0.0-beta.20",
     "vue": "^3.2.38",
     "vue3-guides": "^0.1.1",
@@ -18,6 +19,7 @@
     "vue3-selecto": "^1.5.0"
   },
   "devDependencies": {
+    "@types/d3-hierarchy": "^3.1.0",
     "@vitejs/plugin-vue": "^2.3.3",
     "typescript": "^4.5.4",
     "vite": "^2.9.9",

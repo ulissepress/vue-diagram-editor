@@ -1,7 +1,12 @@
 <template>
     <div style="width: 95%; height: 90%; margin: 0 auto; ">
       
-        <div style="display: flex; width: 100%; height: 100%;">
+        <div style="display: flex; width: 100%; height: 100%; border: 1px dashed gray; padding: 8px;">
+            <!-- <pre>{{ treeData }}</pre>  -->
+            <TreeEditor v-model="treeModel"  />
+        </div>
+
+        <div style="display: none; width: 100%; height: 100%;">
             <pre>{{ formModel }}</pre> 
             <XForm v-model="formModel" :schema="formSchema" />
         </div>
@@ -37,9 +42,48 @@ import YouTubeWidget, { YoutubeWidgetItem } from './components/custom-widgets/Yo
 import { PropertyType } from './components/inspector/types';
 
 
+import { RCA_Model, RCA_Node } from './components/rca-editor/rca-models';
+import TreeEditor from './components/rca-editor/TreeEditor.vue';
 import { FieldWidth, FormField } from './components/xform/types';
 import XForm from './components/xform/XForm.vue';
 import XFormUtils from './components/xform/XFormUtils';
+
+const treeData2 = {
+    id: 'rootNode',
+    title: 'Root',
+    children: [
+        createNode('A', [createNode('A1', [createNode('A11'),createNode('A12')]),createNode('A2'), createNode('A3'), createNode('A4'), createNode('A5')]),
+        createNode('B', [createNode('B1'),createNode('B2'),createNode('B3')]),
+        createNode('C', [createNode('C1'),createNode('C2')]),
+        createNode('D'),
+    ]
+};
+
+const treeData = {
+    id: 'rootNode',
+    title: 'Root',
+    children: [
+        createNode('A', [createNode('A1', [createNode('A11', [createNode('A111')])]), createNode('A2')]),
+        createNode('B', [createNode('B1', [createNode('B1.1'), createNode('B1.2'), createNode('B1.3')]), createNode('B2'), createNode('B3', [createNode('B3.1', [createNode('B3.1.1'),createNode('B3.1.2'),createNode('B3.1.3'),createNode('B3.1.4')]), createNode('B3.2'), createNode('B3.3')]), createNode('B4')]),
+        createNode('C', [createNode('C1'),createNode('C2', [createNode('C2.1'), createNode('C2.2'),createNode('C2.3')  ]),createNode('C3')]),
+    ]
+};
+
+const treeModel = ref<RCA_Model>({
+    id: 0,
+    root: treeData
+});
+
+
+function createNode(title: string, children: RCA_Node[]|undefined = undefined) : RCA_Node {
+    let n: RCA_Node = {
+        id: Math.random().toString(36).substring(2),
+        title,
+        children
+    }
+
+    return n;
+}
 
 const showDiagramEditor = ref(false);
 
