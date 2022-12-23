@@ -14,7 +14,7 @@
                           v-model    = "modelValue" 
                           :section   = "section" 
                           :hideTitle = "schema.tabs[currentTab].sections.length === 1" 
-                          @update:model-value = "forceUpdate++" />
+                          @update:model-value = "emit('update:modelValue', modelValue); forceUpdate++" />
         </div>
     </div>
 </template>
@@ -22,6 +22,7 @@
 <script setup lang="ts">
 import { onMounted, onUpdated, provide, ref } from 'vue';
 import { resolveBooleanValue, resolveNumberValue, resolveStringValue } from './helpers';
+import { registerBuiltinEditors } from './registry';
 import { BooleanValue, FormSchema, NumberValue, StringValue } from './types';
 import XFormSection from './XFormSection.vue';
 import XFormTab from './XFormTab.vue';
@@ -50,6 +51,8 @@ const { modelValue, schema } = defineProps<FormProps>();
     // Define Events
 const emit = defineEmits<FormEvents>();
 
+// Register builtin editors for the variout field types
+registerBuiltinEditors();
 
 onMounted(() => {
     console.log('### XForm mounted')
@@ -74,12 +77,19 @@ provide('xform-context', formContext);
 
 </script>
 
+<style>
+.xform, 
+.xform * {
+    box-sizing: border-box;
+    --xform-debug: 0px;
+}
+</style>
 
 <style scoped>
 .xform {
     /* Base font size for the form. All other elements should use 
     font size expressed in 'em' units */
-    font-size: 14px;  
+    font-size: 16px;  
 
     background-color: transparent;
     width:  100%;
@@ -87,12 +97,15 @@ provide('xform-context', formContext);
     max-height: 100%;
     max-width: 100%;
 
-    padding: 8px;
-    overflow: scroll;
+    padding: 0px;
+    overflow: auto;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
+
+    border: var(--xform-debug) dashed gray;
+
 }
+
 
 .form-title {
     flex-grow: 0;
@@ -101,8 +114,22 @@ provide('xform-context', formContext);
     margin-bottom: 1em;
 }
 
+.tab-container {
+    width: 100%;
+    height: auto;
+    padding: 0px;
+    margin-bottom: 4px;
+
+    border: var(--xform-debug) dashed blue;
+}
+
 .section-container {
     flex-grow: 1;
-    overflow: scroll;
+    overflow: auto;
+    width: 100%;
+    padding: 0px;
+
+    border: var(--xform-debug) dashed blue;
+
 }
 </style>

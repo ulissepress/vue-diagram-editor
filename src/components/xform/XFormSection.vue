@@ -8,7 +8,7 @@
                         v-model = "modelValue" 
                         :field  = "field"
                         :style  = "{ width: calculateFieldWidth(field) }"  
-                        @update:model-value = "emit('update:modelValue', modelValue)" />
+                        @update:modelValue = "emit('update:modelValue', modelValue); log('xsection', $event)" />
         </div>
     </div>
 </template>
@@ -38,43 +38,52 @@ const emit = defineEmits<FormSectionEvents>();
 
 const formContext = inject<FormContext>('xform-context')!;
 
+function log(...params: any[]) {
+    console.log(...params);
+}
+
 
 function calculateFieldWidth(f: FormField) : string {
     let w = f.width === FieldWidth.SMALL  ? "25%" :
             f.width === FieldWidth.MEDIUM ? "50%" :
             f.width === FieldWidth.LARGE  ? "75%" : "100%";
     
-    return `calc(${w} - 6px)`;
+    return `calc(${w} - 8px)`;
 }
 </script>
 
 
 <style scoped>
 .xform-section {
-    background-color: #e2e9f2;
+    background-color: transparent; /* #e2e9f2; */
     width: 100%;
     height: auto;
     padding: 0px;
     margin-bottom: 16px;
+
+    border: var(--xform-debug) dashed red;
 }
 
 .section-title {
     font-size: 0.8em;
+    font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 1px;
-    background-color: #c8d3e1;
+    background-color: transparent; /* #c8d3e1; */
     color: #333;
-    padding: 4px;
-    padding-left: 8px;
-    margin-bottom: 8px;
+    padding: 0px;
+    margin-bottom: 12px;
 }
 
 .section-fields-container {
-    width: calc(100% - 24px);
-    background-color: transparent;
-    padding: 4px 16px;
+    width: 100%;
+    background-color: transparent; 
+    padding: 0px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 0px;
+
+    border: var(--xform-debug) dashed green;
+
 }
 </style>
