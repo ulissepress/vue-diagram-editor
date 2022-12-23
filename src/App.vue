@@ -1,7 +1,7 @@
 <template>
     <div style="width: 95%; height: 90%; margin: 0 auto; ">
-
-        <div style="gap: 16px; width: 100%; height: 100%;">
+      
+        <div style="display: flex; width: 100%; height: 100%;">
             <pre>{{ formModel }}</pre> 
             <XForm v-model="formModel" :schema="formSchema" style="background: #dedede; padding: 16px;"/>
         </div>
@@ -39,6 +39,8 @@ import { PropertyType } from './components/inspector/types';
 import { FieldWidth, FormField } from './components/xform/types';
 import XForm from './components/xform/XForm.vue';
 import XFormUtils from './components/xform/XFormUtils';
+
+const showDiagramEditor = ref(false);
 
 const formModel = ref({
     customer: 'Mario Rossi',
