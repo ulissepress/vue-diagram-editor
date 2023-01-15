@@ -1,7 +1,37 @@
 <template>
-    <div style="width: 95%; height: 90%; margin: 0 auto; ">
+    <div style="width: 100%; height: 90%; margin: 20px auto; ">
       
-        <div style="display: flex; width: 100%; height: 100%; border: 1px dashed gray; padding: 8px;">
+        <div style="display: flex; width: 100%; height: 100%; border: 1px dashed gray; padding: 0px;">
+            <HeaderLayout :options="{ height: '150px', sticky: true }">
+                <template #header>
+                    But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was 
+                    born and I will give you a complete account of the system, and expound the actual teachings of the 
+                    great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids 
+                    pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure 
+                    rationally encounter consequences that are extremely painful. Nor again is there anyone who loves<br/>
+                    <p>or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances 
+                    occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us 
+                    ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right 
+                    to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids
+                    a pain that produces no resultant pleasure?</p>
+                </template>
+                
+                <template #header-collapsed>
+                    Now i am collapsed.<br>
+                    But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was 
+                    born and I will give you a complete account of the system, and expound the actual teachings of the 
+                    great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids 
+                    pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure 
+                    rationally encounter consequences that are extremely painful. Nor again is there anyone who loves
+                </template>
+
+                <!-- main content -->
+                <div v-html="loremIpsum(6)"></div>
+             </HeaderLayout>
+
+        </div>
+
+        <div style="display: none; width: 100%; height: 100%; border: 1px dashed gray; padding: 8px;">
             <!-- <pre>{{ treeData }}</pre>  -->
             <TreeEditor v-model="treeModel"  />
         </div>
@@ -10,8 +40,6 @@
             <pre>{{ formModel }}</pre> 
             <XForm v-model="formModel" :schema="formSchema" />
         </div>
-        
-       
        
         <!-- <pre>{{ elements.map(e => { return e.id + ' / ' + e.x + ' / '+ e.y + ' / '+ e.w + ' / '+ e.h }  ) }}</pre> -->
         <DiagramEditor v-if="showDiagramEditor"
@@ -29,7 +57,6 @@
         </SvgEditor>
         <button @click="editable = !editable">EDIT MODE {{ editable }}</button> 
         -->
-
     </div>
 </template>
 
@@ -48,13 +75,16 @@ import { FieldWidth, FormField } from './components/xform/types';
 import XForm from './components/xform/XForm.vue';
 import XFormUtils from './components/xform/XFormUtils';
 
+
+import HeaderLayout from "./components/layouts/HeaderLayout.vue";
+
 const treeData2 = {
     id: 'rootNode',
     title: 'Root',
     children: [
-        createNode('A', [createNode('A1', [createNode('A11'),createNode('A12')]),createNode('A2'), createNode('A3'), createNode('A4'), createNode('A5')]),
-        createNode('B', [createNode('B1'),createNode('B2'),createNode('B3')]),
-        createNode('C', [createNode('C1'),createNode('C2')]),
+        createNode('A', [createNode('A1', [createNode('A11'), createNode('A12')]), createNode('A2'), createNode('A3'), createNode('A4'), createNode('A5')]),
+        createNode('B', [createNode('B1'), createNode('B2'), createNode('B3')]),
+        createNode('C', [createNode('C1'), createNode('C2')]),
         createNode('D'),
     ]
 };
@@ -204,6 +234,19 @@ let elements: DiagramElement[] = reactive([
 
 //     return path;
 // })
+
+
+function loremIpsum(n: number = 1) : string {
+    let h = '';
+    for(let i = 0; i<n; i++) h += `
+        <div><strong><big>${i+1}</big></strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+           dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip 
+           ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+           fugiat nulla pariatur.<br>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt 
+           mollit anim id est laborum.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip 
+           ex ea commodo consequat.</div><br/>`;
+    return h;
+}
 
 </script>
 
