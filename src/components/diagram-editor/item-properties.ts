@@ -1,5 +1,5 @@
 import { ClipType, ConnectionMarker, ConnectionStyle, ConnectionType, TextDecoration, TextHAlign, TextTransform, TextVAlign } from './types';
-import { InspectorTab, PropertyType } from '../inspector/types';
+import { InspectorSection, InspectorTab, PropertyType } from '../inspector/types';
 import { ObjectInspectorModel, ObjectProperty } from './../inspector/types';
 
 export const separator$ : ObjectProperty = { name: "" };
@@ -37,7 +37,7 @@ export const radius$  : ObjectProperty = { name: "borderRadius",  label: "Radius
 export const opacity$ : ObjectProperty = { name: "opacity",       label: "Opacity %", type: PropertyType.RANGE, editorFullsize: true, editorOptions: { min: 0,    max: 100, step: 1 }};
 
 
-export const textStyleSection$ = {   // TextStyle
+export const textStyleSection$ : InspectorSection = {   // TextStyle
     name: "text_style",
     title: "Text",
     properties: [
@@ -66,7 +66,7 @@ export const textStyleSection$ = {   // TextStyle
     ] 
 }
 
-export const borderSection$ = {   // Border
+export const borderSection$ : InspectorSection = {   // Border
     name: "border",
     title: "Border",
     properties: [
@@ -81,7 +81,7 @@ export const borderSection$ = {   // Border
     ] 
 }
 
-export const shadowSection$ = {   // Shadow
+export const shadowSection$ : InspectorSection = {   // Shadow
     name: "shadow",
     title: "Shadow",
     properties: [
@@ -93,7 +93,7 @@ export const shadowSection$ = {   // Shadow
     ] 
 }
 
-export const borderWithoutRadiusSection$ = {   // Border
+export const borderWithoutRadiusSection$ : InspectorSection = {   // Border
     name: "border",
     title: "Border",
     properties: [

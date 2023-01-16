@@ -48,7 +48,6 @@ export interface ObjectInspectorProps {
 }
 
 export interface ObjectInspectorEvents {
-    (e: 'drag', event: any): void
     (e: 'property-changed', property: ObjectProperty, oldValue: any, newValue: any, emitCommand: boolean): void
 }
 
