@@ -22,12 +22,9 @@
         </div>
 
         <!-- Main Content -->
-        <div class="main-content" :style="{
-            overflow: options.sticky ? 'scroll' : 'visible'
-        }">
+        <div class="main-content" :style="{ overflow: options.sticky ? 'scroll' : 'visible' }">
             <slot></slot>
         </div>
-        <!-- <pre>{{ options }}</pre> -->
     </div>
 </template>
 

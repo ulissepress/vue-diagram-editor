@@ -3,10 +3,12 @@
         <div class="field-label">
             {{ formContext.resolveString(field.label || field.name) }}
         </div>
-        <div class="field-editor" style="width: calc(100% - 8px)">
-            <TextEditor :object   = "modelValue" 
-                        :property = "{ name: field.name }" 
-                        @property-changed="emit('update:modelValue', modelValue)" />
+        <div class="field-editor">
+            <!-- The component use 'localValue' as v-model, then intercepts the update:modelValue event to set the new value in the modelValue object path-->
+            <component :is                 = "getEditorForFieldType(field.type)[0]" 
+                        v-bind             = "getEditorForFieldType(field.type)[1]" 
+                        v-model            = "localValue"
+                        @update:modelValue = "updateModel" /> 
         </div>
         <div v-if="!isEmpty(field.helpText)" class="field-help">
             {{ formContext.resolveString(field.helpText || '') }}
@@ -15,9 +17,10 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from 'vue';
-import TextEditor from '../inspector/property-editors/TextEditor.vue';
+import { inject, ref } from 'vue';
+import { getObjectValue, setObjectValue } from '../inspector/property-editors/utils';
 import { isEmpty } from './helpers';
+import { getEditorForFieldType } from './registry';
 import { FormField } from './types';
 import { FormContext } from './XForm.vue';
 
@@ -26,18 +29,18 @@ export interface FormFieldProps {
     field: FormField
 }
 
-export interface FormFieldEvents {
-    (e: 'update:modelValue', modelValue: object ): void    
-}
-
 // Define Props
 const { modelValue, field } = defineProps<FormFieldProps>();
 
-    // Define Events
-const emit = defineEmits<FormFieldEvents>();
-
 const formContext = inject<FormContext>('xform-context')!;
 
+// The local value is initialized reading the field.name path from the object model
+const localValue = ref<any>(getObjectValue(modelValue, field.name));
+
+function updateModel(value: any) {
+    localValue.value = value;  
+    setObjectValue(modelValue, field.name, value);
+}
 </script>
 
 
@@ -48,7 +51,11 @@ const formContext = inject<FormContext>('xform-context')!;
     width:  100%;
     height: auto;
     padding: 0px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
+    margin-right: 8px;
+
+    border: var(--xform-debug) dashed blue;
+
 }
 
 .field-label {
@@ -60,7 +67,9 @@ const formContext = inject<FormContext>('xform-context')!;
 }
 
 .field-editor {
+    width: 100%;
     font-size: 1em;
+    border: var(--xform-debug) dashed blue;    
 }
 
 .field-help {

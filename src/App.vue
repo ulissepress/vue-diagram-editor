@@ -38,15 +38,16 @@
 
         <div style="display: none; width: 100%; height: 100%;">
             <pre>{{ formModel }}</pre> 
-            <XForm v-model="formModel" :schema="formSchema" />
+            <XForm v-model="formModel" :schema="formSchema" style="background: #dedede; padding: 16px;"/>
         </div>
        
         <!-- <pre>{{ elements.map(e => { return e.id + ' / ' + e.x + ' / '+ e.y + ' / '+ e.w + ' / '+ e.h }  ) }}</pre> -->
-        <DiagramEditor v-if="showDiagramEditor"
+        <!-- <DiagramEditor v-if="showDiagramEditor"
                        :elements             = "elements"
                        :readonly             = "false" 
                        :customWidgets        = "true"
-                       :customWidgetsCatalog = "widgets" />
+                       :customWidgetsCatalog = "widgets" /> 
+        -->
         <!-- 
         <SvgEditor v-model="points" :editable="editable">
             <template #ui="{ points, editable }">
@@ -139,7 +140,7 @@ const sectionAfields: FormField[] = [
     }),
     XFormUtils.createField("field_a3", {
         label:    "Field A3", 
-        helpText: { $: "new Date()" } , 
+        helpText: { $: "context.model.customer + ' timestamp=' + new Date()*1" } , 
         width:    FieldWidth.MEDIUM, 
         visible:  { $: "context.model.address.city !== 'XXX'" }
     }),
@@ -160,10 +161,15 @@ const sectionBfields: FormField[] = [
 ]
 
 const sectionCfields: FormField[] = [
-    XFormUtils.createField("field_c1"),
+    XFormUtils.createField("field_c1a", { width: FieldWidth.SMALL }),
+    XFormUtils.createField("field_c1b", { width: FieldWidth.LARGE }),
     XFormUtils.createField("field_c2"),
-    XFormUtils.createField("field_c3"),
-    XFormUtils.createField("field_c4"),
+    XFormUtils.createField("field_c3", { width: FieldWidth.MEDIUM }),
+    XFormUtils.createField("field_c4", { width: FieldWidth.MEDIUM }),
+    XFormUtils.createField("field_c5", { width: FieldWidth.SMALL }),
+    XFormUtils.createField("field_c6", { width: FieldWidth.SMALL }),
+    XFormUtils.createField("field_c7", { width: FieldWidth.SMALL }),
+    XFormUtils.createField("field_c8", { width: FieldWidth.SMALL }),
 ]
 
 const tab1 = XFormUtils.createTab({ 
@@ -179,8 +185,8 @@ const tab2 = XFormUtils.createTab({ title: { $: " context.model.customer + ' Det
 
 const formSchema = XFormUtils.createForm({
     name:  "my_form",
-    title: "Edit Customer",
-    tabs:  [tab1, tab2, XFormUtils.createTab(), XFormUtils.createTab()]
+    //title: "Edit Customer",
+    tabs:  [tab1, tab2, XFormUtils.createTab(), XFormUtils.createTab() ]
 }); 
 
 
