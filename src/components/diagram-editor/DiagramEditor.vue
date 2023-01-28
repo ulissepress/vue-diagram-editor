@@ -1131,7 +1131,6 @@ function onSelectionEnd(e: any) {
     --diagram-primary-color: v-bind(editorTheme.primaryColor);
 
     position: relative;
-    border: 1px solid #ccc;
     width: 100%;
     height: 100%;    
     background-color: white;
@@ -1169,7 +1168,6 @@ function onSelectionEnd(e: any) {
 
 .editor-container {
     position: relative;
-    border: 1px solid #ccc;
     width: 100%;
     height: 100%;    
     background-color: white;

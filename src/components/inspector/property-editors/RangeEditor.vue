@@ -6,7 +6,7 @@
            :max    = "property.editorOptions?.max  || 100" 
            :step   = "property.editorOptions?.step || 1" 
            @input  = "onChange($event, false)" 
-           @change = "onChange($event, true)" />
+           @change = "onChange($event, true)" /> 
 
     <NumberEditor :object="object" :property="property" @property-changed="onNumericValueChanged" />
 </template>
@@ -39,6 +39,7 @@ const originalValue = ref(0);
 onMounted(() => {
     originalValue.value = getObjectValue(object, property.name)
 })
+
 
 function convertValue(value: string): number {
     let v = parseFloat(value);
